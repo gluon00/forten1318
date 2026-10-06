@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>의정부시일시청소년쉼터 MBTI 검사</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { background-color: #fff; width: 100%; max-width: 600px; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #2c3e50; text-align: center; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .policy-box { border: 1px solid #ccc; padding: 15px; height: 150px; overflow-y: scroll; background-color: #f9f9f9; font-size: 13px; line-height: 1.5; margin-bottom: 10px; }
+        .btn { width: 100%; padding: 15px; background-color: #3498db; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        .btn:hover { background-color: #2980b9; }
+        .question-card { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #3498db; }
+        .options label { display: block; padding: 10px; background: #fff; border: 1px solid #ddd; margin-bottom: 10px; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+        .options label:hover { background: #eef2f5; }
+        .options input[type="radio"] { margin-right: 10px; }
+        .result-box { text-align: center; padding: 30px; background-color: #eaf2f8; border-radius: 10px; margin-bottom: 20px; }
+        .result-mbti { font-size: 48px; font-weight: bold; color: #e74c3c; margin: 10px 0; }
+        .satisfaction { display: flex; justify-content: space-between; margin-top: 10px; }
+        .satisfaction label { text-align: center; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 1. 개인정보 수집 및 기본 정보 입력 화면 -->
+    <div id="step1" class="section active">
+        <h2>MBTI 검사 시작하기</h2>
+        <p style="text-align:center; font-size:14px; color:#666;">의정부시일시청소년쉼터(이동형)</p>
+        
+        <div class="form-group">
+            <label>개인정보 수집 및 이용 동의</label>
+            <div class="policy-box">
+                의정부시일시청소년쉼터(이동형)(이하 '기관'이라 한다)는 개인정보 보호법 제30조에 따라 정보 주체의 개인정보를 보호하고, 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 다음과 같이 개인정보 처리지침을 수립하고 공개합니다.<br><br>
+                1. 개인정보 수집 및 이용 목적: 기관은 수집한 개인정보를 서비스 제공 및 이용자 식별을 위해 사용합니다.<br>
+                2. 수집하는 개인정보 항목: 필수 항목 (이름, 성별, 나이)<br>
+                3. 개인정보 보유 및 이용 기간: 수집된 개인정보는 수집 및 이용 목적이 달성된 후 즉시 파기합니다.<br>
+                4. 개인정보의 제3자 제공: 기관은 이용자의 동의 없이 개인정보를 제3자에게 제공하지 않습니다.<br>
+                5. 동의 거부 시 불이익: 개인정보 제공 및 이용동의는 필수 사항입니다. 동의하지 않을 경우 서비스 이용이 제한될 수 있습니다.
+            </div>
+            <label><input type="checkbox" id="agree"> 위 개인정보 수집 및 이용에 동의합니다. (필수)</label>
+        </div>
+
+        <div class="form-group">
+            <label>이름</label>
+            <input type="text" id="userName" placeholder="이름을 입력하세요">
+        </div>
+        <div class="form-group">
+            <label>성별</label>
+            <label style="display:inline; margin-right:20px; font-weight:normal;"><input type="radio" name="gender" value="남성"> 남성</label>
+            <label style="display:inline; font-weight:normal;"><input type="radio" name="gender" value="여성"> 여성</label>
+        </div>
+        <div class="form-group">
+            <label>나이</label>
+            <input type="number" id="userAge" placeholder="나이를 입력하세요 (예: 18)">
+        </div>
+
+        <button class="btn" onclick="startTest()">검사 시작하기</button>
+    </div>
+
+    <!-- 2. 문제 풀이 화면 -->
+    <div id="step2" class="section">
+        <h2>MBTI 검사 (20문항)</h2>
+        <div id="questionContainer"></div>
+        <button class="btn" onclick="calculateResult()">결과 보기</button>
+    </div>
+
+    <!-- 3. 결과 및 만족도 조사 화면 -->
+    <div id="step3" class="section">
+        <h2>검사 결과</h2>
+        <div class="result-box">
+            <p><span id="resName"></span>님의 MBTI 유형은</p>
+            <div class="result-mbti" id="resMbti">ENFP</div>
+            <p>입니다!</p>
+        </div>
+
+        <div class="form-group">
+            <label>오늘 진행한 검사 및 활동에 얼마나 만족하시나요?</label>
+            <div class="satisfaction">
+                <label><input type="radio" name="satisfaction" value="1"><br>1점<br>(매우 불만족)</label>
+                <label><input type="radio" name="satisfaction" value="2"><br>2점</label>
+                <label><input type="radio" name="satisfaction" value="3"><br>3점<br>(보통)</label>
+                <label><input type="radio" name="satisfaction" value="4"><br>4점</label>
+                <label><input type="radio" name="satisfaction" value="5"><br>5점<br>(매우 만족)</label>
+            </div>
+        </div>
+
+        <button class="btn" id="submitBtn" onclick="submitData()">구글 드라이브로 제출하기</button>
+    </div>
+
+    <!-- 4. 제출 완료 화면 -->
+    <div id="step4" class="section">
+        <h2>제출 완료!</h2>
+        <p style="text-align:center;">참여해 주셔서 감사합니다. 모든 데이터가 성공적으로 저장되었습니다.</p>
+    </div>
+
+</div>
+
+<script>
+    // 구글 앱스 스크립트 웹 앱 URL을 여기에 붙여넣으세요!
+    const scriptURL = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
+
+    const questions = [
+        // E/I 문항 (1~5)
+        { q: "주말을 보낼 때 나는:", a: "사람들과 어울리며 에너지를 얻는다.", b: "혼자만의 시간을 가지며 에너지를 얻는다.", typeA: "E", typeB: "I" },
+        { q: "새로운 모임에 참석했을 때:", a: "먼저 사람들에게 다가가 대화를 주도한다.", b: "누군가 다가와 줄 때까지 기다리는 편이다.", typeA: "E", typeB: "I" },
+        { q: "스트레스를 받을 때 나는:", a: "친구들을 만나서 수다를 떨며 푼다.", b: "혼자 조용히 생각하거나 휴식을 취한다.", typeA: "E", typeB: "I" },
+        { q: "대화를 할 때 나는 주로:", a: "내 생각을 적극적으로 말하는 편이다.", b: "다른 사람의 이야기를 주로 듣는 편이다.", typeA: "E", typeB: "I" },
+        { q: "나의 평소 성향은:", a: "활동적이고 사교적이다.", b: "조용하고 신중하다.", typeA: "E", typeB: "I" },
+        // S/N 문항 (6~10)
+        { q: "사물을 볼 때 나는:", a: "있는 그대로의 사실과 세부사항에 집중한다.", b: "이면에 숨겨진 의미나 전체적인 흐름을 본다.", typeA: "S", typeB: "N" },
+        { q: "일을 처리할 때 나는:", a: "기존의 검증된 매뉴얼을 따르는 것이 좋다.", b: "새롭고 창의적인 방식을 시도하는 것이 좋다.", typeA: "S", typeB: "N" },
+        { q: "대화할 때 나는:", a: "현실적이고 구체적인 이야기를 좋아한다.", b: "상상이나 미래에 대한 이야기를 좋아한다.", typeA: "S", typeB: "N" },
+        { q: "나의 주된 관심사는:", a: "'현재'에 무엇이 일어나고 있는가 이다.", b: "'미래'에 어떤 가능성이 있는가 이다.", typeA: "S", typeB: "N" },
+        { q: "무언가를 배울 때 나는:", a: "실용적이고 직접 활용할 수 있는 것이 좋다.", b: "개념적이고 이론적인 것을 배우는 것이 좋다.", typeA: "S", typeB: "N" },
+        // T/F 문항 (11~15)
+        { q: "결정을 내릴 때 나는:", a: "논리적이고 객관적인 사실을 바탕으로 한다.", b: "사람들의 감정과 상황을 고려하여 결정한다.", typeA: "T", typeB: "F" },
+        { q: "친구가 고민을 이야기할 때 나는:", a: "문제 해결을 위한 조언이나 방법을 먼저 제시한다.", b: "친구의 감정에 먼저 공감하고 위로해 준다.", typeA: "T", typeB: "F" },
+        { q: "논쟁이 발생했을 때 더 중요한 것은:", a: "무엇이 옳고 그른지 사실을 밝히는 것", b: "서로의 감정이 상하지 않게 합의점을 찾는 것", typeA: "T", typeB: "F" },
+        { q: "나를 더 잘 설명하는 단어는:", a: "분석적, 이성적", b: "따뜻함, 공감적", typeA: "T", typeB: "F" },
+        { q: "일을 평가할 때 우선하는 것은:", a: "공정성과 정확한 결과", b: "참여한 사람들의 노력과 관계", typeA: "T", typeB: "F" },
+        // J/P 문항 (16~20)
+        { q: "여행을 갈 때 나는:", a: "일정과 숙소를 미리 철저하게 계획한다.", b: "그때그때 상황에 맞춰 유연하게 다닌다.", typeA: "J", typeB: "P" },
+        { q: "업무나 과제를 할 때:", a: "미리미리 계획을 세워 여유 있게 끝낸다.", b: "마감일이 다가와야 집중력이 생겨 몰아서 한다.", typeA: "J", typeB: "P" },
+        { q: "나의 방이나 책상 상태는:", a: "물건들이 제자리에 잘 정돈되어 있다.", b: "다소 흐트러져 있지만 나는 어디 있는지 안다.", typeA: "J", typeB: "P" },
+        { q: "갑작스러운 일정 변경이 생기면:", a: "당황스럽고 스트레스를 받는 편이다.", b: "그럴 수 있다고 생각하고 융통성 있게 대처한다.", typeA: "J", typeB: "P" },
+        { q: "내가 선호하는 라이프스타일은:", a: "체계적이고 예측 가능한 생활", b: "자유롭고 즉흥적인 생활", typeA: "J", typeB: "P" }
+    ];
+
+    let userInfo = {};
+    let finalMBTI = "";
+
+    function startTest() {
+        const agree = document.getElementById('agree').checked;
+        const name = document.getElementById('userName').value;
+        const gender = document.querySelector('input[name="gender"]:checked');
+        const age = document.getElementById('userAge').value;
+
+        if(!agree) return alert("개인정보 수집 및 이용에 동의해주세요.");
+        if(!name) return alert("이름을 입력해주세요.");
+        if(!gender) return alert("성별을 선택해주세요.");
+        if(!age) return alert("나이를 입력해주세요.");
+
+        userInfo = { name: name, gender: gender.value, age: age };
+        renderQuestions();
+        showSection('step2');
+    }
+
+    function renderQuestions() {
+        const container = document.getElementById('questionContainer');
+        let html = '';
+        questions.forEach((q, index) => {
+            html += `
+                <div class="question-card">
+                    <p><strong>Q${index + 1}.</strong> ${q.q}</p>
+                    <div class="options">
+                        <label><input type="radio" name="q${index}" value="${q.typeA}"> ${q.a}</label>
+                        <label><input type="radio" name="q${index}" value="${q.typeB}"> ${q.b}</label>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        window.scrollTo(0,0);
+    }
+
+    function calculateResult() {
+        let scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+        for (let i = 0; i < 20; i++) {
+            let selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if (!selected) return alert(`${i + 1}번 문항을 선택하지 않았습니다.`);
+            scores[selected.value]++;
+        }
+
+        let mbti = "";
+        mbti += (scores.E >= scores.I) ? "E" : "I";
+        mbti += (scores.S >= scores.N) ? "S" : "N";
+        mbti += (scores.T >= scores.F) ? "T" : "F";
+        mbti += (scores.J >= scores.P) ? "J" : "P";
+        
+        finalMBTI = mbti;
+        document.getElementById('resName').innerText = userInfo.name;
+        document.getElementById('resMbti').innerText = finalMBTI;
+        showSection('step3');
+        window.scrollTo(0,0);
+    }
+
+    function submitData() {
+        const satisfaction = document.querySelector('input[name="satisfaction"]:checked');
+        if (!satisfaction) return alert("만족도 별점을 체크해주세요.");
+
+        document.getElementById('submitBtn').innerText = "제출 중...";
+        document.getElementById('submitBtn').disabled = true;
+
+        const formData = new URLSearchParams();
+        formData.append('name', userInfo.name);
+        formData.append('gender', userInfo.gender);
+        formData.append('age', userInfo.age);
+        formData.append('mbti', finalMBTI);
+        formData.append('satisfaction', satisfaction.value);
+
+        fetch(scriptURL, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            showSection('step4');
+        })
+        .catch(error => {
+            alert('데이터 제출 중 오류가 발생했습니다. 담당자에게 문의하세요.');
+            document.getElementById('submitBtn').innerText = "구글 드라이브로 제출하기";
+            document.getElementById('submitBtn').disabled = false;
+        });
+    }
+
+    function showSection(id) {
+        document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+</script>
+</body>
+</html>
