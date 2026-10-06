@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>소식지 구독 신청</title>
+<style>
+  body {
+    font-family: 'Malgun Gothic', sans-serif;
+    background-color: #f4f4f9;
+    padding: 20px;
+  }
+  .form-container {
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  h2 {
+    text-align: center;
+    color: #333;
+  }
+  .terms-box {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 15px;
+    height: 150px;
+    overflow-y: scroll;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 15px;
+  }
+  .form-group {
+    margin-bottom: 15px;
+  }
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 14px;
+  }
+  .form-group input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* 패딩 포함 넓이 계산 */
+  }
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #d9534f; /* 필수 강조 색상 */
+  }
+  .checkbox-group input {
+    margin-right: 8px;
+    transform: scale(1.2);
+  }
+  .submit-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .submit-btn:hover {
+    background-color: #004494;
+  }
+  /* 로딩 표시용 */
+  .loading {
+    display: none;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #0056b3;
+  }
+</style>
+</head>
+<body>
+
+<div class="form-container">
+  <h2>소식지 구독 신청</h2>
+  
+  <div class="terms-box">
+    <strong>※ 개인정보 수집 및 이용 동의</strong><br>
+    의정부시일시청소년쉼터(이동형)(이하 '기관'이라 한다)는 개인정보 보호법 제30조에 따라 정보 주체의 개인정보를 보호하고, 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 다음과 같이 개인정보 처리지침을 수립하고 공개합니다.<br><br>
+    
+    <strong>1. 개인정보 수집 및 이용 목적</strong><br>
+    기관은 수집한 개인정보를 서비스 제공 및 이용자 식별을 위해 사용합니다.<br><br>
+    
+    <strong>2. 수집하는 개인정보 항목</strong><br>
+    기관은 서비스 제공을 위해 다음과 같은 개인 정보를 수집합니다.<br>
+    - 필수 항목: 이름, 이메일 or 연락처<br><br>
+    
+    <strong>3. 개인정보 보유 및 이용 기간</strong><br>
+    수집된 개인정보는 수집 및 이용 목적이 달성된 후 즉시 파기합니다. 다만, 관련 법령에 따라 보관이 필요한 경우 해당 법령에서 정한 기간 동안 보관됩니다.<br><br>
+    
+    <strong>4. 개인정보의 제3자 제공</strong><br>
+    기관은 이용자의 동의 없이 개인정보를 제3자에게 제공하지 않습니다. 단, 다음의 경우 예외로 합니다.<br>
+    - 이용자가 사전에 동의한 경우<br>
+    - 법령에 따라 제공이 요구되는 경우<br><br>
+    
+    <strong>5. 동의 거부 시 불이익</strong><br>
+    개인정보 제공 및 이용동의는 필수 사항입니다. 동의하지 않을 경우 서비스 이용이 제한될 수 있습니다.
+  </div>
+
+  <form id="subscribeForm" name="subscribeForm">
+    <div class="checkbox-group">
+      <input type="checkbox" id="consent" name="consent" value="동의함" required>
+      <label for="consent">(필수) 개인정보 수집 및 이용에 동의합니다.</label>
+    </div>
+
+    <div class="form-group">
+      <label for="name">이름</label>
+      <input type="text" id="name" name="name" placeholder="이름을 입력해주세요" required>
+    </div>
+
+    <div class="form-group">
+      <label for="contact">이메일 또는 연락처</label>
+      <input type="text" id="contact" name="contact" placeholder="이메일 주소 또는 전화번호" required>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submitBtn">제출</button>
+    <div class="loading" id="loadingText">데이터를 전송 중입니다... 잠시만 기다려주세요.</div>
+  </form>
+</div>
+
+<script>
+  // ★ 1단계에서 복사한 웹 앱 URL을 아래 따옴표 안에 넣어주세요!
+  const scriptURL = 'https://script.google.com/macros/s/AKfycby-TLTE5sCqQ99l7Mn4aLk0xIWjUpCnxK2bXMpaDrE8y4ruumk5PGbaYGBkm72iDVy0AA/exec';
+  const form = document.forms['subscribeForm'];
+  const submitBtn = document.getElementById('submitBtn');
+  const loadingText = document.getElementById('loadingText');
+
+  form.addEventListener('submit', e => {
+    e.preventDefault(); // 기본 제출 새로고침 방지
+    
+    // 버튼 비활성화 및 로딩 메시지 표시
+    submitBtn.disabled = true;
+    loadingText.style.display = 'block';
+
+    fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+      .then(response => {
+        alert("소식지 구독 신청이 완료되었습니다. 감사합니다!");
+        form.reset(); // 폼 내용 초기화
+        submitBtn.disabled = false;
+        loadingText.style.display = 'none';
+      })
+      .catch(error => {
+        alert("전송 중 오류가 발생했습니다. 다시 시도해주세요.");
+        console.error('Error!', error.message);
+        submitBtn.disabled = false;
+        loadingText.style.display = 'none';
+      });
+  });
+</script>
+
+</body>
+</html>
