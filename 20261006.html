@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정보 및 위치 제출 폼</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; max-width: 400px; margin: auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { width: 100%; padding: 12px; background-color: #4285F4; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        button:hover { background-color: #3367D6; }
+        #status { margin-top: 15px; text-align: center; font-weight: bold; color: #d93025; }
+    </style>
+</head>
+<body>
+
+    <h2>개인정보 및 위치 제출</h2>
+    
+    <form id="dataForm">
+        <div class="form-group">
+            <label for="name">이름:</label>
+            <input type="text" id="name" name="name" required placeholder="홍길동">
+        </div>
+        <div class="form-group">
+            <label for="age">나이:</label>
+            <input type="number" id="age" name="age" required placeholder="25">
+        </div>
+        <div class="form-group">
+            <label for="gender">성별:</label>
+            <select id="gender" name="gender">
+                <option value="남성">남성</option>
+                <option value="여성">여성</option>
+                <option value="선택안함">선택안함</option>
+            </select>
+        </div>
+
+        <!-- 위치 정보를 담을 숨겨진 필드 -->
+        <input type="hidden" id="latitude" name="latitude">
+        <input type="hidden" id="longitude" name="longitude">
+
+        <button type="button" onclick="getLocationAndSubmit()">위치 정보 포함하여 제출하기</button>
+    </form>
+
+    <div id="status"></div>
+
+    <script>
+        // ★여기에 구글 Apps Script 배포 후 얻은 웹앱 URL을 붙여넣으세요★
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzVAZQl2kBXjQGoZEXyZ4S4jMHV01JNhHAUXTo40QZX3ow0q6wJWOBFRdPKAY2L017Byw/exec';
+
+        function getLocationAndSubmit() {
+            const statusDiv = document.getElementById('status');
+            
+            // 필수 입력값 확인
+            const form = document.getElementById('dataForm');
+            if(!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            statusDiv.innerText = "위치 정보를 가져오는 중입니다...";
+            statusDiv.style.color = "#1a73e8";
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(submitForm, showError);
+            } else {
+                statusDiv.innerText = "이 브라우저에서는 위치 정보를 지원하지 않습니다.";
+                statusDiv.style.color = "#d93025";
+            }
+        }
+
+        function submitForm(position) {
+            document.getElementById('latitude').value = position.coords.latitude;
+            document.getElementById('longitude').value = position.coords.longitude;
+
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerText = "구글 드라이브로 데이터 전송 중...";
+
+            const form = document.getElementById('dataForm');
+            const formData = new FormData(form);
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors', // CORS 에러 방지용
+                body: formData
+            })
+            .then(() => {
+                statusDiv.innerText = "✅ 성공적으로 구글 드라이브에 저장되었습니다!";
+                statusDiv.style.color = "#0f9d58";
+                form.reset();
+            })
+            .catch(error => {
+                console.error('Error!', error);
+                statusDiv.innerText = "❌ 제출 중 오류가 발생했습니다.";
+                statusDiv.style.color = "#d93025";
+            });
+        }
+
+        function showError(error) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.style.color = "#d93025";
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    statusDiv.innerText = "위치 정보 제공이 거부되었습니다.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    statusDiv.innerText = "위치 정보를 사용할 수 없습니다.";
+                    break;
+                case error.TIMEOUT:
+                    statusDiv.innerText = "위치 정보를 가져오는 데 시간이 초과되었습니다.";
+                    break;
+                default:
+                    statusDiv.innerText = "알 수 없는 오류가 발생했습니다.";
+                    break;
+            }
+        }
+    </script>
+
+</body>
+</html>
