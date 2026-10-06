@@ -4,60 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>의정부시일시청소년쉼터 MBTI 검사</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
     <style>
+        :root { --ink:#252a4a; --p:#5b5bd6; --pl:#eceaff; --y:#ffd23f; --pk:#ff7ab6; --mint:#3ecfb2; --bg:#eef0ff; --c:#5b5bd6; }
         * { box-sizing: border-box; }
         html { -webkit-text-size-adjust: 100%; }
-        body { font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; background-color: #f4f7f6; margin: 0; padding: clamp(10px, 3vw, 40px); display: flex; justify-content: center; word-break: keep-all; line-height: 1.5; }
-        .container { background-color: #fff; width: 100%; max-width: 720px; padding: clamp(18px, 4vw, 40px); border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1, h2 { color: #2c3e50; text-align: center; font-size: clamp(20px, 4.5vw, 28px); margin-top: 0; }
+        body { font-family: 'Malgun Gothic','Apple SD Gothic Neo',sans-serif; color: var(--ink); margin: 0; padding: clamp(10px,3vw,40px); display: flex; justify-content: center; word-break: keep-all; line-height: 1.55;
+            background: radial-gradient(circle at 10% 8%, #ffe9a8 0, transparent 22%), radial-gradient(circle at 92% 15%, #ffc6e0 0, transparent 24%), radial-gradient(circle at 85% 92%, #b9f1e5 0, transparent 26%), var(--bg); background-attachment: fixed; min-height: 100vh; }
+        h1, h2, .jua { font-family: 'Jua','Malgun Gothic',sans-serif; font-weight: 400; }
+        .container { background: #fff; width: 100%; max-width: 720px; border-radius: 24px; box-shadow: 0 10px 30px rgba(91,91,214,.18); overflow: hidden; align-self: flex-start; }
+        .body { padding: clamp(18px,4vw,36px); }
+        .hero { background: linear-gradient(135deg, var(--p), #8a6bf0 55%, var(--pk)); color: #fff; text-align: center; padding: clamp(26px,6vw,44px) 20px; position: relative; overflow: hidden; }
+        .hero::before, .hero::after { content:""; position:absolute; border-radius:50%; background: rgba(255,255,255,.16); }
+        .hero::before { width:150px; height:150px; left:-40px; top:-50px; }
+        .hero::after { width:110px; height:110px; right:-25px; bottom:-45px; background: rgba(255,210,63,.45); }
+        .hero > * { position: relative; z-index: 1; }
+        .hero .emoji { font-size: clamp(40px,9vw,56px); line-height: 1; }
+        .hero h2 { color:#fff; margin: 8px 0 4px; font-size: clamp(24px,6vw,34px); }
+        .hero p { margin:0; font-size:14px; opacity:.92; }
         .section { display: none; }
         .section.active { display: block; }
         .form-group { margin-bottom: 20px; }
         label { display: block; font-weight: bold; margin-bottom: 8px; }
-        input[type="text"], input[type="number"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
-        .policy-box { border: 1px solid #ccc; padding: 15px; height: 160px; overflow-y: scroll; background-color: #f9f9f9; font-size: 13px; line-height: 1.6; margin-bottom: 10px; }
-        .inline-label { display: inline-block; margin-right: 20px; font-weight: normal; }
-        .btn { width: 100%; padding: 15px; background-color: #3498db; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 10px; }
-        .btn:hover { background-color: #2980b9; }
-        .btn:disabled { background-color: #95a5a6; cursor: default; }
-        .question-card { background-color: #f8f9fa; padding: clamp(14px, 3vw, 22px); border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #3498db; }
-        .question-card p { margin-top: 0; }
-        .options label { display: flex; align-items: flex-start; gap: 10px; padding: 12px; background: #fff; border: 1px solid #ddd; margin-bottom: 10px; border-radius: 6px; cursor: pointer; font-weight: normal; transition: 0.3s; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 13px 14px; border: 2px solid #dcdcf5; border-radius: 12px; font-size: 16px; color: var(--ink); transition: .2s; }
+        input[type="text"]:focus, input[type="number"]:focus { outline: none; border-color: var(--p); box-shadow: 0 0 0 4px var(--pl); }
+        input[type="radio"], input[type="checkbox"] { accent-color: var(--p); width: 18px; height: 18px; }
+        .policy-box { border: 2px solid #dcdcf5; padding: 15px; height: 150px; overflow-y: scroll; background: #fafaff; border-radius: 12px; font-size: 13px; line-height: 1.6; margin-bottom: 10px; }
+        .choice { display:inline-flex; align-items:center; gap:8px; margin-right:12px; padding:10px 18px; border:2px solid #dcdcf5; border-radius:999px; font-weight:normal; cursor:pointer; }
+        .choice:has(input:checked) { border-color: var(--p); background: var(--pl); }
+        .btn { width: 100%; padding: 16px; background: var(--p); color: #fff; border: none; border-radius: 14px; font-family:'Jua','Malgun Gothic',sans-serif; font-size: 19px; cursor: pointer; margin-top: 10px; box-shadow: 0 5px 0 #4343a8; transition: .12s; }
+        .btn:hover { filter: brightness(1.08); }
+        .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #4343a8; }
+        .btn:disabled { background:#a5a8c4; box-shadow: 0 5px 0 #868aa8; cursor: default; }
+        .progress-wrap { position: sticky; top: 0; background:#fff; padding: 12px 0 10px; z-index: 2; margin-bottom: 14px; }
+        .progress-text { display:flex; justify-content:space-between; font-size:14px; margin-bottom:6px; font-weight:bold; }
+        .bar { height: 12px; background: var(--pl); border-radius: 999px; overflow: hidden; }
+        .bar i { display:block; height:100%; width:0; background: linear-gradient(90deg, var(--mint), var(--y), var(--pk)); border-radius:999px; transition: width .35s; }
+        .question-card { background: #fafaff; padding: clamp(14px,3vw,22px); border-radius: 18px; margin-bottom: 18px; border: 2px solid #ecebfb; }
+        .question-card p { margin: 0 0 12px; font-size: 17px; }
+        .qn { display:inline-block; background: var(--y); color: var(--ink); font-family:'Jua',sans-serif; padding: 2px 11px; border-radius: 999px; margin-right: 8px; font-size: 15px; }
+        .options label { display: flex; align-items: flex-start; gap: 10px; padding: 13px; background: #fff; border: 2px solid #dcdcf5; margin-bottom: 10px; border-radius: 14px; cursor: pointer; font-weight: normal; transition: .2s; }
         .options label:last-child { margin-bottom: 0; }
-        .options label:hover { background: #eef2f5; }
-        .options input[type="radio"] { margin-top: 4px; flex-shrink: 0; }
-        .progress { position: sticky; top: 0; background: #fff; padding: 8px 0; font-size: 14px; text-align: center; color: #555; z-index: 1; border-bottom: 1px solid #eee; margin-bottom: 15px; }
-        .result-box { text-align: center; padding: clamp(20px, 4vw, 30px); background-color: #eaf2f8; border-radius: 10px; margin-bottom: 20px; }
-        .result-mbti { font-size: clamp(40px, 12vw, 56px); font-weight: bold; color: #e74c3c; margin: 10px 0 0; letter-spacing: 2px; }
-        .result-title { font-size: clamp(16px, 3.5vw, 20px); font-weight: bold; color: #2c3e50; margin: 4px 0 12px; }
-        .result-desc { text-align: left; background: #fff; border-radius: 8px; padding: 16px; font-size: 15px; line-height: 1.7; margin: 15px 0 10px; }
+        .options label:hover { border-color: #b4b4ee; }
+        .options label:has(input:checked) { border-color: var(--p); background: var(--pl); font-weight: bold; }
+        .options input[type="radio"] { margin-top: 3px; flex-shrink: 0; }
+        .result-box { text-align: center; padding: clamp(22px,4vw,32px); background: linear-gradient(180deg, color-mix(in srgb, var(--c) 14%, #fff), #fff 80%); border: 3px solid var(--c); border-radius: 22px; margin-bottom: 22px; animation: pop .6s cubic-bezier(.2,1.4,.4,1); }
+        @keyframes pop { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .result-emoji { font-size: clamp(52px,14vw,72px); line-height: 1.1; }
+        .letters { display:flex; justify-content:center; gap: clamp(6px,2vw,12px); margin: 10px 0 6px; }
+        .letters span { font-family:'Jua',sans-serif; font-size: clamp(30px,10vw,46px); width: 1.5em; height: 1.5em; line-height: 1.5em; background: var(--c); color:#fff; border-radius: 14px; box-shadow: 0 5px 0 rgba(0,0,0,.18); }
+        .result-title { font-family:'Jua',sans-serif; font-size: clamp(19px,4.5vw,24px); color: var(--c); margin: 6px 0 12px; }
+        .result-desc { text-align: left; background: #fff; border-radius: 14px; padding: 16px; font-size: 15px; line-height: 1.75; margin: 15px 0 10px; border: 2px dashed color-mix(in srgb, var(--c) 40%, #fff); }
         .tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
-        .tag { background: #3498db; color: #fff; font-size: 13px; padding: 4px 10px; border-radius: 999px; }
+        .tag { background: var(--c); color: #fff; font-size: 13px; padding: 4px 12px; border-radius: 999px; }
+        .note { font-size:12px; color:#777; margin:0; }
         .satisfaction { display: flex; justify-content: space-between; gap: 6px; margin-top: 10px; }
-        .satisfaction label { flex: 1; text-align: center; cursor: pointer; font-size: 13px; font-weight: normal; padding: 10px 2px; border: 1px solid #ddd; border-radius: 6px; margin: 0; }
-        .satisfaction label:hover { background: #eef2f5; }
-        .satisfaction input { margin-bottom: 4px; }
+        .satisfaction label { flex: 1; text-align: center; cursor: pointer; font-size: 13px; font-weight: normal; padding: 10px 2px; border: 2px solid #dcdcf5; border-radius: 14px; margin: 0; transition:.2s; }
+        .satisfaction label:has(input:checked) { border-color: var(--y); background: #fff6cf; font-weight: bold; }
+        .done { text-align:center; padding: 20px 0; }
+        .done .emoji { font-size: 70px; }
 
-        /* PC 화면: 문항 선택지를 2열로 배치 */
         @media (min-width: 768px) {
             .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
             .options label { margin-bottom: 0; }
         }
-        /* 휴대폰 화면 */
         @media (max-width: 480px) {
-            .inline-label { display: block; margin-bottom: 8px; }
+            .choice { display:flex; margin: 0 0 8px; }
             .satisfaction label { font-size: 11px; padding: 8px 0; }
-            .policy-box { height: 130px; }
+            .policy-box { height: 125px; }
         }
+        @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
     </style>
 </head>
 <body>
 
 <div class="container">
+<div class="hero">
+    <div class="emoji">🧭</div>
+    <h2>나를 알아가는 MBTI 검사</h2>
+    <p>의정부시일시청소년쉼터(이동형)</p>
+</div>
+<div class="body">
     <!-- 1. 개인정보 수집 및 기본 정보 입력 화면 -->
     <div id="step1" class="section active">
-        <h2>MBTI 검사 시작하기</h2>
-        <p style="text-align:center; font-size:14px; color:#666;">의정부시일시청소년쉼터(이동형)</p>
+        <h2 style="margin-top:0;">✏️ 먼저 나를 소개해 주세요</h2>
 
         <div class="form-group">
             <label>개인정보 수집 및 이용 동의</label>
@@ -78,39 +109,38 @@
         </div>
         <div class="form-group">
             <label>성별</label>
-            <label class="inline-label"><input type="radio" name="gender" value="남성"> 남성</label>
-            <label class="inline-label"><input type="radio" name="gender" value="여성"> 여성</label>
+            <label class="choice"><input type="radio" name="gender" value="남성"> 남성</label>
+            <label class="choice"><input type="radio" name="gender" value="여성"> 여성</label>
         </div>
         <div class="form-group">
             <label>나이</label>
             <input type="number" id="userAge" inputmode="numeric" placeholder="나이를 입력하세요 (예: 18)">
         </div>
 
-        <button class="btn" onclick="startTest()">검사 시작하기</button>
+        <button class="btn" onclick="startTest()">검사 시작하기 🚀</button>
     </div>
 
     <!-- 2. 문제 풀이 화면 -->
     <div id="step2" class="section">
-        <h2>MBTI 검사 (20문항)</h2>
-        <div class="progress" id="progress">0 / 20 문항 완료</div>
+        <div class="progress-wrap"><div class="progress-text"><span>🧩 MBTI 검사 20문항</span><span id="progress">0 / 20</span></div><div class="bar"><i id="barFill"></i></div></div>
         <div id="questionContainer"></div>
-        <button class="btn" onclick="calculateResult()">결과 보기</button>
+        <button class="btn" onclick="calculateResult()">결과 보기 ✨</button>
     </div>
 
     <!-- 3. 결과 및 만족도 조사 화면 -->
     <div id="step3" class="section">
-        <h2>검사 결과</h2>
-        <div class="result-box">
-            <p style="margin:0;"><span id="resName"></span>님의 MBTI 유형은</p>
-            <div class="result-mbti" id="resMbti">ENFP</div>
+        <div class="result-box" id="resBox">
+            <div class="result-emoji" id="resEmoji"></div>
+            <p style="margin:6px 0 0;"><span id="resName"></span>님의 MBTI 유형은</p>
+            <div class="letters" id="resMbti"></div>
             <div class="result-title" id="resTitle"></div>
             <div class="tags" id="resTags"></div>
             <div class="result-desc" id="resDesc"></div>
-            <p style="font-size:12px; color:#777; margin:0;">※ 이 검사는 간단한 자기 이해용 참고 자료이며, 정확한 진단이 아닙니다.</p>
+            <p class="note">※ 이 검사는 간단한 자기 이해용 참고 자료이며, 정확한 진단이 아닙니다.</p>
         </div>
 
         <div class="form-group">
-            <label>오늘 진행한 검사 및 활동에 얼마나 만족하시나요?</label>
+            <label>⭐ 오늘 진행한 검사 및 활동에 얼마나 만족하시나요?</label>
             <div class="satisfaction">
                 <label><input type="radio" name="satisfaction" value="1"><br>1점<br>(매우 불만족)</label>
                 <label><input type="radio" name="satisfaction" value="2"><br>2점</label>
@@ -125,10 +155,10 @@
 
     <!-- 4. 제출 완료 화면 -->
     <div id="step4" class="section">
-        <h2>제출 완료!</h2>
-        <p style="text-align:center;">참여해 주셔서 감사합니다. 모든 데이터가 성공적으로 저장되었습니다.</p>
+        <div class="done"><div class="emoji">🎉</div><h2>제출 완료!</h2><p>참여해 주셔서 감사합니다.<br>모든 데이터가 성공적으로 저장되었습니다.</p></div>
     </div>
 
+</div>
 </div>
 
 <script>
@@ -182,6 +212,15 @@
         ENTJ: { title: "대담한 지휘관", tags: ["결단력", "목표 달성", "리더십"], desc: "목표를 세우고 빠르게 실행하며 팀을 이끄는 유형이에요. 효율과 논리를 중시하고 도전적인 일에서 힘을 발휘해요. 함께하는 사람들의 마음을 살피면 신뢰가 더 깊어져요." }
     };
 
+    // 유형별 이모지 / 성향 그룹 색상
+    const emojiMap = { ISTJ:'📋', ISFJ:'🧸', INFJ:'🔮', INTJ:'♟️', ISTP:'🛠️', ISFP:'🎨', INFP:'🌙', INTP:'🔬', ESTP:'🏄', ESFP:'🎤', ENFP:'🌈', ENTP:'💡', ESTJ:'🏆', ESFJ:'🤝', ENFJ:'🌟', ENTJ:'🚀' };
+    function groupColor(m) {
+        if (m[1] === 'N' && m[2] === 'T') return '#7b4fd6';  // 분석가
+        if (m[1] === 'N' && m[2] === 'F') return '#17a98c';  // 외교관
+        if (m[1] === 'S' && m[3] === 'J') return '#3a78d8';  // 관리자
+        return '#f08a24';                                     // 탐험가
+    }
+
     let userInfo = {};
     let finalMBTI = "";
 
@@ -207,7 +246,7 @@
         questions.forEach((q, index) => {
             html += `
                 <div class="question-card">
-                    <p><strong>Q${index + 1}.</strong> ${q.q}</p>
+                    <p><span class="qn">Q${index + 1}</span>${q.q}</p>
                     <div class="options">
                         <label><input type="radio" name="q${index}" value="${q.typeA}" onchange="updateProgress()"> <span>${q.a}</span></label>
                         <label><input type="radio" name="q${index}" value="${q.typeB}" onchange="updateProgress()"> <span>${q.b}</span></label>
@@ -222,7 +261,8 @@
 
     function updateProgress() {
         const done = document.querySelectorAll('#questionContainer input[type="radio"]:checked').length;
-        document.getElementById('progress').innerText = `${done} / ${questions.length} 문항 완료`;
+        document.getElementById('progress').innerText = `${done} / ${questions.length}`;
+        document.getElementById('barFill').style.width = (done / questions.length * 100) + '%';
     }
 
     function calculateResult() {
@@ -242,7 +282,9 @@
         finalMBTI = mbti;
         const info = mbtiInfo[mbti];
         document.getElementById('resName').innerText = userInfo.name;
-        document.getElementById('resMbti').innerText = finalMBTI;
+        document.getElementById('resMbti').innerHTML = finalMBTI.split('').map(c => `<span>${c}</span>`).join('');
+        document.getElementById('resEmoji').innerText = emojiMap[mbti];
+        document.getElementById('resBox').style.setProperty('--c', groupColor(mbti));
         document.getElementById('resTitle').innerText = info.title;
         document.getElementById('resTags').innerHTML = info.tags.map(t => `<span class="tag">#${t}</span>`).join('');
         document.getElementById('resDesc').innerText = info.desc;
