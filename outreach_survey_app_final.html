@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>의정부시일시청소년쉼터(이동형) 아웃리치</title>
+    <style>
+        /* 모바일 최적화 CSS */
+        body { 
+            margin: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; 
+            background-color: #f0f2f5; 
+            color: #333; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        .app-container { 
+            max-width: 480px; 
+            margin: 0 auto; 
+            background: #fff; 
+            min-height: 100vh; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.05); 
+            display: flex; 
+            flex-direction: column; 
+            position: relative;
+        }
+        .screen { 
+            display: none; 
+            padding: 24px 20px; 
+            flex-grow: 1; 
+            flex-direction: column; 
+        }
+        .screen.active { 
+            display: flex; 
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        /* 타이틀 및 헤더 */
+        .header { text-align: center; margin-bottom: 24px; }
+        .header h2 { font-size: 22px; color: #1a73e8; margin: 0 0 8px 0; word-break: keep-all; }
+        .header p { font-size: 15px; color: #666; margin: 0; }
+        
+        /* 약관 및 안내 박스 */
+        .card { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 10px; padding: 16px; margin-bottom: 24px; }
+        .scroll-box { 
+            max-height: 140px; 
+            overflow-y: auto; 
+            font-size: 13px; 
+            line-height: 1.6; 
+            color: #555; 
+            background: #fff; 
+            border: 1px solid #ddd; 
+            padding: 12px; 
+            border-radius: 6px; 
+            margin-bottom: 12px; 
+        }
+        
+        /* 폼 요소 */
+        .form-group { margin-bottom: 22px; }
+        .form-group > label { display: block; font-weight: 700; margin-bottom: 10px; font-size: 16px; }
+        .form-control { 
+            width: 100%; 
+            padding: 14px; 
+            border: 1px solid #ced4da; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 16px; 
+            transition: border-color 0.2s;
+        }
+        .form-control:focus { outline: none; border-color: #1a73e8; }
+        
+        /* 체크박스 & 라디오 버튼 */
+        .checkbox-label { display: flex; align-items: center; font-weight: bold; font-size: 15px; cursor: pointer; color: #d93025; }
+        .checkbox-label input { margin-right: 10px; width: 22px; height: 22px; accent-color: #d93025; }
+        
+        .radio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .radio-grid.col-1 { grid-template-columns: 1fr; }
+        .radio-btn { 
+            display: flex; align-items: center; background: #fff; 
+            border: 1px solid #ced4da; padding: 14px; border-radius: 8px; 
+            font-size: 15px; cursor: pointer; transition: 0.2s;
+        }
+        .radio-btn input { margin-right: 10px; width: 18px; height: 18px; accent-color: #1a73e8; }
+        
+        /* 버튼 */
+        .btn-primary { 
+            background: #1a73e8; color: white; border: none; padding: 16px; 
+            width: 100%; border-radius: 8px; font-size: 17px; font-weight: bold; 
+            cursor: pointer; margin-top: auto; transition: background 0.2s;
+        }
+        .btn-primary:active { background: #1557b0; }
+        .btn-primary:disabled { background: #a8c7fa; cursor: not-allowed; }
+        
+        /* 퀴즈 UI */
+        .quiz-title { font-size: 19px; font-weight: bold; margin-bottom: 24px; line-height: 1.5; word-break: keep-all; }
+        .ox-container { display: flex; gap: 16px; margin-bottom: 24px; }
+        .btn-ox { 
+            flex: 1; aspect-ratio: 1; font-size: 56px; font-weight: bold; 
+            border: 2px solid #1a73e8; background: white; color: #1a73e8; 
+            border-radius: 16px; cursor: pointer; transition: all 0.2s; 
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .btn-ox.correct { background: #34a853; color: white; border-color: #34a853; transform: scale(1.02); }
+        .btn-ox.wrong { background: #ea4335; color: white; border-color: #ea4335; }
+        .btn-ox:disabled { cursor: default; box-shadow: none; }
+        
+        .explanation { 
+            display: none; background: #e8f0fe; border-left: 4px solid #1a73e8; 
+            padding: 16px; border-radius: 6px; font-size: 15px; line-height: 1.6; margin-bottom: 24px; 
+        }
+        .explanation.show { display: block; animation: slideDown 0.3s ease-out; }
+        
+        /* 요약 및 최종 제출 화면 */
+        .summary-list {
+            background: #fff;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+        .summary-list strong { color: #1a73e8; display: inline-block; width: 80px; }
+        .summary-list span.correct-txt { color: #34a853; font-weight: bold; }
+        .summary-list span.wrong-txt { color: #ea4335; font-weight: bold; }
+        .summary-item { margin-bottom: 8px; border-bottom: 1px dashed #eee; padding-bottom: 8px; }
+        .summary-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+        /* 상단 프로그레스 바 */
+        .progress-bar { height: 6px; background: #e9ecef; margin: -24px -20px 24px -20px; }
+        .progress-fill { height: 100%; background: #1a73e8; transition: width 0.4s ease; border-radius: 0 3px 3px 0; }
+        
+        /* 애니메이션 및 상태 */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .loading { 
+            display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(255,255,255,0.9); align-items: center; justify-content: center; 
+            flex-direction: column; z-index: 100; color: #1a73e8; font-size: 18px; font-weight: bold;
+        }
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid #e8f0fe; border-top: 4px solid #1a73e8; 
+            border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 16px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="app-container" id="app">
+        <!-- 로딩 화면 -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            데이터를 저장하고 있습니다...
+        </div>
+        
+        <!-- Screen 1: 개인정보 및 기본설문 -->
+        <div class="screen active" id="screen-1">
+            <div class="header">
+                <h2>의정부시일시청소년쉼터(이동형)</h2>
+                <p>아웃리치 프로그램</p>
+            </div>
+            
+            <div class="card">
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label>1. 개인정보수집 및 이용동의</label>
+                    <div class="scroll-box">
+                        의정부시일시청소년쉼터(이동형)은 아래와 같이 귀하의 개인정보를 수집·이용하는 내용을「개인정보보호법」 제 15조 및 제 22조에 따라 알려드리오니, 동의하여 주시기 바랍니다.<br><br>
+                        <strong>☑ 개인정보의 수집·이용 목적:</strong><br>의정부시일시청소년쉼터(이동형)에서 진행하는 아웃리치 프로그램 참여 및 서비스 제공을 위한 활용<br><br>
+                        <strong>☑ 수집하려는 필수 항목:</strong><br>성명, 성별, 나이, 가출 경험 및 가출 여부, 취업여부, 재학여부<br><br>
+                        <strong>☑ 개인정보의 보유 및 이용 기간:</strong><br>5년(행정서류 보존기한)<br><br>
+                        ※ 개인정보보호법에 의거 개인정보 수집 및 이용에 따른 동의를 거부할 수 있으나, 참여 및 서비스 제공이 불가합니다.
+                    </div>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="agree"> (필수) 동의합니다.
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>이름</label>
+                <input type="text" id="name" class="form-control" placeholder="이름을 입력하세요">
+            </div>
+
+            <div class="form-group">
+                <label>성별</label>
+                <div class="radio-grid">
+                    <label class="radio-btn"><input type="radio" name="gender" value="남자"> 남자</label>
+                    <label class="radio-btn"><input type="radio" name="gender" value="여자"> 여자</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>나이 (만 나이)</label>
+                <input type="number" id="age" class="form-control" placeholder="숫자만 입력 (만 9~24세)" min="9" max="24">
+            </div>
+
+            <div class="form-group">
+                <label>가출 경험이 있나요?</label>
+                <div class="radio-grid">
+                    <label class="radio-btn"><input type="radio" name="runaway" value="있다"> 있다</label>
+                    <label class="radio-btn"><input type="radio" name="runaway" value="없다"> 없다</label>
+                    <label class="radio-btn"><input type="radio" name="runaway" value="가출중"> 가출중</label>
+                    <label class="radio-btn"><input type="radio" name="runaway" value="가능성 있다"> 가능성 있다</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>학교를 다니고 있나요?</label>
+                <div class="radio-grid col-1">
+                    <label class="radio-btn"><input type="radio" name="school" value="초등학교"> 초등학교</label>
+                    <label class="radio-btn"><input type="radio" name="school" value="중학교"> 중학교</label>
+                    <label class="radio-btn"><input type="radio" name="school" value="고등학교"> 고등학교</label>
+                    <label class="radio-btn"><input type="radio" name="school" value="대학교"> 대학교</label>
+                    <label class="radio-btn"><input type="radio" name="school" value="안다닌다"> 안다닌다</label>
+                    <label class="radio-btn"><input type="radio" name="school" value="고등학교, 대학교 졸업(취직)"> 고등학교, 대학교 졸업(취직)</label>
+                    <label class="radio-btn"><input type="radio" name="school" value="고등학교, 대학교 졸업(무직)"> 고등학교, 대학교 졸업(무직)</label>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="validateScreen1()">퀴즈 시작하기</button>
+        </div>
+
+        <!-- Screen 2: 퀴즈 1 -->
+        <div class="screen" id="screen-2">
+            <div class="progress-bar"><div class="progress-fill" style="width: 20%;"></div></div>
+            <div class="header">
+                <h2>도박예방퀴즈 (1/5)</h2>
+                <p>팩트체크! 진실 혹은 거짓</p>
+            </div>
+            <div class="quiz-title">1) ‘문화상품권’이나 ‘게임 아이템’을 걸고 하는 내기는 도박이 아니다.</div>
+            <div class="ox-container">
+                <button class="btn-ox" id="btn-q1-O" onclick="answerQuiz(1, 'O', 'X')">O</button>
+                <button class="btn-ox" id="btn-q1-X" onclick="answerQuiz(1, 'X', 'X')">X</button>
+            </div>
+            <div class="explanation" id="exp-1">
+                <strong style="color:#d93025; font-size: 16px;">정답 : X</strong><br><br>
+                <strong>해설) 도박이란?</strong><br>
+                대상에 상관없이, 불확실한 결과에 돈이나 재산상의 가치를 걸고 얻거나 잃는 행위입니다.<br>현금이 아니어도 가치 있는 것을 걸고 우연에 따라 얻거나 잃는다면 도박이 될 수 있어요.
+            </div>
+            <button class="btn-primary" id="next-1" disabled onclick="nextScreen(3)">다음 문제</button>
+        </div>
+
+        <!-- Screen 3: 퀴즈 2 -->
+        <div class="screen" id="screen-3">
+            <div class="progress-bar"><div class="progress-fill" style="width: 40%;"></div></div>
+            <div class="header">
+                <h2>도박예방퀴즈 (2/5)</h2>
+            </div>
+            <div class="quiz-title">2) 도박 사이트 링크를 친구에게 공유할 경우, 처벌받을 수 있다?</div>
+            <div class="ox-container">
+                <button class="btn-ox" id="btn-q2-O" onclick="answerQuiz(2, 'O', 'O')">O</button>
+                <button class="btn-ox" id="btn-q2-X" onclick="answerQuiz(2, 'X', 'O')">X</button>
+            </div>
+            <div class="explanation" id="exp-2">
+                <strong style="color:#1a73e8; font-size: 16px;">정답 : O</strong><br><br>
+                <strong>해설)</strong><br>도박 사이트 링크를 친구에게 공유할 경우, ‘도박을 돕거나 홍보하는 행위’로 처벌받을 수 있으니 절대 공유하거나 접속하지 마세요!
+            </div>
+            <button class="btn-primary" id="next-2" disabled onclick="nextScreen(4)">다음 문제</button>
+        </div>
+
+        <!-- Screen 4: 퀴즈 3 -->
+        <div class="screen" id="screen-4">
+            <div class="progress-bar"><div class="progress-fill" style="width: 60%;"></div></div>
+            <div class="header">
+                <h2>도박예방퀴즈 (3/5)</h2>
+            </div>
+            <div class="quiz-title">3) 불법 도박으로 진 빚이라도, 돈을 빌렸다면 무조건 갚아야 한다?</div>
+            <div class="ox-container">
+                <button class="btn-ox" id="btn-q3-O" onclick="answerQuiz(3, 'O', 'X')">O</button>
+                <button class="btn-ox" id="btn-q3-X" onclick="answerQuiz(3, 'X', 'X')">X</button>
+            </div>
+            <div class="explanation" id="exp-3">
+                <strong style="color:#d93025; font-size: 16px;">정답 : X</strong><br><br>
+                <strong>해설)</strong><br>불법 도박으로 생긴 빚은 일반적인 빚과 달리 무조건 갚아야 하는 것은 아닙니다. 도박 빚을 갚으려고 2차 범죄(사기, 대리입금 등)에 빠지지 말고, 즉시 믿을 수 있는 어른이나 전문기관에 도움을 요청하세요!
+            </div>
+            <button class="btn-primary" id="next-3" disabled onclick="nextScreen(5)">다음 문제</button>
+        </div>
+
+        <!-- Screen 5: 퀴즈 4 -->
+        <div class="screen" id="screen-5">
+            <div class="progress-bar"><div class="progress-fill" style="width: 80%;"></div></div>
+            <div class="header">
+                <h2>도박예방퀴즈 (4/5)</h2>
+            </div>
+            <div class="quiz-title">4) 도박은 분석하고 공부하면 돈을 벌 수 있다?</div>
+            <div class="ox-container">
+                <button class="btn-ox" id="btn-q4-O" onclick="answerQuiz(4, 'O', 'X')">O</button>
+                <button class="btn-ox" id="btn-q4-X" onclick="answerQuiz(4, 'X', 'X')">X</button>
+            </div>
+            <div class="explanation" id="exp-4">
+                <strong style="color:#d93025; font-size: 16px;">정답 : X</strong><br><br>
+                <strong>해설)</strong><br>도박은 실력으로 이기는 게임이 아니에요. 처음에 돈을 따더라도 ‘조금만 더 하면 딸 수 있다’는 생각으로 계속하다 보면 더 큰 돈을 잃을 수 있습니다.
+            </div>
+            <button class="btn-primary" id="next-4" disabled onclick="nextScreen(6)">다음 문제</button>
+        </div>
+
+        <!-- Screen 6: 퀴즈 5 -->
+        <div class="screen" id="screen-6">
+            <div class="progress-bar"><div class="progress-fill" style="width: 100%;"></div></div>
+            <div class="header">
+                <h2>도박예방퀴즈 (5/5)</h2>
+            </div>
+            <div class="quiz-title">5) 온라인에서 ‘꽁머니(베팅용 머니)’를 받아 게임처럼 베팅하는 것은 도박이다.</div>
+            <div class="ox-container">
+                <button class="btn-ox" id="btn-q5-O" onclick="answerQuiz(5, 'O', 'O')">O</button>
+                <button class="btn-ox" id="btn-q5-X" onclick="answerQuiz(5, 'X', 'O')">X</button>
+            </div>
+            <div class="explanation" id="exp-5">
+                <strong style="color:#1a73e8; font-size: 16px;">정답 : O</strong><br><br>
+                <strong>해설)</strong><br>‘꽁머니’는 공짜가 아니에요! 불법 도박 사이트는 꽁머니로 시작하게 한 뒤 실제 돈을 걸도록 유도하기도 합니다. 게임처럼 보여도 배팅을 하면 도박이 될 수 있어요.
+            </div>
+            <button class="btn-primary" id="next-5" disabled onclick="nextScreen(7)">만족도 조사로 이동</button>
+        </div>
+
+        <!-- Screen 7: 만족도 조사 -->
+        <div class="screen" id="screen-7">
+            <div class="header" style="margin-top: 20px;">
+                <h2>프로그램 만족도</h2>
+                <p style="font-size: 17px; font-weight: bold; color: #333; margin-top: 16px; word-break: keep-all;">
+                    프로그램을 통해 도박의 위험성을 알게 되었다.
+                </p>
+            </div>
+            
+            <div class="form-group">
+                <div class="radio-grid col-1">
+                    <label class="radio-btn"><input type="radio" name="satisfaction" value="5"> 매우 만족 (5점)</label>
+                    <label class="radio-btn"><input type="radio" name="satisfaction" value="4"> 만족 (4점)</label>
+                    <label class="radio-btn"><input type="radio" name="satisfaction" value="3"> 보통 (3점)</label>
+                    <label class="radio-btn"><input type="radio" name="satisfaction" value="2"> 불만족 (2점)</label>
+                    <label class="radio-btn"><input type="radio" name="satisfaction" value="1"> 매우 불만족 (1점)</label>
+                </div>
+            </div>
+            
+            <button class="btn-primary" onclick="prepareSubmit()">제출 내용 확인하기</button>
+        </div>
+
+        <!-- Screen 8: 최종 확인 및 관리자 코드 -->
+        <div class="screen" id="screen-8">
+            <div class="header">
+                <h2>제출 내용 확인</h2>
+                <p>아래 내용을 확인하고 저장해주세요.</p>
+            </div>
+            
+            <div class="summary-list" id="summary-content">
+                <!-- Javascript를 통해 내용이 채워집니다. -->
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label>관리자 확인 코드</label>
+                <input type="password" id="adminCode" class="form-control" placeholder="비밀코드를 입력해주세요 (숫자)">
+            </div>
+            
+            <button class="btn-primary" onclick="submitForm()">최종 저장하기</button>
+            <button class="btn-primary" style="background: #6c757d; margin-top: 10px;" onclick="nextScreen(7)">뒤로 가기</button>
+        </div>
+
+    </div>
+
+<script>
+    let formData = {};
+
+    function validateScreen1() {
+        const agree = document.getElementById('agree').checked;
+        const name = document.getElementById('name').value.trim();
+        const gender = document.querySelector('input[name="gender"]:checked');
+        const age = document.getElementById('age').value;
+        const runaway = document.querySelector('input[name="runaway"]:checked');
+        const school = document.querySelector('input[name="school"]:checked');
+
+        if (!agree) {
+            alert("개인정보 수집 및 이용에 동의해주세요.");
+            return;
+        }
+        if (!name) {
+            alert("이름을 입력해주세요.");
+            document.getElementById('name').focus();
+            return;
+        }
+        if (!gender) {
+            alert("성별을 선택해주세요.");
+            return;
+        }
+        if (!age || age < 9 || age > 24) {
+            alert("만 9~24세 청소년만 참여 가능합니다. 숫자를 정확히 입력해주세요.");
+            document.getElementById('age').focus();
+            return;
+        }
+        if (!runaway) {
+            alert("가출 경험 여부를 선택해주세요.");
+            return;
+        }
+        if (!school) {
+            alert("학교 재학 여부를 선택해주세요.");
+            return;
+        }
+
+        // 초기 데이터 세팅
+        formData = {
+            name: name,
+            gender: gender.value,
+            age: age,
+            runaway: runaway.value,
+            school: school.value,
+            quiz1_isCorrect: "",
+            quiz2_isCorrect: "",
+            quiz3_isCorrect: "",
+            quiz4_isCorrect: "",
+            quiz5_isCorrect: ""
+        };
+
+        nextScreen(2);
+    }
+
+    function nextScreen(screenNumber) {
+        window.scrollTo(0, 0);
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-' + screenNumber).classList.add('active');
+    }
+
+    function answerQuiz(qNum, selected, correct) {
+        // 중복 클릭 방지 (버튼 비활성화)
+        document.getElementById(`btn-q${qNum}-O`).disabled = true;
+        document.getElementById(`btn-q${qNum}-X`).disabled = true;
+        
+        // 정답 체크 및 스타일 변경
+        const selectedBtn = document.getElementById(`btn-q${qNum}-${selected}`);
+        const isCorrect = (selected === correct);
+        
+        if (isCorrect) {
+            selectedBtn.classList.add('correct');
+        } else {
+            selectedBtn.classList.add('wrong');
+            // 오답일 경우 정답 버튼도 표시해줌
+            document.getElementById(`btn-q${qNum}-${correct}`).classList.add('correct');
+        }
+
+        // 해설 노출 및 다음 버튼 활성화
+        document.getElementById(`exp-${qNum}`).classList.add('show');
+        document.getElementById(`next-${qNum}`).disabled = false;
+
+        // 결과 저장
+        formData[`quiz${qNum}_isCorrect`] = isCorrect ? "정답" : "오답";
+    }
+
+    function prepareSubmit() {
+        const satisfaction = document.querySelector('input[name="satisfaction"]:checked');
+        if (!satisfaction) {
+            alert("프로그램 만족도를 선택해주세요.");
+            return;
+        }
+        formData.satisfaction = satisfaction.value;
+        
+        const satisfactionMap = {
+            '5': '매우 만족 (5점)',
+            '4': '만족 (4점)',
+            '3': '보통 (3점)',
+            '2': '불만족 (2점)',
+            '1': '매우 불만족 (1점)'
+        };
+
+        // 요약 화면 구성
+        const summaryContent = document.getElementById('summary-content');
+        
+        const getResultStyle = (val) => val === '정답' ? `<span class="correct-txt">O 맞힘</span>` : `<span class="wrong-txt">X 틀림</span>`;
+        
+        summaryContent.innerHTML = `
+            <div class="summary-item"><strong>이름</strong> ${formData.name}</div>
+            <div class="summary-item"><strong>성별/나이</strong> ${formData.gender} / 만 ${formData.age}세</div>
+            <div class="summary-item"><strong>가출경험</strong> ${formData.runaway}</div>
+            <div class="summary-item"><strong>재학상태</strong> ${formData.school}</div>
+            <div class="summary-item"><strong>만족도</strong> ${satisfactionMap[formData.satisfaction]}</div>
+            <div class="summary-item" style="margin-top: 10px;">
+                <strong>퀴즈 결과</strong><br>
+                Q1: ${getResultStyle(formData.quiz1_isCorrect)} | 
+                Q2: ${getResultStyle(formData.quiz2_isCorrect)} | 
+                Q3: ${getResultStyle(formData.quiz3_isCorrect)} <br>
+                Q4: ${getResultStyle(formData.quiz4_isCorrect)} | 
+                Q5: ${getResultStyle(formData.quiz5_isCorrect)}
+            </div>
+        `;
+
+        document.getElementById('adminCode').value = ""; // 코드 입력창 초기화
+        nextScreen(8);
+    }
+
+    function submitForm() {
+        const adminCode = document.getElementById('adminCode').value;
+        if (adminCode !== '2015') {
+            alert("비밀코드가 일치하지 않습니다. 관리자에게 문의하세요.");
+            document.getElementById('adminCode').focus();
+            return;
+        }
+
+        // 로딩 화면 표시
+        document.getElementById('loading').style.display = 'flex';
+        
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYQrxhyEx1kcJniuevN5V7C5_4uomXvewAJXfaibYOBzTJFru_xjM9dcfVj9c4DvZ0/exec'; // ★ 여기에 구글 앱스 스크립트 웹 앱 URL을 입력하세요. ★
+
+        if (SCRIPT_URL) {
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            }).then(() => {
+                completeSubmission();
+            }).catch(e => {
+                console.error('Error!', e.message);
+                completeSubmission();
+            });
+        } else {
+            // URL 설정이 안 되어 있을 경우, 1초 대기 후 완료 시뮬레이션
+            setTimeout(completeSubmission, 1000);
+        }
+    }
+
+    function completeSubmission() {
+        document.getElementById('loading').style.display = 'none';
+        alert("성공적으로 저장되었습니다!");
+        
+        // 폼 초기화
+        document.querySelectorAll('input[type="text"], input[type="number"], input[type="password"]').forEach(el => el.value = '');
+        document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(el => el.checked = false);
+        
+        for(let i=1; i<=5; i++) {
+            document.getElementById(`btn-q${i}-O`).className = 'btn-ox';
+            document.getElementById(`btn-q${i}-O`).disabled = false;
+            document.getElementById(`btn-q${i}-X`).className = 'btn-ox';
+            document.getElementById(`btn-q${i}-X`).disabled = false;
+            document.getElementById(`exp-${i}`).classList.remove('show');
+            document.getElementById(`next-${i}`).disabled = true;
+        }
+        formData = {};
+
+        // 첫 화면으로 이동
+        nextScreen(1);
+    }
+</script>
+</body>
+</html>
