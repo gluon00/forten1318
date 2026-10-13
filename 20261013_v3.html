@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>의정부시일시청소년쉼터(이동형) 아웃리치</title>
+    <!-- 구글 폰트 & 아이콘 적용 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 모바일 최적화 및 꽉 차는 앱 느낌의 UI 스타일 */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #1a73e8, #2979ff);
+            --bg-gradient: linear-gradient(180deg, #f0f4f9 0%, #e5eef7 100%);
+            --card-bg: #ffffff;
+            --text-dark: #1c2024;
+            --text-muted: #5f6368;
+            --primary-blue: #1a73e8;
+            --light-blue: #ebf3fe;
+            --correct-green: #34a853;
+            --wrong-red: #ea4335;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body { 
+            margin: 0; 
+            padding: 0;
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif; 
+            background: #e2ebf4; 
+            color: var(--text-dark); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        .app-container { 
+            width: 100%;
+            max-width: 480px; 
+            height: 100vh;
+            height: 100dvh;
+            background: var(--bg-gradient); 
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+            display: flex; 
+            flex-direction: column; 
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .app-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .screen { 
+            display: none; 
+            padding: 32px 24px 40px 24px; 
+            flex: 1; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            min-height: 100%;
+            animation: fadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+        }
+
+        .screen.active { 
+            display: flex; 
+        }
+
+        /* 1단: 탑 섹션 */
+        .top-section {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        
+        .top-section .brand-icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+            display: inline-block;
+            filter: drop-shadow(0 2px 4px rgba(26,115,232,0.15));
+        }
+
+        .top-section h2 {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--primary-blue);
+            margin: 0 0 4px 0;
+            word-break: keep-all;
+            letter-spacing: -0.8px;
+        }
+        
+        .top-section p {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin: 0;
+            letter-spacing: -0.3px;
+        }
+
+        /* 2단: 미들 섹션 */
+        .middle-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: var(--card-bg); 
+            border-radius: 24px; 
+            padding: 40px 24px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(26,115,232,0.06);
+            border: 1px solid rgba(255,255,255,0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .middle-section::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(66,133,244,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .middle-section::after {
+            content: '';
+            position: absolute;
+            bottom: -60px;
+            left: -60px;
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, rgba(52,168,83,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .middle-section h3 {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--primary-blue);
+            margin: 0 0 16px 0;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .middle-section p.quiz-desc {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+            line-height: 1.6;
+            margin: 0 0 12px 0;
+            text-align: center;
+            word-break: keep-all;
+        }
+
+        .middle-section p.quiz-subdesc {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-muted);
+            line-height: 1.6;
+            text-align: center;
+            word-break: keep-all;
+        }
+
+        .middle-section .highlight {
+            color: var(--primary-blue);
+            position: relative;
+            display: inline-block;
+        }
+
+        .middle-section .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: rgba(26, 115, 232, 0.15);
+            z-index: -1;
+        }
+
+        /* 3단: 바텀 섹션 */
+        .bottom-section {
+            width: 100%;
+            margin-top: auto;
+        }
+
+        /* 버튼 디자인 공통 */
+        .btn-primary { 
+            background: var(--primary-gradient); 
+            color: white; 
+            border: none; 
+            padding: 18px; 
+            width: 100%; 
+            border-radius: 16px; 
+            font-size: 18px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 20px rgba(26, 115, 232, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary:active { 
+            transform: scale(0.97); 
+            box-shadow: 0 2px 10px rgba(26, 115, 232, 0.2);
+        }
+        .btn-primary:disabled { 
+            background: #cbd5e1; 
+            color: #94a3b8;
+            cursor: not-allowed; 
+            transform: none; 
+            box-shadow: none; 
+        }
+
+        .btn-secondary {
+            background: #f1f5f9; 
+            color: #475569; 
+            border: 1.5px solid #e2e8f0;
+            padding: 16px; 
+            width: 100%; 
+            border-radius: 14px; 
+            font-size: 16px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .btn-secondary:active { background: #e2e8f0; }
+
+        .btn-danger {
+            background: transparent; 
+            color: var(--wrong-red); 
+            border: 1.5px solid var(--wrong-red); 
+            padding: 14px; 
+            width: 100%; 
+            border-radius: 14px; 
+            font-size: 15px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: all 0.2s;
+            margin-top: 20px;
+        }
+        .btn-danger:active { background: #fff5f5; }
+
+        /* 진행상황 바 */
+        .progress-bar { 
+            height: 6px; 
+            background: #e2e8f0; 
+            margin: -32px -24px 28px -24px; 
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-fill { 
+            height: 100%; 
+            background: var(--primary-gradient); 
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            border-radius: 0 4px 4px 0; 
+        }
+
+        /* 퀴즈 UI */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .quiz-title { 
+            font-size: 21px; 
+            font-weight: 800; 
+            margin-bottom: 24px; 
+            line-height: 1.5; 
+            word-break: keep-all; 
+            color: var(--text-dark); 
+            letter-spacing: -0.5px; 
+        }
+        
+        .ox-container { 
+            display: flex; 
+            gap: 16px; 
+            margin-bottom: 24px; 
+        }
+        
+        .btn-ox { 
+            flex: 1; 
+            aspect-ratio: 1.1; 
+            font-size: 64px; 
+            font-weight: 900; 
+            border: 3px solid #e2e8f0; 
+            background: #ffffff; 
+            color: var(--primary-blue); 
+            border-radius: 24px; 
+            cursor: pointer; 
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 6px 12px rgba(0,0,0,0.03);
+        }
+        
+        .btn-ox:hover:not(:disabled) { 
+            border-color: var(--primary-blue); 
+            transform: translateY(-4px); 
+            box-shadow: 0 8px 16px rgba(26,115,232,0.12); 
+        }
+        
+        .btn-ox.correct { 
+            background: var(--correct-green); 
+            color: white; 
+            border-color: var(--correct-green); 
+            transform: scale(1.03); 
+            box-shadow: 0 10px 20px rgba(52,168,83,0.3); 
+        }
+        
+        .btn-ox.wrong { 
+            background: var(--wrong-red); 
+            color: white; 
+            border-color: var(--wrong-red); 
+            transform: scale(0.97);
+            box-shadow: 0 10px 20px rgba(234,67,53,0.25); 
+        }
+        
+        .btn-ox:disabled { cursor: default; }
+
+        .explanation { 
+            display: none; 
+            background: #eef2f9; 
+            border-left: 5px solid var(--primary-blue); 
+            padding: 16px 20px; 
+            border-radius: 14px; 
+            font-size: 15px; 
+            line-height: 1.65; 
+            margin-bottom: 24px; 
+            color: #334155;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .explanation.show { 
+            display: block; 
+            animation: slideDown 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+
+        /* 폼 & 설문 UI */
+        .form-container {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+            margin-bottom: 24px;
+        }
+        
+        .form-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        .form-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .card { 
+            background: #ffffff; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 18px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02); 
+        }
+
+        .scroll-box { 
+            max-height: 140px; 
+            overflow-y: auto; 
+            font-size: 13px; 
+            line-height: 1.6; 
+            color: #475569; 
+            background: #f8fafc; 
+            border: 1px solid #e2e8f0; 
+            padding: 14px; 
+            border-radius: 10px; 
+            margin-bottom: 12px; 
+        }
+
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+        
+        .form-group > label { 
+            display: block; 
+            font-weight: 700; 
+            margin-bottom: 8px; 
+            font-size: 15px; 
+            color: #1e293b; 
+        }
+        
+        .form-control { 
+            width: 100%; 
+            padding: 15px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 14px; 
+            box-sizing: border-box; 
+            font-size: 15px; 
+            transition: all 0.2s ease;
+            background-color: #fafbfc;
+            font-weight: 500;
+        }
+        .form-control:focus { 
+            outline: none; 
+            border-color: var(--primary-blue); 
+            background-color: #ffffff; 
+            box-shadow: 0 0 0 4px rgba(26,115,232,0.1); 
+        }
+
+        .checkbox-label { 
+            display: flex; 
+            align-items: center; 
+            font-weight: 700; 
+            font-size: 14px; 
+            cursor: pointer; 
+            color: var(--wrong-red); 
+        }
+        
+        .checkbox-label input { 
+            margin-right: 8px; 
+            width: 20px; 
+            height: 20px; 
+            accent-color: var(--wrong-red); 
+            cursor: pointer; 
+        }
+
+        .radio-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+        }
+        
+        .radio-grid.col-1 { 
+            grid-template-columns: 1fr; 
+        }
+        
+        .radio-btn { 
+            display: flex; 
+            align-items: center; 
+            background: #ffffff; 
+            border: 2px solid #e2e8f0; 
+            padding: 15px; 
+            border-radius: 14px; 
+            font-size: 15px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            color: #475569;
+        }
+        
+        .radio-btn:has(input:checked) {
+            border-color: var(--primary-blue);
+            background-color: var(--light-blue);
+            color: var(--primary-blue);
+            box-shadow: 0 4px 12px rgba(26,115,232,0.08);
+        }
+
+        .radio-btn input { 
+            margin-right: 10px; 
+            width: 18px; 
+            height: 18px; 
+            accent-color: var(--primary-blue);
+            cursor: pointer; 
+        }
+
+        .hidden-group { 
+            display: none; 
+            margin-top: 12px; 
+            padding: 16px; 
+            background: #fffbeb; 
+            border-radius: 14px; 
+            border: 1.5px solid #fef3c7; 
+        }
+        
+        .hidden-group.show { 
+            display: block; 
+            animation: fadeIn 0.3s ease-out; 
+        }
+        
+        .hidden-group label { 
+            color: #b45309; 
+            margin-bottom: 8px; 
+            font-size: 14px;
+            font-weight: 700;
+        }
+        
+        .hidden-group .radio-btn { 
+            border-color: #fde68a; 
+            background: #ffffff; 
+        }
+        
+        .hidden-group .radio-btn:has(input:checked) {
+            border-color: #d97706;
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        /* 만족도 조사 리커트 척도 디자인 */
+        .likert-group { 
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        
+        .likert-question { 
+            font-size: 16px; 
+            font-weight: 800; 
+            color: #1e293b; 
+            line-height: 1.5; 
+            margin-bottom: 16px; 
+            word-break: keep-all; 
+        }
+        
+        .likert-labels { 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 12px; 
+            font-weight: 700; 
+            color: var(--text-muted); 
+            margin-bottom: 8px; 
+            padding: 0 4px; 
+        }
+        
+        .likert-radios { 
+            display: flex; 
+            justify-content: space-between; 
+            gap: 6px; 
+        }
+        
+        .likert-radios label { 
+            flex: 1; 
+            text-align: center; 
+        }
+        
+        .likert-radios input { 
+            display: none; 
+        }
+        
+        .likert-radios .circle { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            height: 48px; 
+            border-radius: 12px; 
+            background: #f8fafc; 
+            border: 2px solid #e2e8f0; 
+            font-weight: 800; 
+            font-size: 16px;
+            color: #64748b; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            cursor: pointer;
+        }
+        
+        .likert-radios label:has(input:checked) .circle {
+            background: var(--light-blue); 
+            border-color: var(--primary-blue); 
+            color: var(--primary-blue); 
+            box-shadow: 0 4px 12px rgba(26,115,232,0.15);
+            transform: scale(1.05);
+        }
+
+        /* 요약 및 최종 제출 화면 */
+        .summary-list {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            font-size: 15px;
+            line-height: 1.8;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+            overflow-y: auto;
+            max-height: 380px;
+        }
+        
+        .summary-list strong { 
+            color: var(--text-muted); 
+            display: inline-block; 
+            width: 85px; 
+            font-weight: 600; 
+        }
+        
+        .summary-list span.correct-txt { color: var(--correct-green); font-weight: bold; }
+        .summary-list span.wrong-txt { color: var(--wrong-red); font-weight: bold; }
+        
+        .summary-item { 
+            margin-bottom: 12px; 
+            border-bottom: 1px dashed #f1f5f9; 
+            padding-bottom: 12px; 
+            color: var(--text-dark); 
+        }
+        
+        .summary-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        
+        .summary-item.quiz-res { 
+            margin-top: 16px; 
+            border-top: 2.5px solid #f1f5f9; 
+            padding-top: 16px; 
+            border-bottom: none; 
+        }
+        
+        .summary-item.quiz-res strong { 
+            color: var(--primary-blue); 
+            width: 100%; 
+            display: block; 
+            margin-bottom: 8px; 
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        /* 로딩 화면 */
+        .loading { 
+            display: none; 
+            position: absolute; 
+            top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(255,255,255,0.96); 
+            align-items: center; 
+            justify-content: center; 
+            flex-direction: column; 
+            z-index: 100; 
+            color: var(--primary-blue); 
+            font-size: 18px; 
+            font-weight: 700;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="app-container" id="app">
+        <!-- 로딩 화면 -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>데이터를 안전하게 저장하고 있습니다...</div>
+        </div>
+        
+        <!-- Screen 0: 시작 화면 (3단 레이아웃) -->
+        <div class="screen active" id="screen-0">
+            <!-- 1단: 상단 로고 및 기관 -->
+            <div class="top-section">
+                <span class="brand-icon">🚍</span>
+                <h2 style="font-size: 26px;">의정부시일시청소년쉼터(이동형)</h2>
+                <p style="font-size: 17px;">타시군구 아웃리치-연천편</p>
+            </div>
+            
+            <!-- 2단: 화면 꽉 차는 메인 카드 -->
+            <div class="middle-section">
+                <h3 style="font-size: 34px;">가출예방퀴즈</h3>
+                <p class="quiz-desc">
+                    어서와! <span class="highlight">청소년쉼터는 처음이지?</span>
+                </p>
+                <p class="quiz-subdesc">
+                    간단한 퀴즈 2문제를 풀고<br>
+                    간식과 선물을 받아가세요!
+                </p>
+            </div>
+            
+            <!-- 3단: 하단 시작 버튼 -->
+            <div class="bottom-section">
+                <button class="btn-primary" onclick="initQuiz()">
+                    퀴즈 시작하기 🚀
+                </button>
+            </div>
+        </div>
+
+        <!-- Screen 1: 퀴즈 1 -->
+        <div class="screen" id="screen-1">
+            <div class="progress-bar"><div class="progress-fill" style="width: 50%;"></div></div>
+            <div class="quiz-container">
+                <div class="top-section" style="margin-bottom: 24px;">
+                    <p style="color: var(--primary-blue); font-weight: 800; font-size: 15px; margin-bottom: 4px;">가출 예방 퀴즈 (1/2)</p>
+                    <p style="font-size: 13px; color: var(--text-muted); font-weight: 500;">진실 혹은 거짓</p>
+                </div>
+                <div class="quiz-title" id="quiz-title-1"></div>
+                <div class="ox-container">
+                    <button class="btn-ox" id="btn-q1-O" onclick="answerQuiz(1, 'O')">O</button>
+                    <button class="btn-ox" id="btn-q1-X" onclick="answerQuiz(1, 'X')">X</button>
+                </div>
+                <div class="explanation" id="exp-1">
+                    <strong id="exp-1-ans" style="font-size: 16px;"></strong><br><br>
+                    <div id="exp-1-text"></div>
+                </div>
+            </div>
+            <div class="bottom-section">
+                <button class="btn-primary" id="next-1" disabled onclick="nextScreen(2)">
+                    다음 문제 풀기 ➡️
+                </button>
+            </div>
+        </div>
+
+        <!-- Screen 2: 퀴즈 2 -->
+        <div class="screen" id="screen-2">
+            <div class="progress-bar"><div class="progress-fill" style="width: 100%;"></div></div>
+            <div class="quiz-container">
+                <div class="top-section" style="margin-bottom: 24px;">
+                    <p style="color: var(--primary-blue); font-weight: 800; font-size: 15px; margin-bottom: 4px;">가출 예방 퀴즈 (2/2)</p>
+                    <p style="font-size: 13px; color: var(--text-muted); font-weight: 500;">진실 혹은 거짓</p>
+                </div>
+                <div class="quiz-title" id="quiz-title-2"></div>
+                <div class="ox-container">
+                    <button class="btn-ox" id="btn-q2-O" onclick="answerQuiz(2, 'O')">O</button>
+                    <button class="btn-ox" id="btn-q2-X" onclick="answerQuiz(2, 'X')">X</button>
+                </div>
+                <div class="explanation" id="exp-2">
+                    <strong id="exp-2-ans" style="font-size: 16px;"></strong><br><br>
+                    <div id="exp-2-text"></div>
+                </div>
+            </div>
+            <div class="bottom-section">
+                <button class="btn-primary" id="next-2" disabled onclick="nextScreen(3)">
+                    동의 및 만족도 조사 📝
+                </button>
+            </div>
+        </div>
+
+        <!-- Screen 3: 만족도 조사 -->
+        <div class="screen" id="screen-3">
+            <div class="form-container">
+                <div class="top-section" style="margin-bottom: 24px;">
+                    <span class="brand-icon">✏️</span>
+                    <h2>만족도 조사</h2>
+                    <p>더 좋은 프로그램을 만드는 데 도움이 됩니다.</p>
+                </div>
+                
+                <div class="likert-group">
+                    <div class="likert-question">① 가출예방에 필요한 위험 상황 및 위기대응 방법에 대해 잘 알게 되었나요?</div>
+                    <div class="likert-labels"><span>← 아니다</span><span>그렇다 →</span></div>
+                    <div class="likert-radios">
+                        <label><input type="radio" name="sat1" value="1"><div class="circle">1</div></label>
+                        <label><input type="radio" name="sat1" value="2"><div class="circle">2</div></label>
+                        <label><input type="radio" name="sat1" value="3"><div class="circle">3</div></label>
+                        <label><input type="radio" name="sat1" value="4"><div class="circle">4</div></label>
+                        <label><input type="radio" name="sat1" value="5"><div class="circle">5</div></label>
+                    </div>
+                </div>
+
+                <div class="likert-group">
+                    <div class="likert-question">② 도움이 필요할 때 이용할 수 있는 지원기관의 종류와 역할을 이해하게 되었나요?</div>
+                    <div class="likert-labels"><span>← 아니다</span><span>그렇다 →</span></div>
+                    <div class="likert-radios">
+                        <label><input type="radio" name="sat2" value="1"><div class="circle">1</div></label>
+                        <label><input type="radio" name="sat2" value="2"><div class="circle">2</div></label>
+                        <label><input type="radio" name="sat2" value="3"><div class="circle">3</div></label>
+                        <label><input type="radio" name="sat2" value="4"><div class="circle">4</div></label>
+                        <label><input type="radio" name="sat2" value="5"><div class="circle">5</div></label>
+                    </div>
+                </div>
+
+                <div class="likert-group">
+                    <div class="likert-question">③ 청소년쉼터에 대해 긍정적인 인식을 갖게 되었나요?</div>
+                    <div class="likert-labels"><span>← 아니다</span><span>그렇다 →</span></div>
+                    <div class="likert-radios">
+                        <label><input type="radio" name="sat3" value="1"><div class="circle">1</div></label>
+                        <label><input type="radio" name="sat3" value="2"><div class="circle">2</div></label>
+                        <label><input type="radio" name="sat3" value="3"><div class="circle">3</div></label>
+                        <label><input type="radio" name="sat3" value="4"><div class="circle">4</div></label>
+                        <label><input type="radio" name="sat3" value="5"><div class="circle">5</div></label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bottom-section">
+                <button class="btn-primary" onclick="validateSatisfaction()">
+                    만족도 저장 후 다음으로 ➡️
+                </button>
+            </div>
+        </div>
+        
+        <!-- Screen 4: 개인정보 및 기본설문 -->
+        <div class="screen" id="screen-4">
+            <div class="form-container" id="info-form-container">
+                <div class="top-section" style="margin-bottom: 24px;">
+                    <h2>개인정보 & 기본 설문</h2>
+                    <p>응답은 비밀이 보장됩니다.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="form-group" style="margin-bottom: 10px;">
+                        <label style="font-size: 14px; font-weight: 800; color: #1e293b;">1. 개인정보 수집·이용 동의</label>
+                        <div class="scroll-box">
+                            의정부시일시청소년쉼터(이동형)은 아래와 같이 귀하의 개인정보를 수집·이용하는 내용을「개인정보보호법」 제 15조 및 제 22조에 따라 알려드리오니, 동의하여 주시기 바랍니다.<br><br>
+                            <strong>☑ 개인정보의 수집·이용 목적:</strong><br>의정부시일시청소년쉼터(이동형)에서 진행하는 아웃리치 프로그램 참여 및 서비스 제공을 위한 활용<br><br>
+                            <strong>☑ 수집하려는 필수 항목:</strong><br>성명, 성별, 나이, 가출 경험 및 가출 여부, 취업여부, 재학여부<br><br>
+                            <strong>☑ 개인정보의 보유 및 이용 기간:</strong><br>5년(행정서류 보존기한)<br><br>
+                            ※ 개인정보보호법에 의거 개인정보 수집 및 이용에 따른 동의를 거부할 수 있으나, 참여 및 서비스 제공이 불가합니다.
+                        </div>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="agree"> <span>(필수) 내용을 확인하였으며 동의합니다.</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>이름</label>
+                    <input type="text" id="name" class="form-control" placeholder="이름을 입력하세요">
+                </div>
+
+                <div class="form-group">
+                    <label>성별</label>
+                    <div class="radio-grid">
+                        <label class="radio-btn"><input type="radio" name="gender" value="남자"> 남자</label>
+                        <label class="radio-btn"><input type="radio" name="gender" value="여자"> 여자</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>나이 (만 나이)</label>
+                    <input type="number" id="age" class="form-control" placeholder="숫자만 입력 (만 9~24세)" min="9" max="24">
+                </div>
+
+                <div class="form-group">
+                    <label>가출 경험이 있나요?</label>
+                    <div class="radio-grid">
+                        <label class="radio-btn"><input type="radio" name="runaway" value="있다" onchange="toggleRunawayLocation(false)"> 있다</label>
+                        <label class="radio-btn"><input type="radio" name="runaway" value="없다" onchange="toggleRunawayLocation(false)"> 없다</label>
+                        <label class="radio-btn"><input type="radio" name="runaway" value="가출중" onchange="toggleRunawayLocation(true)"> 가출중</label>
+                        <label class="radio-btn"><input type="radio" name="runaway" value="가능성 있다" onchange="toggleRunawayLocation(false)"> 가능성 있다</label>
+                    </div>
+                    
+                    <!-- '가출중' 선택 시 표시되는 추가 질문 -->
+                    <div class="hidden-group" id="runaway-location-group">
+                        <label>현재 어디서 지내고 계신가요?</label>
+                        <div class="radio-grid col-1">
+                            <label class="radio-btn"><input type="radio" name="runaway_location" value="독립생활(원룸, 고시원, 모텔 등)"> 독립생활(원룸, 고시원, 모텔 등)</label>
+                            <label class="radio-btn"><input type="radio" name="runaway_location" value="친구 및 지인의 집"> 친구 및 지인의 집</label>
+                            <label class="radio-btn"><input type="radio" name="runaway_location" value="길거리, 건물 등"> 길거리, 건물 등</label>
+                            <label class="radio-btn"><input type="radio" name="runaway_location" value="청소년쉼터 등의 시설"> 청소년쉼터 등의 시설</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>학교를 다니고 있나요?</label>
+                    <div class="radio-grid col-1">
+                        <label class="radio-btn"><input type="radio" name="school" value="초등학교"> 초등학교</label>
+                        <label class="radio-btn"><input type="radio" name="school" value="중학교"> 중학교</label>
+                        <label class="radio-btn"><input type="radio" name="school" value="고등학교"> 고등학교</label>
+                        <label class="radio-btn"><input type="radio" name="school" value="대학교"> 대학교</label>
+                        <label class="radio-btn"><input type="radio" name="school" value="안다닌다"> 안다닌다</label>
+                        <label class="radio-btn"><input type="radio" name="school" value="고등학교, 대학교 졸업(취직)"> 고등학교, 대학교 졸업(취직)</label>
+                        <label class="radio-btn"><input type="radio" name="school" value="고등학교, 대학교 졸업(무직)"> 고등학교, 대학교 졸업(무직)</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-section">
+                <button class="btn-primary" onclick="prepareSubmit()">
+                    작성완료 및 결과확인 ➡️
+                </button>
+            </div>
+        </div>
+
+
+        <!-- Screen 5: 최종 확인 및 관리자 코드 -->
+        <div class="screen" id="screen-5">
+            <div class="form-container">
+                <div class="top-section" style="margin-bottom: 20px;">
+                    <h2>최종 설문 제출</h2>
+                    <p>작성한 내용을 확인 후 저장해 주세요.</p>
+                </div>
+                
+                <div class="summary-list" id="summary-content">
+                    <!-- Javascript를 통해 내용이 채워집니다. -->
+                </div>
+
+                <div class="form-group" style="margin-top: 10px;">
+                    <label style="color: #202124; font-weight: 800; font-size: 15px;">관리자 인증코드</label>
+                    <input type="password" id="adminCode" class="form-control" placeholder="비밀 코드를 입력하세요 (숫자)" style="text-align: center; font-size: 17px; letter-spacing: 2px;">
+                </div>
+            </div>
+            
+            <div class="bottom-section">
+                <button class="btn-primary" onclick="submitForm()">
+                    데이터 최종 저장하기 💾
+                </button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-secondary" style="flex: 1;" onclick="nextScreen(4)">수정하기 ✏️</button>
+                    <button class="btn-danger" style="flex: 1; margin-top: 10px;" onclick="resetSurvey()">초기화 🔄</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+    // 50개의 문항 데이터
+    const questionsPool = [
+        { q: "가출은 집을 나온 기간이 짧으면 위험하지 않다.", a: "X", exp: "단, 몇 시간이나 하루 정도의 짧은 가출이라도 범죄 표적이 되거나 사고 위험에 노출될 수 있습니다." },
+        { q: "청소년의 가출은 개인의 선택만으로 발생한다고 보기 어렵다.", a: "O", exp: "가출은 개인의 충동뿐 아니라 가정 내 갈등, 학업 스트레스, 또래 관계 등 복합적인 환경적 요인이 있습니다." },
+        { q: "가출 전에는 가족·친구·학교 등과의 갈등이나 어려움이 나타날 수 있다.", a: "O", exp: "가출은 갑자기 일어나는 경우도 있지만, 대개 일상에서의 갈등이나 어려움이 누적되어 신호로 나타납니다." },
+        { q: "가출 경험이 한 번 있으면 반드시 반복해서 가출하게 된다.", a: "X", exp: "적절한 상담과 환경 개선, 주위의 관심이 있다면 충분히 재가출을 예방하고 일상으로 복귀할 수 있습니다." },
+        { q: "청소년의 가출은 개인이 의지가 약해서 생기는 문제일 뿐 가정이나 사회적 영향과는 무관하다.", a: "X", exp: "가정 폭력, 부모와의 소통 부재, 학교 폭력 등 주변 환경이 가출에 큰 영향을 미칩니다." },
+        { q: "화가 난 상태에서는 문제를 해결하기 위해 바로 집을 나가는 것이 좋다.", a: "X", exp: "감정이 격해진 상태에서의 가출은 위험 상황을 초래할 수 있으므로, 시간을 두고 대화로 해결해야 합니다." },
+        { q: "가출 중 낯선 사람이 제공하는 숙박이나 이동 수단은 조심해야 한다.", a: "O", exp: "낯선 사람의 호의는 범죄(성범죄, 불법 노동 강요 등)로 이어질 위험이 매우 높으므로 절대로 응해서는 안 됩니다." },
+        { q: "SNS나 인터넷에서 무료로 숙식을 제공한다는 온라인 게시글은 내용만 좋으면 믿어도 된다.", a: "X", exp: "온라인상의 무료 숙식 제공 게시글은 청소년을 대상으로 한 범죄의 유인책인 경우가 많아 매우 위험합니다." },
+        { q: "가출을 고민할 때 상담을 받는 것은 문제를 해결하기 위한 방법 중 하나이다.", a: "O", exp: "혼자 고민하기보다 청소년 유관기관 등을 통해 도움을 받으면 보다 안전한 해결책을 찾을 수 있습니다." },
+        { q: "가출을 예방하기 위해서는 청소년 개인뿐 아니라 가정·학교·지역사회의 관심과 협력이 필요하다.", a: "O", exp: "안전한 울타리를 제공하고 위험 청소년을 발굴·지원하기 위해 사회 전체의 다각적 협력이 필수적입니다." },
+        { q: "청소년쉼터를 이용하면 무조건 장기간 생활해야 한다.", a: "X", exp: "청소년 쉼터는 일시(24시간~일주일), 단기(3개월~9개월), 중장기(최대 3년) 등 상황에 맞게 이용할 수 있습니다." },
+        { q: "청소년쉼터는 가출한 청소년을 통제하거나 훈육하기 위한 시설이다.", a: "X", exp: "쉼터는 통제 기관이 아니라, 가출 청소년의 안전한 보호, 의식주 제공, 상담 및 자립을 지원하는 보호 시설입니다." },
+        { q: "친구가 가출했다는 사실을 알게 되면 SNS에 사진과 개인정보를 공개하는 것이 가장 빠른 방법이다.", a: "X", exp: "개인정보 무단 공개는 2차 피해를 부를 수 있으므로, 즉시 보호자나 경찰(112), 전문 기관에 제보해야 합니다." },
+        { q: "청소년의 가출은 갑작스럽게 결정되는 경우도 있지만 이전부터 여러 어려움이 쌓여 나타날 수도 있다.", a: "O", exp: "많은 경우 지속적인 스트레스나 갈등이 한계에 도달했을 때 가출이라는 형태의 대처 방식으로 나타납니다." },
+        { q: "가출을 생각하는 청소년에게는 먼저 왜 그런 생각을 하게 되었는지 살펴보는 것이 필요하다.", a: "O", exp: "무조건적인 비난보다 가출을 생각하게 된 원인과 마음 상태를 공감하고 파악하는 것이 우선되어야 합니다." },
+        { q: "가정 내에서 문제가 생겼다면 가출 외에는 해결할 방법이 없다.", a: "X", exp: "청소년 상담 1388, 가정폭력 상담소, 학교 상담실(Wee 클래스) 등 전문적인 도움을 받아 해결책을 찾을 수 있습니다." },
+        { q: "학교생활의 어려움이나 또래관계의 갈등도 가출을 고민하게 만드는 요인이 된다.", a: "O", exp: "성적 압박, 학업 스트레스, 친구 관계에서의 소외나 갈등 역시 청소년 가출의 주요 요인 중 하나입니다." },
+        { q: "부모와의 갈등이 있다고 해서 모든 청소년이 가출을 선택하는 것은 아니다.", a: "O", exp: "갈등 상황에서도 대화, 상담을 활용해 문제를 해결하는 청소년들도 많습니다." },
+        { q: "집을 나온 시간이 짧더라도 낯선 환경에서는 여러 위험에 노출될 수 있다.", a: "O", exp: "시간의 길이와 상관없이, 보호자가 없는 야외나 낯선 공간 자체에 존재하는 위협 요소는 매우 큽니다." },
+        { q: "가출한 청소년은 모두 위험한 행동을 하려고 집을 나온 것이다.", a: "X", exp: "위험 행동이 목적이 아니라, 가정 폭력 탈출이나 감정적 고통 회피, 도움 요청 등 다양한 이유로 집을 나옵니다." },
+        { q: "가출한 청소년에게는 안전하게 머물 수 있는 장소를 확보하는 것이 중요하다.", a: "O", exp: "범죄 노출을 막기 위해 청소년쉼터 등 신체적·심리적으로 안전한 보금자리를 신속히 마련해 주는 것이 급선무입니다." },
+        { q: "상담을 받는 것은 자신이 약하거나 문제가 많은 사람이라는 뜻이다.", a: "X", exp: "상담은 누구나 겪을 수 있는 어려움을 건강하게 극복하기 위해 전문적인 도움을 요청하는 용기 있는 행동입니다." },
+        { q: "친구가 가출을 고민하고 있다면 비밀을 지켜주기 위해 어떤 상황에서도 다른 사람에게 알리지 않아야 한다.", a: "X", exp: "친구의 신변이 위험해질 수 있는 상황이라면 비밀 유지보다 친구의 안전이 우선이므로 상담 기관에 도움을 요청해야 합니다." },
+        { q: "가출 예방의 중요한 목표 중 하나는 청소년이 위기 상황에서 안전하게 도움을 요청할 수 있도록 돕는 것이다.", a: "O", exp: "해결하기 어려운 위기 상황에 처했을 때 안전한 전문 기관에 도움을 요청할 권리와 방법을 알려주는 것이 핵심입니다." },
+        { q: "청소년 가출은 부모나 보호자의 동의 없이 집을 떠나 24시간 이상 집에 돌아오지 않는 행위를 의미한다.", a: "O", exp: "통상적으로 보호자 동의 없이 24시간 이상 가출 상태가 지속되는 경우를 가출 청소년 정의 기준으로 봅니다." },
+        { q: "청소년 가출은 집을 떠난 시간이 24시간보다 짧으면 가출과 관련된 상황으로 볼 수 없다.", a: "X", exp: "24시간 미만이라도 보호자의 승인 없이 무단 이탈하여 위험에 노출되었다면 위기/가출 정황으로 파악하고 개입해야 합니다." },
+        { q: "청소년 가출의 원인 중 부모님과의 문제가 가장 높은 비율을 차지한다.", a: "O", exp: "각종 실태조사에 따르면 가출의 가장 주된 요인으로 가정 내 갈등(부모와의 마찰, 폭력 등)이 1위로 집계됩니다." },
+        { q: "청소년 가출의 원인에는 학업과 관련된 어려움도 포함될 수 있다.", a: "O", exp: "성적 하락, 입시 중압감, 학교 적응 실패 등 학업 스트레스도 가출의 주요 원인 중 하나입니다." },
+        { q: "친구들과 함께하기 위해 가출하는 청소년도 있을 수 있다.", a: "O", exp: "또래 집단과의 동조 심리나 친구들과 함께 지내고 싶은 욕구 때문에 동반 가출을 선택하는 경우도 존재합니다." },
+        { q: "청소년의 가출을 예방하기 위해서는 가출의 원인을 이해하는 것이 중요하다.", a: "O", exp: "표면적인 가출 행동만 비난하기보다 근본적인 원인을 파악해야 적절한 환경 개선과 맞춤형 지원이 가능해집니다." },
+        { q: "가출을 하면 언제나 안전하게 머물 수 있는 장소가 마련되어 있다.", a: "X", exp: "준비 없는 가출은 당장 갈 곳이 없어 위험한 장소로 내몰리기 쉬우며, 안전한 보금자리를 즉각 구하기 어렵습니다." },
+        { q: "가출한 청소년에게는 심리적인 어려움이 나타날 수 있다.", a: "O", exp: "미래에 대한 불안, 죄책감, 외로움, 스트레스 등 심리·감정적 고통을 크게 겪게 됩니다." },
+        { q: "가출 후 높은 우울이나 불안과 같은 심리적 어려움을 경험할 가능성이 있다.", a: "O", exp: "안전의 위협과 불안정한 생활환경으로 인해 우울증, 불안장애, 공황 상태 등을 겪을 확률이 매우 높습니다." },
+        { q: "가출 후 갈취와 같은 범죄 피해에 노출될 가능성이 없다.", a: "X", exp: "보호자가 없는 청소년은 금품 갈취, 폭행, 착취 등 각종 범죄 피해의 표적이 되기 쉽습니다." },
+        { q: "가정밖청소년은 성매매 피해와 같은 위험에 노출될 가능성이 있다.", a: "O", exp: "궁핍과 거처 부재를 빌미로 성매매나 성착취 범죄로 유인·협박받는 위험이 매우 높습니다." },
+        { q: "인터넷 SNS 등 인터넷에서 거주지와 돈을 제공해주겠다는 '헬퍼'는 안전하다.", a: "X", exp: "인터넷상의 일명 '헬퍼'는 순수한 호의가 아닌 성착취, 불법 노동 강요, 노동력 착취 등을 목적으로 하는 범죄자인 경우가 많아 절대 믿어서는 안 됩니다." },
+        { q: "가출팸에 들어가면 모든 생활 문제가 해결된다.", a: "X", exp: "가출팸은 또 다른 폭력, 비행 공유, 범죄 모의, 경제적 착취 등의 더 큰 문제를 일으키는 경우가 많습니다." },
+        { q: "가출 후에는 의식주와 관련된 생존의 위험성을 경험할 수 있다.", a: "O", exp: "당장 먹을 음식, 잘 곳, 입을 옷 등 기본 생존 조건이 위협받아 식사를 거르거나 노숙을 하는 위험에 직면합니다." },
+        { q: "청소년 쉼터는 단순히 잠자리만 제공하며 학업이나 진로 지원은 하지 않는다.", a: "X", exp: "청소년 쉼터는 의식주뿐만 아니라 학업 복귀, 직업 훈련, 진로 상담, 자립 지원 등 통합 서비스를 제공합니다." },
+        { q: "가정폭력이나 학대를 피해 집을 나온 청소년도 청소년 쉼터의 긴급 보호 조치를 받을 수 있다.", a: "O", exp: "가정폭력이나 학대 피해 청소년은 쉼터를 통해 즉각적인 긴급 신변 보호와 관련 기관 연계 지원을 받을 수 있습니다." },
+        { q: "이동형 청소년 쉼터는 거리를 방황하는 청소년을 직접 찾아가 긴급물품과 상담을 제공한다.", a: "O", exp: "이동형 쉼터는 거리로 직접 찾아가 위기 청소년을 발굴하고 물품 지원, 간식, 상담 등을 제공합니다." },
+        { q: "청소년 쉼터 이용 시 원칙적으로 이용 요금이 발생한다.", a: "X", exp: "청소년 쉼터의 모든 이용 및 프로그램, 식사, 숙박 등은 청소년에게 전액 무료로 제공됩니다." },
+        { q: "가정밖청소년이 생활비를 벌기 위해 청소년 유해업소에서 일하는 것은 법적으로 금지되어 있다.", a: "O", exp: "청소년보호법에 따라 청소년은 유해업소(유흥주점, 단란주점, 사행성 업소 등)에 취업하거나 알바를 할 수 없습니다." },
+        { q: "친구가 가출을 고민할 때 같이 집을 나가주는 것이 친구 사이의 의리를 지키는 올바른 방법이다.", a: "X", exp: "같이 가출하는 것은 두 사람 모두를 위험에 빠뜨리는 일입니다. 친구의 어려움을 들어주고 안전한 상담 기관을 소개해 주는 것이 진정한 도움입니다." },
+        { q: "가출 기간 중 불규칙한 식사와 노숙은 건강 악화와 영양 불균형을 초래한다.", a: "O", exp: "비위생적인 환경과 부실한 식사로 인해 면역력 저하, 영양실조 등 신체 건강이 심각하게 악화될 수 있습니다." },
+        { q: "SNS 오픈채팅방에 '재져줄 사람' 구함 등의 글을 올리는 행동은 성범죄 표적이 되기 쉽다.", a: "O", exp: "범죄 목적을 가진 불순한 접근자들에게 위치와 무방비 상태를 노출하게 되므로 성범죄 위험에 크게 내몰립니다." },
+        { q: "청소년 쉼터는 기간에 따라 일시쉼터, 단기쉼터, 중장기쉼터로 나누어 운영된다.", a: "O", exp: "청소년 쉼터는 보호 기간과 목적에 따라 일시(24시간~7일), 단기(3개월~최대 9개월), 중장기(최대 3년) 쉼터로 구분되어 맞춤형 보호 서비스를 제공합니다." },
+        { q: "가정밖청소년은 신분증이 없거나 보호자가 없으면 병원 진료 및 의료 지원을 받을 수 없다.", a: "X", exp: "신분증이나 보호자가 없더라도 청소년쉼터나 관련 전문 지원기관, 보건소, 긴급 의료 지원제도를 통해 필요한 진료 및 치료를 받을 수 있습니다." },
+        { q: "주변에 어려움을 겪는 친구 이야기를 들어주고 공감해 주는 것만으로도 가출 예방에 큰 도움이 된다.", a: "O", exp: "자신의 힘들고 불안한 마음을 진심으로 정서적 지원받고 정서적 안전지대를 확인하는 것만으로도 충동적인 가출을 예방하는 데 결정적인 역할을 합니다." },
+        { q: "청소년 쉼터는 가출 상태의 청소년뿐만 아니라 가출을 고민하는 청소년의 예방 상담도 가능하다.", a: "O", exp: "쉼터는 이미 집을 나온 청소년 보호뿐만 아니라, 가출 위기에 있거나 가정·학교 문제로 고민하는 청소년에게 사전 예방 상담과 지원 프로그램을 함께 제공합니다." }
+    ];
+
+    let formData = {
+        sat1: "",
+        sat2: "",
+        sat3: ""
+    };
+    
+    for (let i = 1; i <= 50; i++) {
+        formData['quiz_' + i] = "";
+    }
+    
+    let selectedQuizzes = [];
+
+    function initQuiz() {
+        // 모든 결과 초기화
+        for (let i = 1; i <= 50; i++) {
+            formData['quiz_' + i] = "";
+        }
+        formData.sat1 = "";
+        formData.sat2 = "";
+        formData.sat3 = "";
+
+        // 50문제 중 랜덤으로 2개 선택 (중복 방지)
+        let idx1 = Math.floor(Math.random() * questionsPool.length);
+        let idx2 = Math.floor(Math.random() * questionsPool.length);
+        while(idx1 === idx2) {
+            idx2 = Math.floor(Math.random() * questionsPool.length);
+        }
+        
+        selectedQuizzes = [
+            { num: idx1 + 1, data: questionsPool[idx1] },
+            { num: idx2 + 1, data: questionsPool[idx2] }
+        ];
+
+        // 퀴즈 1 화면 세팅
+        document.getElementById('quiz-title-1').innerText = `${selectedQuizzes[0].num}) ${selectedQuizzes[0].data.q}`;
+        document.getElementById('exp-1-text').innerHTML = `<strong>해설)</strong><br>${selectedQuizzes[0].data.exp}`;
+        resetQuizUI(1);
+
+        // 퀴즈 2 화면 세팅
+        document.getElementById('quiz-title-2').innerText = `${selectedQuizzes[1].num}) ${selectedQuizzes[1].data.q}`;
+        document.getElementById('exp-2-text').innerHTML = `<strong>해설)</strong><br>${selectedQuizzes[1].data.exp}`;
+        resetQuizUI(2);
+
+        nextScreen(1);
+    }
+    
+    function resetQuizUI(qIdx) {
+        document.getElementById(`btn-q${qIdx}-O`).className = 'btn-ox';
+        document.getElementById(`btn-q${qIdx}-O`).disabled = false;
+        document.getElementById(`btn-q${qIdx}-X`).className = 'btn-ox';
+        document.getElementById(`btn-q${qIdx}-X`).disabled = false;
+        document.getElementById(`exp-${qIdx}`).classList.remove('show');
+        document.getElementById(`next-${qIdx}`).disabled = true;
+    }
+
+    function toggleRunawayLocation(show) {
+        const group = document.getElementById('runaway-location-group');
+        if (show) {
+            group.classList.add('show');
+        } else {
+            group.classList.remove('show');
+            document.querySelectorAll('input[name="runaway_location"]').forEach(el => el.checked = false);
+        }
+    }
+
+    function nextScreen(screenNumber) {
+        window.scrollTo(0, 0);
+        
+        // 폼 스크롤 최상단 이동
+        const formContainer = document.getElementById('info-form-container');
+        if (formContainer) {
+            formContainer.scrollTop = 0;
+        }
+
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-' + screenNumber).classList.add('active');
+    }
+
+    function answerQuiz(qIdx, selected) {
+        document.getElementById(`btn-q${qIdx}-O`).disabled = true;
+        document.getElementById(`btn-q${qIdx}-X`).disabled = true;
+        
+        const actualCorrect = selectedQuizzes[qIdx - 1].data.a;
+        const isCorrect = (selected === actualCorrect);
+        
+        const selectedBtn = document.getElementById(`btn-q${qIdx}-${selected}`);
+        
+        if (isCorrect) {
+            selectedBtn.classList.add('correct');
+            document.getElementById(`exp-${qIdx}-ans`).innerText = `정답입니다! 🎉 (정답 : ${actualCorrect})`;
+            document.getElementById(`exp-${qIdx}-ans`).style.color = 'var(--correct-green)';
+        } else {
+            selectedBtn.classList.add('wrong');
+            document.getElementById(`btn-q${qIdx}-${actualCorrect}`).classList.add('correct');
+            document.getElementById(`exp-${qIdx}-ans`).innerText = `틀렸습니다! 🥺 (정답 : ${actualCorrect})`;
+            document.getElementById(`exp-${qIdx}-ans`).style.color = 'var(--wrong-red)';
+        }
+
+        document.getElementById(`exp-${qIdx}`).classList.add('show');
+        document.getElementById(`next-${qIdx}`).disabled = false;
+
+        // 결과 저장 (해당 문제 번호(1~50)에 매핑하여 '정답' 또는 '오답' 문자열 저장)
+        let actualQuestionNumber = selectedQuizzes[qIdx - 1].num;
+        formData['quiz_' + actualQuestionNumber] = isCorrect ? "정답" : "오답";
+    }
+
+    function validateSatisfaction() {
+        const sat1 = document.querySelector('input[name="sat1"]:checked');
+        const sat2 = document.querySelector('input[name="sat2"]:checked');
+        const sat3 = document.querySelector('input[name="sat3"]:checked');
+        
+        if (!sat1 || !sat2 || !sat3) {
+            alert("세 가지 만족도 문항에 모두 응답해주세요.");
+            return;
+        }
+        
+        formData.sat1 = sat1.value;
+        formData.sat2 = sat2.value;
+        formData.sat3 = sat3.value;
+        
+        nextScreen(4);
+    }
+
+    function prepareSubmit() {
+        const agree = document.getElementById('agree').checked;
+        const name = document.getElementById('name').value.trim();
+        const gender = document.querySelector('input[name="gender"]:checked');
+        const age = document.getElementById('age').value;
+        const runaway = document.querySelector('input[name="runaway"]:checked');
+        const runawayLocation = document.querySelector('input[name="runaway_location"]:checked');
+        const school = document.querySelector('input[name="school"]:checked');
+
+        if (!agree) {
+            alert("개인정보 수집 및 이용에 동의해주세요.");
+            return;
+        }
+        if (!name) {
+            alert("이름을 입력해주세요.");
+            document.getElementById('name').focus();
+            return;
+        }
+        if (!gender) {
+            alert("성별을 선택해주세요.");
+            return;
+        }
+        if (!age || age < 9 || age > 24) {
+            alert("만 9~24세 청소년만 참여 가능합니다. 숫자를 정확히 입력해주세요.");
+            document.getElementById('age').focus();
+            return;
+        }
+        if (!runaway) {
+            alert("가출 경험 여부를 선택해주세요.");
+            return;
+        }
+        
+        let locationValue = "해당없음";
+        if (runaway.value === "가출중") {
+            if (!runawayLocation) {
+                alert("현재 지내는 곳을 선택해주세요.");
+                return;
+            }
+            locationValue = runawayLocation.value;
+        }
+
+        if (!school) {
+            alert("학교 재학 여부를 선택해주세요.");
+            return;
+        }
+
+        formData.name = name;
+        formData.gender = gender.value;
+        formData.age = age;
+        formData.runaway = runaway.value;
+        formData.runawayLocation = locationValue;
+        formData.school = school.value;
+
+        const summaryContent = document.getElementById('summary-content');
+        const getResultStyle = (val) => val === '정답' ? `<span class="correct-txt">맞힘 ⭕</span>` : `<span class="wrong-txt">틀림 ❌</span>`;
+        
+        let runawayText = formData.runaway;
+        if (formData.runaway === '가출중') {
+            runawayText += ` <span style="font-size: 13px; color: var(--text-muted);">(${formData.runawayLocation})</span>`;
+        }
+
+        // 풀이한 2개의 퀴즈 결과 추출
+        let quiz1_num = selectedQuizzes[0].num;
+        let quiz1_res = formData['quiz_' + quiz1_num];
+        
+        let quiz2_num = selectedQuizzes[1].num;
+        let quiz2_res = formData['quiz_' + quiz2_num];
+
+        summaryContent.innerHTML = `
+            <div class="summary-item"><strong>이름</strong> ${formData.name}</div>
+            <div class="summary-item"><strong>성별/나이</strong> ${formData.gender} / 만 ${formData.age}세</div>
+            <div class="summary-item"><strong>가출경험</strong> ${runawayText}</div>
+            <div class="summary-item"><strong>재학상태</strong> ${formData.school}</div>
+            <div class="summary-item">
+                <strong style="width: 100%; display: block; margin-bottom: 4px;">만족도 조사 결과</strong>
+                ① 위기대응 방법 이해: ${formData.sat1}점<br>
+                ② 지원기관 역할 이해: ${formData.sat2}점<br>
+                ③ 쉼터 긍정적 인식: ${formData.sat3}점
+            </div>
+            <div class="summary-item quiz-res">
+                <strong>📝 가출예방 퀴즈 결과</strong>
+                Q${quiz1_num}: ${getResultStyle(quiz1_res)} <br>
+                Q${quiz2_num}: ${getResultStyle(quiz2_res)}
+            </div>
+        `;
+
+        document.getElementById('adminCode').value = ""; 
+        nextScreen(5);
+    }
+
+    function submitForm() {
+        const adminCode = document.getElementById('adminCode').value;
+        if (adminCode !== '2015') {
+            alert("관리자 확인 코드가 일치하지 않습니다.");
+            document.getElementById('adminCode').focus();
+            return;
+        }
+
+        document.getElementById('loading').style.display = 'flex';
+        
+        // ★ SCRIPT_URL 에 Apps Script 배포 URL을 입력하세요.
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby_VDVNkZZ6nM3OpHPtcdyaue9paan_Q5mrenCIN9sYE_dSIvViqrd5LrHj4v0O-lbU/exec'; 
+
+        if (SCRIPT_URL) {
+            // JSONP 방식을 위한 동적 스크립트 생성
+            const script = document.createElement('script');
+            const callbackName = 'jsonpCallback_' + Math.round(100000 * Math.random());
+            
+            // 콜백 함수 전역 등록
+            window[callbackName] = function(data) {
+                document.body.removeChild(script);
+                delete window[callbackName];
+                completeSubmission();
+            };
+            
+            // 데이터 파라미터화
+            let queryStr = `?callback=${callbackName}`;
+            for (let key in formData) {
+                queryStr += `&${key}=${encodeURIComponent(formData[key])}`;
+            }
+            
+            script.src = SCRIPT_URL + queryStr;
+            
+            // 에러 발생 시 처리
+            script.onerror = function() {
+                document.body.removeChild(script);
+                delete window[callbackName];
+                console.error("전송 에러 발생");
+                completeSubmission(); // 에러가 나도 진행되게 처리
+            }
+            
+            document.body.appendChild(script);
+
+        } else {
+            setTimeout(completeSubmission, 1000);
+        }
+    }
+    
+    function resetSurvey() {
+        if(confirm("작성하신 모든 내용이 삭제되고 처음으로 돌아갑니다. 다시 작성하시겠습니까?")) {
+            document.querySelectorAll('input[type="text"], input[type="number"], input[type="password"]').forEach(el => el.value = '');
+            document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(el => el.checked = false);
+            toggleRunawayLocation(false);
+            nextScreen(0);
+        }
+    }
+
+    function completeSubmission() {
+        document.getElementById('loading').style.display = 'none';
+        alert("성공적으로 저장되었습니다! 참여해 주셔서 감사합니다. 🎉");
+        
+        document.querySelectorAll('input[type="text"], input[type="number"], input[type="password"]').forEach(el => el.value = '');
+        document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(el => el.checked = false);
+        toggleRunawayLocation(false);
+        nextScreen(0);
+    }
+</script>
+</body>
+</html>
