@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <!-- 모바일 최적화 및 줌 방지 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>포텐 대나무 숲</title>
+    <!-- 세련된 감성 폰트 불러오기 -->
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --bg-color: #e8f5e9;
+            --card-colors: #fef08a, #bbf7d0, #fbcfe8, #e9d5ff, #bae6fd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background: linear-gradient(135deg, #f1f8e9 0%, #c8e6c9 100%);
+            background-attachment: fixed;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 60px; /* 헤더 높이만큼 여백 */
+        }
+
+        /* 반투명 글래스모피즘 상단 바 */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+        header h1 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-color);
+            letter-spacing: -0.5px;
+        }
+
+        /* 포스트잇 게시판 (모바일 2단, 태블릿/PC 반응형) */
+        .forest-board {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            padding-bottom: 100px; /* 플로팅 버튼 여백 */
+        }
+
+        .post-it {
+            font-family: 'Gowun Dodum', sans-serif;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 2px 4px 10px rgba(0,0,0,0.08);
+            font-size: 15px;
+            line-height: 1.5;
+            color: #222;
+            word-wrap: break-word;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 140px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .post-it:active {
+            transform: scale(0.95) !important; /* 모바일 터치 효과 */
+        }
+
+        .post-date {
+            font-family: 'Pretendard', sans-serif;
+            font-size: 11px;
+            color: rgba(0,0,0,0.4);
+            text-align: right;
+            margin-top: 15px;
+        }
+
+        /* 플로팅 글쓰기 버튼 (FAB) */
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.4);
+            cursor: pointer;
+            z-index: 100;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .fab:active {
+            transform: scale(0.9);
+            background-color: #1b5e20;
+        }
+
+        /* 글쓰기 모달 (바텀 시트 스타일) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+            z-index: 200;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .bottom-sheet {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            border-radius: 20px 20px 0 0;
+            padding: 24px;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+            transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 201;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .bottom-sheet.active {
+            bottom: 0;
+        }
+
+        .bottom-sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin: 0 auto 10px auto;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            resize: none;
+            font-family: 'Gowun Dodum', sans-serif;
+            font-size: 16px;
+            background-color: #f9f9f9;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: var(--primary-color);
+            background-color: white;
+        }
+
+        .submit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .submit-btn:disabled {
+            background-color: #9e9e9e;
+            cursor: not-allowed;
+        }
+
+        /* 로딩 스피너 및 빈 화면 안내 */
+        .loading-text, .empty-state {
+            text-align: center;
+            width: 100%;
+            padding: 40px 0;
+            color: #666;
+            grid-column: 1 / -1;
+            font-size: 14px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🎋 포텐 대나무 숲</h1>
+    </header>
+
+    <div class="forest-board" id="board">
+        <div class="loading-text">숲의 소리를 불러오는 중...</div>
+    </div>
+
+    <!-- 플로팅 버튼 -->
+    <div class="fab" onclick="toggleModal()">+</div>
+
+    <!-- 글쓰기 바텀 시트 (모달) -->
+    <div class="modal-overlay" id="overlay" onclick="toggleModal()"></div>
+    <div class="bottom-sheet" id="bottomSheet">
+        <div class="bottom-sheet-handle"></div>
+        <textarea id="messageInput" placeholder="오늘의 생각이나 감정을 익명으로 털어놓아 보세요..."></textarea>
+        <button class="submit-btn" id="submitBtn" onclick="submitMessage()">바람에 날려 보내기</button>
+    </div>
+
+    <script>
+        // 🚨 주의: 여기에 배포하신 Apps Script '웹 앱 URL'을 반드시 다시 넣어주세요!
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZEbCbgKcEGIpMxQ3q_vEeL70P_ymfhF56WnZYxe5AVUX8WtdFE1_xxay4L_l4jzXT/exec'; 
+
+        // 감성적인 파스텔 색상 배열
+        const postItColors = ['#fef08a', '#bbf7d0', '#fbcfe8', '#e9d5ff', '#bae6fd', '#fed7aa'];
+
+        window.onload = function() {
+            loadMessages();
+        };
+
+        // 모달(글쓰기 창) 열기/닫기
+        function toggleModal() {
+            const overlay = document.getElementById('overlay');
+            const bottomSheet = document.getElementById('bottomSheet');
+            
+            if(bottomSheet.classList.contains('active')) {
+                overlay.classList.remove('active');
+                bottomSheet.classList.remove('active');
+                document.getElementById('messageInput').blur(); // 키보드 내리기
+            } else {
+                overlay.classList.add('active');
+                bottomSheet.classList.add('active');
+                document.getElementById('messageInput').focus(); // 키보드 올리기
+            }
+        }
+
+        // 시간 포맷팅 (오전/오후 H:MM)
+        function formatTime(dateString) {
+            const date = new Date(dateString);
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
+            const ampm = hours >= 12 ? '오후' : '오전';
+            hours = hours % 12;
+            hours = hours ? hours : 12; 
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            return `${ampm} ${hours}:${minutes}`;
+        }
+
+        // 데이터 불러오기
+        function loadMessages() {
+            const board = document.getElementById('board');
+            
+            fetch(SCRIPT_URL)
+                .then(response => response.json())
+                .then(data => {
+                    board.innerHTML = ''; 
+                    
+                    if(data.length === 0) {
+                        board.innerHTML = '<div class="empty-state">아직 오늘 남겨진 이야기가 없습니다.<br>첫 번째로 외쳐보세요!</div>';
+                        return;
+                    }
+
+                    // 최신 글이 위로 오도록 역순 정렬
+                    data.reverse().forEach(item => {
+                        createPostIt(item.message, formatTime(item.date));
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    board.innerHTML = '<div class="empty-state">데이터를 불러오지 못했습니다.</div>';
+                });
+        }
+
+        // 데이터 전송
+        function submitMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const submitBtn = document.getElementById('submitBtn');
+            const message = messageInput.value.trim();
+
+            if (!message) {
+                alert('내용을 입력해주세요!');
+                return;
+            }
+
+            // 로딩 상태 변경 (중복 클릭 방지)
+            submitBtn.innerText = '날려 보내는 중...';
+            submitBtn.disabled = true;
+
+            const formData = new URLSearchParams();
+            formData.append('message', message);
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData.toString()
+            })
+            .then(response => response.json())
+            .then(result => {
+                if(result.result === 'success') {
+                    messageInput.value = '';
+                    toggleModal(); // 모달 닫기
+                    loadMessages(); // 새로고침
+                } else {
+                    alert('전송에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('오류가 발생했습니다.');
+            })
+            .finally(() => {
+                // 버튼 상태 복구
+                submitBtn.innerText = '바람에 날려 보내기';
+                submitBtn.disabled = false;
+            });
+        }
+
+        // 화면에 포스트잇 그리기 (랜덤 색상 및 각도 적용)
+        function createPostIt(text, timeStr) {
+            const board = document.getElementById('board');
+            const postIt = document.createElement('div');
+            postIt.className = 'post-it';
+            
+            // 랜덤 색상
+            const randomColor = postItColors[Math.floor(Math.random() * postItColors.length)];
+            // -3도 ~ +3도 사이의 미세한 랜덤 회전
+            const randomRotation = (Math.random() * 6 - 3).toFixed(1);
+            
+            postIt.style.backgroundColor = randomColor;
+            postIt.style.transform = `rotate(${randomRotation}deg)`;
+
+            const content = document.createElement('div');
+            content.innerText = text;
+            
+            const timeEl = document.createElement('div');
+            timeEl.className = 'post-date';
+            timeEl.innerText = timeStr;
+            
+            postIt.appendChild(content);
+            postIt.appendChild(timeEl);
+            
+            board.appendChild(postIt);
+        }
+    </script>
+</body>
+</html>
