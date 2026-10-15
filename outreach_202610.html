@@ -1,906 +1,789 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>의정부시일시청소년쉼터(이동형) 아웃리치</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-    <style>
-        /* ===== 디자인 토큰 ===== */
-        :root {
-            --bg: #eef1fb;
-            --surface: #ffffff;
-            --ink: #1f2540;
-            --muted: #6b7394;
-            --line: #e3e7f5;
-            --primary: #4c6fff;
-            --primary-dark: #3a56d4;
-            --primary-soft: #eaefff;
-            --ok: #22b384;
-            --ok-soft: #e2f6ee;
-            --bad: #f0566b;
-            --bad-soft: #ffeaee;
-            --warn-soft: #fff6dc;
-            --warn-line: #f6e2a3;
-            --warn-ink: #8a5a00;
-            --pad: 14px;
-            --radius: 16px;
-            --shadow-sm: 0 2px 8px rgba(76, 111, 255, 0.08);
-            --shadow-md: 0 8px 24px rgba(76, 111, 255, 0.18);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>의정부시일시청소년쉼터(이동형) 아웃리치</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<!-- 폰트는 비동기로 불러와 첫 화면 표시를 막지 않습니다 (실패해도 시스템 폰트로 동작) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" media="print" onload="this.media='all'">
+<style>
+:root{
+  --bg-deep:#090d20; --surface:rgba(16,22,48,.94); --surface-card:rgba(255,255,255,.07);
+  --ink:#f4f7ff; --muted:#9aa6cb; --line:rgba(255,255,255,.14); --line-bright:rgba(255,255,255,.28);
+  --primary:#5e81ff; --cyan:#22d3ee; --ok:#10b981; --ok-bright:#34d399; --bad:#f43f5e;
+  --warn-soft:rgba(245,158,11,.16); --warn-line:rgba(251,191,36,.45); --warn-ink:#fcd34d;
+  --pad:18px; --radius:18px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg-deep); color:var(--ink);
+  font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  font-size:14.5px; line-height:1.48; letter-spacing:-.01em;
+  -webkit-tap-highlight-color:transparent; -webkit-text-size-adjust:100%;
+  overflow-x:hidden; min-height:100vh; min-height:100dvh;
+}
 
-        * { box-sizing: border-box; }
+/* ===== 배경: CSS 오로라(GPU 합성) + 가벼운 네트워크 캔버스 ===== */
+.aurora{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.blob{
+  position:absolute; width:90vmax; height:90vmax; border-radius:50%;
+  background:radial-gradient(circle,currentColor 0%,transparent 62%);
+  opacity:.34; transition:color .9s ease; will-change:transform;
+}
+.blob:nth-child(1){color:#4c6fff;left:-35vmax;top:-30vmax;animation:drift1 26s ease-in-out infinite alternate}
+.blob:nth-child(2){color:#22d3ee;right:-45vmax;top:10vh;animation:drift2 32s ease-in-out infinite alternate}
+.blob:nth-child(3){color:#8b5cf6;left:-20vmax;bottom:-50vmax;animation:drift3 29s ease-in-out infinite alternate}
+body.mood-correct .blob:nth-child(1){color:#10b981}
+body.mood-correct .blob:nth-child(2){color:#34d399}
+body.mood-correct .blob:nth-child(3){color:#06b6d4}
+body.mood-wrong .blob:nth-child(1){color:#f43f5e}
+body.mood-wrong .blob:nth-child(2){color:#fb7185}
+body.mood-wrong .blob:nth-child(3){color:#f97316}
+@keyframes drift1{to{transform:translate3d(25vmax,18vmax,0)}}
+@keyframes drift2{to{transform:translate3d(-22vmax,20vmax,0)}}
+@keyframes drift3{to{transform:translate3d(28vmax,-16vmax,0)}}
+#bgCanvas,#fxCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;display:block}
+#bgCanvas{z-index:0}
+#fxCanvas{z-index:9999}
 
-        /* ===== 기본 / 모바일 최적화 ===== */
-        body {
-            margin: 0;
-            font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-            background: linear-gradient(160deg, #e9eefc 0%, #f3effc 55%, #eaf6f6 100%);
-            background-attachment: fixed;
-            color: var(--ink);
-            font-size: 14.5px;
-            line-height: 1.45;
-            letter-spacing: -0.01em;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-text-size-adjust: 100%;
-        }
-        .app-container {
-            max-width: 480px;
-            margin: 0 auto;
-            background: var(--surface);
-            min-height: 100vh;
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
-        }
-        @media (min-width: 481px) {
-            .app-container {
-                margin: 20px auto;
-                min-height: calc(100vh - 40px);
-                border-radius: 28px;
-                box-shadow: 0 20px 50px rgba(60, 80, 160, 0.16);
-            }
-        }
-        .screen {
-            display: none;
-            padding: 12px var(--pad) calc(14px + env(safe-area-inset-bottom, 0px));
-            flex-grow: 1;
-            flex-direction: column;
-            position: relative;
-        }
-        .screen.active {
-            display: flex;
-            animation: fadeIn 0.35s ease-out;
-        }
+/* ===== 레이아웃 ===== */
+.app-container{
+  max-width:480px; margin:0 auto; min-height:100vh; min-height:100dvh;
+  display:flex; flex-direction:column; position:relative; z-index:2; padding:12px;
+}
+@media (min-width:481px){.app-container{margin:24px auto;min-height:calc(100vh - 48px);justify-content:center}}
+#quiz-root{display:contents}
 
-        /* ===== 타이틀 및 헤더 ===== */
-        .header { text-align: center; margin-bottom: 10px; }
-        .header h2 {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--ink);
-            margin: 0 0 3px 0;
-            word-break: keep-all;
-            letter-spacing: -0.02em;
-        }
-        .header p { font-size: 13px; color: var(--muted); margin: 0; }
+.sound-toggle{
+  position:fixed; top:calc(14px + env(safe-area-inset-top,0px)); right:16px; z-index:50;
+  width:40px;height:40px;border-radius:50%;border:1px solid var(--line-bright);
+  background:rgba(19,25,52,.85);color:var(--ink);font-size:17px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.sound-toggle.muted{opacity:.55}
 
-        /* ===== 시작 화면 ===== */
-        #screen-0 { overflow: hidden; justify-content: space-between; padding-top: 32px; padding-bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
-        #screen-0::before, #screen-0::after {
-            content: "";
-            position: absolute;
-            border-radius: 50%;
-            z-index: 0;
-            pointer-events: none;
-        }
-        #screen-0::before {
-            width: 280px; height: 280px; top: -90px; right: -90px;
-            background: radial-gradient(circle at 30% 30%, #c9d6ff, rgba(201, 214, 255, 0) 70%);
-        }
-        #screen-0::after {
-            width: 240px; height: 240px; bottom: 60px; left: -90px;
-            background: radial-gradient(circle at 60% 40%, #d9f3ec, rgba(217, 243, 236, 0) 70%);
-        }
-        #screen-0 > * { position: relative; z-index: 1; }
-        #screen-0 .header { margin-top: 0 !important; margin-bottom: 0; }
-        #screen-0 .header h2 { font-size: 21px; color: var(--primary-dark); }
-        #screen-0 .header p {
-            display: inline-block;
-            margin-top: 4px;
-            padding: 4px 12px;
-            background: var(--primary-soft);
-            color: var(--primary-dark);
-            border-radius: 999px;
-            font-size: 13px;
-            font-weight: 700;
-        }
-        #screen-0 > div[style*="text-align: center"] {
-            margin: auto 0 !important;
-            padding: 32px 16px;
-            background: rgba(255, 255, 255, 0.85);
-            border: 1px solid var(--line);
-            border-radius: 24px;
-            box-shadow: var(--shadow-sm);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-        }
-        #screen-0 h3 {
-            font-size: 26px;
-            font-weight: 800;
-            color: var(--primary) !important;
-            margin: 0 0 8px 0 !important;
-            letter-spacing: -0.03em;
-        }
-        #screen-0 p[style] { font-size: 14.5px; color: var(--muted) !important; line-height: 1.7 !important; margin: 0; word-break: keep-all; }
+/* ===== 카드 화면 (backdrop-filter 제거: 모바일 성능 저하의 주원인) ===== */
+.screen{
+  display:none; flex-direction:column; flex-grow:1; position:relative; overflow:hidden;
+  padding:20px var(--pad) calc(20px + env(safe-area-inset-bottom,0px));
+  background:var(--surface); border:1px solid var(--line); border-radius:28px;
+  box-shadow:0 20px 50px rgba(4,8,26,.6), inset 0 1px 1px rgba(255,255,255,.2);
+}
+.screen.active{display:flex;animation:cardIn .38s cubic-bezier(.22,1,.36,1) both}
+.screen.exiting{animation:cardOut .16s ease-in both;pointer-events:none}
+@keyframes cardIn{from{opacity:0;transform:translate3d(0,26px,0) scale(.97)}to{opacity:1;transform:none}}
+@keyframes cardOut{from{opacity:1}to{opacity:0;transform:translate3d(0,-16px,0) scale(.98)}}
 
-        /* ===== 약관 및 안내 박스 ===== */
-        .card {
-            background: #f7f9ff;
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            padding: 10px;
-            margin-bottom: 12px;
-        }
-        .scroll-box {
-            max-height: 120px;
-            overflow-y: auto;
-            font-size: 12px;
-            line-height: 1.55;
-            color: #565e7e;
-            background: #fff;
-            border: 1px solid var(--line);
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            -webkit-overflow-scrolling: touch;
-        }
-        .scroll-box strong { color: var(--ink); }
+/* 요소 순차 등장: fill-mode를 backwards로 해 끝난 뒤 hover/active 효과가 정상 동작 */
+.st{animation:stIn .4s cubic-bezier(.22,1,.36,1) backwards;animation-delay:calc(var(--i,0)*45ms + 60ms)}
+@keyframes stIn{from{opacity:0;transform:translate3d(0,12px,0)}to{opacity:1;transform:none}}
 
-        /* ===== 폼 요소 ===== */
-        .form-group { margin-bottom: 12px; }
-        .form-group > label {
-            display: block;
-            font-weight: 700;
-            margin-bottom: 5px;
-            font-size: 14px;
-            color: var(--ink);
-        }
-        .form-control {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1.5px solid var(--line);
-            border-radius: 10px;
-            font-size: 16px; /* iOS 확대 방지 */
-            font-family: inherit;
-            color: var(--ink);
-            background: #fbfcff;
-            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-        }
-        .form-control::placeholder { color: #a6adc8; }
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: #fff;
-            box-shadow: 0 0 0 4px rgba(76, 111, 255, 0.14);
-        }
+.header{text-align:center;margin-bottom:14px}
+.header h2{font-size:19px;font-weight:800;margin:0 0 4px;word-break:keep-all;letter-spacing:-.02em}
+.header p{font-size:13px;color:var(--muted);margin:0}
 
-        /* ===== 체크박스 & 라디오 버튼 ===== */
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            color: var(--bad);
-            background: var(--bad-soft);
-            border: 1.5px solid #ffd0d8;
-            padding: 9px 12px;
-            border-radius: 10px;
-        }
-        .checkbox-label input { margin: 0 10px 0 0; width: 20px; height: 20px; accent-color: var(--bad); flex-shrink: 0; }
-        .checkbox-label:has(input:checked) { background: #ffdfe5; border-color: var(--bad); }
+/* 시작 화면 */
+#screen-0{justify-content:space-between;padding-top:36px}
+#screen-0 .header{margin-top:28px}
+#screen-0 .header h2{
+  font-size:21px;background:linear-gradient(135deg,#fff,#c7d6ff 55%,#7ce7ff);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+#screen-0 .header p{
+  display:inline-block;margin-top:8px;padding:5px 14px;background:rgba(94,129,255,.2);
+  border:1px solid rgba(124,231,255,.35);color:#9de8ff;border-radius:999px;font-size:12.5px;font-weight:700;
+}
+.intro-box{
+  margin:auto 0;padding:36px 18px;text-align:center;border-radius:24px;
+  background:linear-gradient(145deg,rgba(255,255,255,.1),rgba(255,255,255,.03));
+  border:1px solid var(--line-bright);
+}
+.intro-box h3{
+  font-size:28px;font-weight:900;margin:0 0 12px;letter-spacing:-.03em;
+  background:linear-gradient(135deg,#7da0ff,#38ef7d);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.intro-box p{font-size:14.5px;color:#d6def8;line-height:1.7;margin:0;word-break:keep-all}
 
-        .radio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-        .radio-grid.col-1 { grid-template-columns: 1fr; }
-        .radio-btn {
-            display: flex;
-            align-items: center;
-            background: #fbfcff;
-            border: 1.5px solid var(--line);
-            padding: 9px 12px;
-            border-radius: 10px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, color 0.2s;
-        }
-        .radio-btn input { margin: 0 10px 0 0; width: 18px; height: 18px; accent-color: var(--primary); flex-shrink: 0; }
-        .radio-btn:active { transform: scale(0.99); }
-        .radio-btn:has(input:checked) {
-            background: var(--primary-soft);
-            border-color: var(--primary);
-            color: var(--primary-dark);
-            font-weight: 700;
-            box-shadow: 0 2px 8px rgba(76, 111, 255, 0.14);
-        }
+/* 폼 */
+.card{background:var(--surface-card);border:1px solid var(--line);border-radius:var(--radius);padding:12px;margin-bottom:14px}
+.scroll-box{
+  max-height:120px;overflow-y:auto;font-size:12px;line-height:1.6;color:#c4cee8;background:rgba(8,12,30,.65);
+  border:1px solid var(--line);padding:10px 12px;border-radius:12px;margin-bottom:10px;-webkit-overflow-scrolling:touch;
+}
+.scroll-box strong{color:#8ec5ff}
+.form-group{margin-bottom:13px}
+.form-group>label{display:block;font-weight:700;margin-bottom:6px;font-size:13.5px;color:#dbe4ff}
+.form-control{
+  width:100%;padding:11px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:16px;font-family:inherit;
+  color:var(--ink);background:rgba(11,16,38,.85);transition:border-color .2s,box-shadow .2s;
+}
+.form-control::placeholder{color:#6c79a1}
+.form-control:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 4px rgba(34,211,238,.18)}
 
-        /* ===== 조건부 표시 요소 ===== */
-        .hidden-group {
-            display: none;
-            margin-top: 8px;
-            padding: 10px;
-            background: var(--warn-soft);
-            border-radius: 14px;
-            border: 1.5px solid var(--warn-line);
-        }
-        .hidden-group.show { display: block; animation: slideDown 0.3s ease-out; }
-        .hidden-group > label { display: block; color: var(--warn-ink); font-weight: 700; margin-bottom: 6px; }
-        .hidden-group .radio-btn { border-color: var(--warn-line); background: #fff; }
-        .hidden-group .radio-btn:has(input:checked) { background: var(--primary-soft); border-color: var(--primary); }
+.checkbox-label{
+  display:flex;align-items:center;font-weight:700;font-size:14px;cursor:pointer;color:#fda4af;
+  background:rgba(244,63,94,.14);border:1.5px solid rgba(251,113,133,.38);padding:10px 12px;border-radius:12px;
+  transition:background .2s,border-color .2s,color .2s;
+}
+.checkbox-label input{margin:0 10px 0 0;width:20px;height:20px;accent-color:var(--ok);flex-shrink:0}
+.checkbox-label:has(input:checked){background:rgba(16,185,129,.2);border-color:var(--ok-bright);color:#6ee7b7}
 
-        /* ===== 버튼 ===== */
-        .btn-primary, .btn-secondary, .btn-danger {
-            width: 100%;
-            border: none;
-            padding: 13px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 800;
-            font-family: inherit;
-            letter-spacing: -0.01em;
-            cursor: pointer;
-            transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #5a7bff, #4c6fff 55%, #6a5cff);
-            color: #fff;
-            margin-top: auto;
-            box-shadow: var(--shadow-md);
-        }
-        .btn-primary:active { transform: scale(0.98); box-shadow: 0 4px 12px rgba(76, 111, 255, 0.2); }
-        .btn-primary:disabled {
-            background: #cfd8f7;
-            box-shadow: none;
-            cursor: not-allowed;
-            color: #f5f7ff;
-        }
-        .btn-secondary {
-            background: #eef1fa;
-            color: #4a5378;
-            margin-top: 8px;
-        }
-        .btn-secondary:active { background: #e1e6f5; transform: scale(0.98); }
-        .btn-danger {
-            background: var(--bad-soft);
-            color: var(--bad);
-            margin-top: 8px;
-        }
-        .btn-danger:active { background: #ffd8df; transform: scale(0.98); }
+.radio-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.radio-grid.col-1{grid-template-columns:1fr}
+.radio-btn{
+  display:flex;align-items:center;background:rgba(255,255,255,.055);border:1.5px solid var(--line);
+  padding:10px 13px;border-radius:12px;font-size:14px;color:#e2e8f0;cursor:pointer;
+  transition:transform .15s,background .2s,border-color .2s,color .2s;
+}
+.radio-btn input{margin:0 10px 0 0;width:18px;height:18px;accent-color:var(--cyan);flex-shrink:0}
+.radio-btn:active{transform:scale(.97)}
+.radio-btn:has(input:checked){
+  background:linear-gradient(135deg,rgba(94,129,255,.32),rgba(34,211,238,.22));
+  border-color:var(--cyan);color:#fff;font-weight:700;
+}
+@media (hover:hover){.radio-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3)}}
 
-        /* ===== 퀴즈 UI ===== */
-        .quiz-title {
-            font-size: 17px;
-            font-weight: 700;
-            margin: auto 0 14px;
-            line-height: 1.5;
-            word-break: keep-all;
-            padding: 12px 14px;
-            background: linear-gradient(135deg, #f1f4ff, #f7f3ff);
-            border: 1px solid var(--line);
-            border-left: 5px solid var(--primary);
-            border-radius: var(--radius);
-        }
-        .ox-container { display: flex; gap: 10px; margin-bottom: 12px; }
-        .btn-ox {
-            flex: 1;
-            height: 104px;
-            font-size: 44px;
-            font-weight: 800;
-            font-family: inherit;
-            border: 2px solid #cdd8ff;
-            background: #f5f8ff;
-            color: var(--primary);
-            border-radius: 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: var(--shadow-sm);
-        }
-        .btn-ox:nth-child(2) { border-color: #ffd0d8; background: #fff7f8; color: var(--bad); }
-        .btn-ox:not(:disabled):active { transform: scale(0.96); }
-        .btn-ox:disabled:not(.correct):not(.wrong) { opacity: 0.4; }
-        .btn-ox.correct {
-            background: linear-gradient(135deg, #34c797, #22b384);
-            color: #fff;
-            border-color: var(--ok);
-            box-shadow: 0 8px 20px rgba(34, 179, 132, 0.35);
-            animation: pop 0.35s ease-out;
-        }
-        .btn-ox.wrong {
-            background: linear-gradient(135deg, #f77b8c, #f0566b);
-            color: #fff;
-            border-color: var(--bad);
-            box-shadow: 0 8px 20px rgba(240, 86, 107, 0.3);
-            animation: shake 0.35s ease-out;
-        }
-        .btn-ox:disabled { cursor: default; }
+.hidden-group{display:none;margin-top:10px;padding:12px;background:var(--warn-soft);border-radius:14px;border:1.5px solid var(--warn-line)}
+.hidden-group.show{display:block;animation:slideDown .3s ease}
+.hidden-group>label{display:block;color:var(--warn-ink);font-weight:700;margin-bottom:8px}
+.hidden-group .radio-btn{border-color:rgba(251,191,36,.3);background:rgba(15,23,42,.55)}
+.hidden-group .radio-btn:has(input:checked){background:linear-gradient(135deg,rgba(245,158,11,.32),rgba(94,129,255,.28));border-color:#fbbf24}
 
-        .explanation {
-            display: block;
-            visibility: hidden;
-            opacity: 0;
-            background: var(--primary-soft);
-            border-left: 5px solid var(--primary);
-            padding: 11px 14px;
-            border-radius: 12px;
-            font-size: 14px;
-            line-height: 1.55;
-            margin-bottom: 12px;
-            word-break: keep-all;
-        }
-        .explanation.show { visibility: visible; opacity: 1; animation: slideDown 0.3s ease-out; }
+/* 버튼 */
+.btn-primary,.btn-secondary,.btn-danger{
+  width:100%;border:none;padding:14px;border-radius:14px;font-size:15.5px;font-weight:800;font-family:inherit;
+  letter-spacing:-.01em;cursor:pointer;transition:transform .15s,background .2s,opacity .2s;
+}
+.btn-primary{
+  background:linear-gradient(135deg,#4f74ff,#6851ff 50%,#06b6d4);color:#fff;margin-top:auto;
+  border:1px solid rgba(255,255,255,.25);box-shadow:0 10px 26px rgba(94,129,255,.35);
+}
+.btn-primary:active:not(:disabled){transform:scale(.97)}
+.btn-primary:disabled{background:rgba(148,163,184,.16);border-color:rgba(255,255,255,.08);box-shadow:none;cursor:not-allowed;color:rgba(255,255,255,.35)}
+.btn-secondary{background:rgba(255,255,255,.09);border:1px solid var(--line);color:#cbd5e1;margin-top:8px}
+.btn-danger{background:rgba(244,63,94,.16);border:1px solid rgba(244,63,94,.35);color:#fda4af;margin-top:8px}
+.btn-secondary:active,.btn-danger:active{transform:scale(.98)}
+.screen:not(#screen-0)>.btn-primary{margin-top:auto}
 
-        /* ===== 요약 및 최종 제출 화면 ===== */
-        .summary-list {
-            background: #f9faff;
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            padding: 10px 14px;
-            margin-bottom: 12px;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-        .summary-list strong { color: var(--primary-dark); display: inline-block; width: 72px; font-weight: 700; }
-        .summary-list span.correct-txt { color: var(--ok); font-weight: 800; }
-        .summary-list span.wrong-txt { color: var(--bad); font-weight: 800; }
-        .summary-item { margin-bottom: 5px; border-bottom: 1px dashed var(--line); padding-bottom: 5px; }
-        .summary-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+/* 퀴즈 */
+.quiz-title{
+  font-size:17px;font-weight:700;margin:auto 0 16px;line-height:1.55;word-break:keep-all;padding:16px;
+  background:linear-gradient(135deg,rgba(94,129,255,.16),rgba(168,85,247,.12));
+  border:1px solid var(--line-bright);border-left:5px solid var(--cyan);border-radius:var(--radius);color:#f8fafc;
+}
+.ox-container{display:flex;gap:12px;margin-bottom:14px}
+.btn-ox{
+  flex:1;height:112px;font-size:46px;font-weight:900;font-family:inherit;border-radius:20px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid rgba(94,129,255,.42);background:linear-gradient(145deg,rgba(59,130,246,.18),rgba(29,78,216,.08));color:#60a5fa;
+  transition:transform .15s,opacity .2s;
+}
+.btn-ox:nth-child(2){border-color:rgba(244,63,94,.42);background:linear-gradient(145deg,rgba(244,63,94,.18),rgba(190,18,60,.08));color:#fb7185}
+.btn-ox:not(:disabled):active{transform:scale(.94)}
+.btn-ox:disabled:not(.correct):not(.wrong){opacity:.32}
+.btn-ox:disabled{cursor:default}
+.btn-ox.correct{background:linear-gradient(135deg,#059669,#10b981 55%,#34d399)!important;color:#fff!important;border-color:#6ee7b7!important;animation:pop .4s ease-out}
+.btn-ox.wrong{background:linear-gradient(135deg,#e11d48,#f43f5e 55%,#fb7185)!important;color:#fff!important;border-color:#fda4af!important;animation:shake .4s ease-out}
 
-        /* ===== 상단 프로그레스 바 ===== */
-        .progress-bar {
-            height: 6px;
-            background: #e6eaf8;
-            margin: -12px calc(var(--pad) * -1) 12px calc(var(--pad) * -1);
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #7f9bff, #4c6fff);
-            transition: width 0.5s cubic-bezier(.4, 0, .2, 1);
-            border-radius: 0 6px 6px 0;
-        }
+.explanation{
+  visibility:hidden;opacity:0;transform:translateY(-8px);background:rgba(15,23,48,.85);
+  border:1px solid rgba(94,129,255,.35);border-left:5px solid var(--cyan);padding:13px 15px;border-radius:14px;
+  font-size:13.8px;line-height:1.58;color:#e2e8f0;margin-bottom:14px;word-break:keep-all;
+  transition:opacity .3s,transform .3s,visibility .3s;
+}
+.explanation.show{visibility:visible;opacity:1;transform:none}
+.ans{font-size:16px}
+.ans-x{color:#fb7185}
+.ans-o{color:#38bdf8}
 
-        /* ===== 애니메이션 및 상태 ===== */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pop { 0% { transform: scale(0.94); } 60% { transform: scale(1.05); } 100% { transform: scale(1.02); } }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+/* 요약 */
+.summary-list{background:rgba(11,16,38,.85);border:1px solid var(--line-bright);border-radius:var(--radius);padding:12px 15px;margin-bottom:14px;font-size:14px;line-height:1.65;color:#e2e8f0}
+.summary-list strong{color:#7dd3fc;display:inline-block;width:74px;font-weight:700}
+.correct-txt{color:#34d399;font-weight:800}
+.wrong-txt{color:#fb7185;font-weight:800}
+.summary-item{margin-bottom:6px;border-bottom:1px dashed var(--line);padding-bottom:6px}
+.summary-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
 
-        .loading {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(244, 246, 255, 0.88);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            z-index: 100;
-            color: var(--primary-dark);
-            font-size: 16px;
-            font-weight: 700;
-        }
-        .spinner {
-            width: 40px; height: 40px;
-            border: 4px solid #dbe3ff;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 0.9s linear infinite;
-            margin-bottom: 14px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.progress-bar{height:6px;background:rgba(255,255,255,.1);margin:-20px calc(var(--pad)*-1) 16px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#38bdf8,#6366f1,#34d399);transition:width .5s;border-radius:0 6px 6px 0}
 
-        #screen-6 .form-group { margin: auto 0; }
-        .screen:not(#screen-0) > .btn-primary { margin-top: auto; }
-        #screen-6 .header { margin-top: 4px !important; }
-        #screen-6 .header p { font-size: 16px !important; margin-top: 8px !important; color: var(--ink) !important; }
-        #screen-8 .form-group { margin-top: 6px !important; }
+#screen-6 .form-group{margin:auto 0}
+#screen-6 .header{margin-top:4px}
+#screen-6 .header p{font-size:17px;font-weight:700;margin-top:16px;color:var(--ink);word-break:keep-all}
+#screen-8 .form-group{margin-top:20px}
 
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after { animation: none !important; transition: none !important; }
-        }
-    </style>
+.loading{
+  display:none;position:fixed;inset:0;background:rgba(9,13,30,.92);align-items:center;justify-content:center;
+  flex-direction:column;z-index:10000;color:#93c5fd;font-size:16px;font-weight:700;
+}
+.spinner{width:44px;height:44px;border:4px solid rgba(94,129,255,.22);border-top-color:var(--cyan);border-radius:50%;animation:spin .85s linear infinite;margin-bottom:16px}
+
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.92)}55%{transform:scale(1.07)}100%{transform:scale(1.02)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-5px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
 </head>
 <body>
-    <div class="app-container" id="app">
-        <!-- 로딩 화면 -->
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            데이터를 저장하고 있습니다...
+<div class="aurora" aria-hidden="true"><div class="blob"></div><div class="blob"></div><div class="blob"></div></div>
+<canvas id="bgCanvas" aria-hidden="true"></canvas>
+<canvas id="fxCanvas" aria-hidden="true"></canvas>
+
+<button type="button" class="sound-toggle" id="soundToggle" title="효과음 켜기/끄기" aria-label="효과음 켜기/끄기">🔊</button>
+
+<div class="loading" id="loading"><div class="spinner"></div>데이터를 저장하고 있습니다...</div>
+
+<div class="app-container" id="app">
+
+  <!-- Screen 0: 시작 -->
+  <div class="screen active" id="screen-0">
+    <div class="header">
+      <h2>의정부시일시청소년쉼터(이동형)</h2>
+      <p>아웃리치 프로그램</p>
+    </div>
+    <div class="intro-box">
+      <h3>도박예방퀴즈</h3>
+      <p>팩트체크! 진실 혹은 거짓<br>퀴즈를 먼저 풀고 프로그램에 참여해보세요.</p>
+    </div>
+    <button class="btn-primary" onclick="initQuiz()">퀴즈 시작하기</button>
+  </div>
+
+  <!-- Screen 1~5: 퀴즈 (자바스크립트로 생성) -->
+  <div id="quiz-root"></div>
+
+  <!-- Screen 6: 만족도 -->
+  <div class="screen" id="screen-6">
+    <div class="header">
+      <h2>프로그램 만족도</h2>
+      <p>프로그램을 통해 도박의 위험성을 알게 되었다.</p>
+    </div>
+    <div class="form-group">
+      <div class="radio-grid col-1">
+        <label class="radio-btn"><input type="radio" name="satisfaction" value="5"> 매우 만족 (5점)</label>
+        <label class="radio-btn"><input type="radio" name="satisfaction" value="4"> 만족 (4점)</label>
+        <label class="radio-btn"><input type="radio" name="satisfaction" value="3"> 보통 (3점)</label>
+        <label class="radio-btn"><input type="radio" name="satisfaction" value="2"> 불만족 (2점)</label>
+        <label class="radio-btn"><input type="radio" name="satisfaction" value="1"> 매우 불만족 (1점)</label>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="validateScreen6()">다음 단계</button>
+  </div>
+
+  <!-- Screen 7: 개인정보 및 기본설문 -->
+  <div class="screen" id="screen-7">
+    <div class="header"><h2>개인정보 수집 및 기본설문</h2></div>
+
+    <div class="card">
+      <div class="form-group" style="margin-bottom:10px">
+        <label>1. 개인정보수집 및 이용동의</label>
+        <div class="scroll-box">
+          의정부시일시청소년쉼터(이동형)은 아래와 같이 귀하의 개인정보를 수집·이용하는 내용을「개인정보보호법」 제 15조 및 제 22조에 따라 알려드리오니, 동의하여 주시기 바랍니다.<br><br>
+          <strong>☑ 개인정보의 수집·이용 목적:</strong><br>의정부시일시청소년쉼터(이동형)에서 진행하는 아웃리치 프로그램 참여 및 서비스 제공을 위한 활용<br><br>
+          <strong>☑ 수집하려는 필수 항목:</strong><br>성명, 성별, 나이, 가출 경험 및 가출 여부, 취업여부, 재학여부<br><br>
+          <strong>☑ 개인정보의 보유 및 이용 기간:</strong><br>5년(행정서류 보존기한)<br><br>
+          ※ 개인정보보호법에 의거 개인정보 수집 및 이용에 따른 동의를 거부할 수 있으나, 참여 및 서비스 제공이 불가합니다.
         </div>
-        
-        <!-- Screen 1: 시작 화면 (퀴즈 1로 이동) -->
-        <div class="screen active" id="screen-0">
-            <div class="header" style="margin-top: 40px;">
-                <h2>의정부시일시청소년쉼터(이동형)</h2>
-                <p>아웃리치 프로그램</p>
-            </div>
-            
-            <div style="text-align: center; margin: 40px 0;">
-                <h3 style="color: #1a73e8; margin-bottom: 10px;">도박예방퀴즈</h3>
-                <p style="color: #555; line-height: 1.6;">팩트체크! 진실 혹은 거짓<br>퀴즈를 먼저 풀고 프로그램에 참여해보세요.</p>
-            </div>
-            
-            <button class="btn-primary" onclick="initQuiz()">퀴즈 시작하기</button>
-        </div>
-
-        <!-- Screen 2: 퀴즈 1 -->
-        <div class="screen" id="screen-1">
-            <div class="progress-bar"><div class="progress-fill" style="width: 20%;"></div></div>
-            <div class="header">
-                <h2>도박예방퀴즈 (1/5)</h2>
-                <p>팩트체크! 진실 혹은 거짓</p>
-            </div>
-            <div class="quiz-title">1) ‘문화상품권’이나 ‘게임 아이템’을 걸고 하는 내기는 도박이 아니다.</div>
-            <div class="ox-container">
-                <button class="btn-ox" id="btn-q1-O" onclick="answerQuiz(1, 'O', 'X')">O</button>
-                <button class="btn-ox" id="btn-q1-X" onclick="answerQuiz(1, 'X', 'X')">X</button>
-            </div>
-            <div class="explanation" id="exp-1">
-                <strong style="color:#d93025; font-size: 16px;">정답 : X</strong><br><br>
-                <strong>해설) 도박이란?</strong><br>
-                대상에 상관없이, 불확실한 결과에 돈이나 재산상의 가치를 걸고 얻거나 잃는 행위입니다.<br>현금이 아니어도 가치 있는 것을 걸고 우연에 따라 얻거나 잃는다면 도박이 될 수 있어요.
-            </div>
-            <button class="btn-primary" id="next-1" disabled onclick="nextScreen(2)">다음 문제</button>
-        </div>
-
-        <!-- Screen 3: 퀴즈 2 -->
-        <div class="screen" id="screen-2">
-            <div class="progress-bar"><div class="progress-fill" style="width: 40%;"></div></div>
-            <div class="header">
-                <h2>도박예방퀴즈 (2/5)</h2>
-            </div>
-            <div class="quiz-title">2) 도박 사이트 링크를 친구에게 공유할 경우, 처벌받을 수 있다?</div>
-            <div class="ox-container">
-                <button class="btn-ox" id="btn-q2-O" onclick="answerQuiz(2, 'O', 'O')">O</button>
-                <button class="btn-ox" id="btn-q2-X" onclick="answerQuiz(2, 'X', 'O')">X</button>
-            </div>
-            <div class="explanation" id="exp-2">
-                <strong style="color:#1a73e8; font-size: 16px;">정답 : O</strong><br><br>
-                <strong>해설)</strong><br>도박 사이트 링크를 친구에게 공유할 경우, ‘도박을 돕거나 홍보하는 행위’로 처벌받을 수 있으니 절대 공유하거나 접속하지 마세요!
-            </div>
-            <button class="btn-primary" id="next-2" disabled onclick="nextScreen(3)">다음 문제</button>
-        </div>
-
-        <!-- Screen 4: 퀴즈 3 -->
-        <div class="screen" id="screen-3">
-            <div class="progress-bar"><div class="progress-fill" style="width: 60%;"></div></div>
-            <div class="header">
-                <h2>도박예방퀴즈 (3/5)</h2>
-            </div>
-            <div class="quiz-title">3) 불법 도박으로 진 빚이라도, 돈을 빌렸다면 무조건 갚아야 한다?</div>
-            <div class="ox-container">
-                <button class="btn-ox" id="btn-q3-O" onclick="answerQuiz(3, 'O', 'X')">O</button>
-                <button class="btn-ox" id="btn-q3-X" onclick="answerQuiz(3, 'X', 'X')">X</button>
-            </div>
-            <div class="explanation" id="exp-3">
-                <strong style="color:#d93025; font-size: 16px;">정답 : X</strong><br><br>
-                <strong>해설)</strong><br>불법 도박으로 생긴 빚은 일반적인 빚과 달리 무조건 갚아야 하는 것은 아닙니다. 도박 빚을 갚으려고 2차 범죄(사기, 대리입금 등)에 빠지지 말고, 즉시 믿을 수 있는 어른이나 전문기관에 도움을 요청하세요!
-                <br>*대리입금 : 제 3자가 도박자금을 빌려주고 수배에 달하는 수고비, 지각비를 요구하는 불법 사채 행위
-            </div>
-            <button class="btn-primary" id="next-3" disabled onclick="nextScreen(4)">다음 문제</button>
-        </div>
-
-        <!-- Screen 5: 퀴즈 4 -->
-        <div class="screen" id="screen-4">
-            <div class="progress-bar"><div class="progress-fill" style="width: 80%;"></div></div>
-            <div class="header">
-                <h2>도박예방퀴즈 (4/5)</h2>
-            </div>
-            <div class="quiz-title">4) 도박은 분석하고 공부하면 돈을 벌 수 있다?</div>
-            <div class="ox-container">
-                <button class="btn-ox" id="btn-q4-O" onclick="answerQuiz(4, 'O', 'X')">O</button>
-                <button class="btn-ox" id="btn-q4-X" onclick="answerQuiz(4, 'X', 'X')">X</button>
-            </div>
-            <div class="explanation" id="exp-4">
-                <strong style="color:#d93025; font-size: 16px;">정답 : X</strong><br><br>
-                <strong>해설)</strong><br>도박은 실력이나 공부를 이기는 게임이 아닙니다. 처음부터 사이트가 돈을 버는 구조로 설계되어 있어요. '내 실력으로 땄다'는 생각은 뇌의 착각일 뿐, 판을 거듭할수록 도박 사이트만 돈을 벌고 참가자는 빚만 남게 됩니다.
-            </div>
-            <button class="btn-primary" id="next-4" disabled onclick="nextScreen(5)">다음 문제</button>
-        </div>
-
-        <!-- Screen 6: 퀴즈 5 -->
-        <div class="screen" id="screen-5">
-            <div class="progress-bar"><div class="progress-fill" style="width: 100%;"></div></div>
-            <div class="header">
-                <h2>도박예방퀴즈 (5/5)</h2>
-            </div>
-            <div class="quiz-title">5) 온라인에서 '꽁머니(공짜포인트, 게임머니)'를 받아 게임에 베팅하는 것은 도박이다?</div>
-            <div class="ox-container">
-                <button class="btn-ox" id="btn-q5-O" onclick="answerQuiz(5, 'O', 'O')">O</button>
-                <button class="btn-ox" id="btn-q5-X" onclick="answerQuiz(5, 'X', 'O')">X</button>
-            </div>
-            <div class="explanation" id="exp-5">
-                <strong style="color:#1a73e8; font-size: 16px;">정답 : O</strong><br><br>
-                <strong>해설)</strong><br>내 돈을 쓰지 않았어도 베팅을 하는 순간 도박입니다. 불법 도박 사이트는 '꽁머니(꽁쿠폰, 코인 등)'로 도박을 하게 한 뒤, 진짜 돈을 걸도록 유도하는 미끼입니다. 
-                <br>* 베팅(Betting) : 승부나 결과에 돈(또는 가치 있는 것)을 거는 행위
-            </div>
-            <button class="btn-primary" id="next-5" disabled onclick="nextScreen(6)">개인정보 동의 및 만족도 조사</button>
-        </div>
-        
-        <!-- Screen 7: 만족도 조사 -->
-        <div class="screen" id="screen-6">
-            <div class="header" style="margin-top: 20px;">
-                <h2>프로그램 만족도</h2>
-                <p style="font-size: 17px; font-weight: bold; color: #333; margin-top: 16px; word-break: keep-all;">
-                    프로그램을 통해 도박의 위험성을 알게 되었다.
-                </p>
-            </div>
-            
-            <div class="form-group">
-                <div class="radio-grid col-1">
-                    <label class="radio-btn"><input type="radio" name="satisfaction" value="5"> 매우 만족 (5점)</label>
-                    <label class="radio-btn"><input type="radio" name="satisfaction" value="4"> 만족 (4점)</label>
-                    <label class="radio-btn"><input type="radio" name="satisfaction" value="3"> 보통 (3점)</label>
-                    <label class="radio-btn"><input type="radio" name="satisfaction" value="2"> 불만족 (2점)</label>
-                    <label class="radio-btn"><input type="radio" name="satisfaction" value="1"> 매우 불만족 (1점)</label>
-                </div>
-            </div>
-            
-            <button class="btn-primary" onclick="validateScreen6()">다음 단계</button>
-        </div>
-        
-        <!-- Screen 8: 개인정보 및 기본설문 -->
-        <div class="screen" id="screen-7">
-            <div class="header">
-                <h2>개인정보 수집 및 기본설문</h2>
-            </div>
-            
-            <div class="card">
-                <div class="form-group" style="margin-bottom: 10px;">
-                    <label>1. 개인정보수집 및 이용동의</label>
-                    <div class="scroll-box">
-                        의정부시일시청소년쉼터(이동형)은 아래와 같이 귀하의 개인정보를 수집·이용하는 내용을「개인정보보호법」 제 15조 및 제 22조에 따라 알려드리오니, 동의하여 주시기 바랍니다.<br><br>
-                        <strong>☑ 개인정보의 수집·이용 목적:</strong><br>의정부시일시청소년쉼터(이동형)에서 진행하는 아웃리치 프로그램 참여 및 서비스 제공을 위한 활용<br><br>
-                        <strong>☑ 수집하려는 필수 항목:</strong><br>성명, 성별, 나이, 가출 경험 및 가출 여부, 취업여부, 재학여부<br><br>
-                        <strong>☑ 개인정보의 보유 및 이용 기간:</strong><br>5년(행정서류 보존기한)<br><br>
-                        ※ 개인정보보호법에 의거 개인정보 수집 및 이용에 따른 동의를 거부할 수 있으나, 참여 및 서비스 제공이 불가합니다.
-                    </div>
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="agree"> (필수) 동의합니다.
-                    </label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>이름</label>
-                <input type="text" id="name" class="form-control" placeholder="이름을 입력하세요">
-            </div>
-
-            <div class="form-group">
-                <label>성별</label>
-                <div class="radio-grid">
-                    <label class="radio-btn"><input type="radio" name="gender" value="남자"> 남자</label>
-                    <label class="radio-btn"><input type="radio" name="gender" value="여자"> 여자</label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>나이 (만 나이)</label>
-                <input type="number" id="age" class="form-control" placeholder="숫자만 입력 (만 9~24세)" min="9" max="24">
-            </div>
-
-            <div class="form-group">
-                <label>가출 경험이 있나요?</label>
-                <div class="radio-grid">
-                    <label class="radio-btn"><input type="radio" name="runaway" value="있다" onchange="toggleRunawayLocation(false)"> 있다</label>
-                    <label class="radio-btn"><input type="radio" name="runaway" value="없다" onchange="toggleRunawayLocation(false)"> 없다</label>
-                    <label class="radio-btn"><input type="radio" name="runaway" value="가출중" onchange="toggleRunawayLocation(true)"> 가출중</label>
-                    <label class="radio-btn"><input type="radio" name="runaway" value="가능성 있다" onchange="toggleRunawayLocation(false)"> 가능성 있다</label>
-                </div>
-                
-                <!-- '가출중' 선택 시 표시되는 추가 질문 -->
-                <div class="hidden-group" id="runaway-location-group">
-                    <label>현재 지내는 곳은?</label>
-                    <div class="radio-grid col-1">
-                        <label class="radio-btn"><input type="radio" name="runaway_location" value="독립생활(원룸, 고시원, 모텔 등)"> 독립생활(원룸, 고시원, 모텔 등)</label>
-                        <label class="radio-btn"><input type="radio" name="runaway_location" value="친구 및 지인의 집"> 친구 및 지인의 집</label>
-                        <label class="radio-btn"><input type="radio" name="runaway_location" value="길거리, 건물 등"> 길거리, 건물 등</label>
-                        <label class="radio-btn"><input type="radio" name="runaway_location" value="청소년쉼터 등의 시설"> 청소년쉼터 등의 시설</label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>학교를 다니고 있나요?</label>
-                <div class="radio-grid col-1">
-                    <label class="radio-btn"><input type="radio" name="school" value="초등학교"> 초등학교</label>
-                    <label class="radio-btn"><input type="radio" name="school" value="중학교"> 중학교</label>
-                    <label class="radio-btn"><input type="radio" name="school" value="고등학교"> 고등학교</label>
-                    <label class="radio-btn"><input type="radio" name="school" value="대학교"> 대학교</label>
-                    <label class="radio-btn"><input type="radio" name="school" value="안다닌다"> 안다닌다</label>
-                    <label class="radio-btn"><input type="radio" name="school" value="고등학교, 대학교 졸업(취직)"> 고등학교, 대학교 졸업(취직)</label>
-                    <label class="radio-btn"><input type="radio" name="school" value="고등학교, 대학교 졸업(무직)"> 고등학교, 대학교 졸업(무직)</label>
-                </div>
-            </div>
-
-            <button class="btn-primary" onclick="prepareSubmit()">제출 내용 확인하기</button>
-        </div>
-
-
-        <!-- Screen 9: 최종 확인 및 관리자 코드 -->
-        <div class="screen" id="screen-8">
-            <div class="header">
-                <h2>제출 내용 확인</h2>
-                <p>아래 내용을 확인하고 저장해주세요.</p>
-            </div>
-            
-            <div class="summary-list" id="summary-content">
-                <!-- Javascript를 통해 내용이 채워집니다. -->
-            </div>
-
-            <div class="form-group" style="margin-top: 20px;">
-                <label>관리자 확인 코드</label>
-                <input type="password" id="adminCode" class="form-control" placeholder="비밀코드를 입력해주세요 (숫자)">
-            </div>
-            
-            <button class="btn-primary" onclick="submitForm()">최종 저장하기</button>
-            <button class="btn-secondary" onclick="nextScreen(7)">뒤로 가기 (개인정보 수정)</button>
-            <button class="btn-danger" onclick="resetSurvey()">다시 작성하기 (초기화)</button>
-        </div>
-
+        <label class="checkbox-label"><input type="checkbox" id="agree"> (필수) 동의합니다.</label>
+      </div>
     </div>
 
+    <div class="form-group">
+      <label for="name">이름</label>
+      <input type="text" id="name" class="form-control" placeholder="이름을 입력하세요" autocomplete="off">
+    </div>
+
+    <div class="form-group">
+      <label>성별</label>
+      <div class="radio-grid">
+        <label class="radio-btn"><input type="radio" name="gender" value="남자"> 남자</label>
+        <label class="radio-btn"><input type="radio" name="gender" value="여자"> 여자</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="age">나이 (만 나이)</label>
+      <input type="number" id="age" class="form-control" inputmode="numeric" placeholder="숫자만 입력 (만 9~24세)" min="9" max="24">
+    </div>
+
+    <div class="form-group">
+      <label>가출 경험이 있나요?</label>
+      <div class="radio-grid">
+        <label class="radio-btn"><input type="radio" name="runaway" value="있다" onchange="toggleRunawayLocation(false)"> 있다</label>
+        <label class="radio-btn"><input type="radio" name="runaway" value="없다" onchange="toggleRunawayLocation(false)"> 없다</label>
+        <label class="radio-btn"><input type="radio" name="runaway" value="가출중" onchange="toggleRunawayLocation(true)"> 가출중</label>
+        <label class="radio-btn"><input type="radio" name="runaway" value="가능성 있다" onchange="toggleRunawayLocation(false)"> 가능성 있다</label>
+      </div>
+      <div class="hidden-group" id="runaway-location-group">
+        <label>현재 지내는 곳은?</label>
+        <div class="radio-grid col-1">
+          <label class="radio-btn"><input type="radio" name="runaway_location" value="독립생활(원룸, 고시원, 모텔 등)"> 독립생활(원룸, 고시원, 모텔 등)</label>
+          <label class="radio-btn"><input type="radio" name="runaway_location" value="친구 및 지인의 집"> 친구 및 지인의 집</label>
+          <label class="radio-btn"><input type="radio" name="runaway_location" value="길거리, 건물 등"> 길거리, 건물 등</label>
+          <label class="radio-btn"><input type="radio" name="runaway_location" value="청소년쉼터 등의 시설"> 청소년쉼터 등의 시설</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>학교를 다니고 있나요?</label>
+      <div class="radio-grid col-1">
+        <label class="radio-btn"><input type="radio" name="school" value="초등학교"> 초등학교</label>
+        <label class="radio-btn"><input type="radio" name="school" value="중학교"> 중학교</label>
+        <label class="radio-btn"><input type="radio" name="school" value="고등학교"> 고등학교</label>
+        <label class="radio-btn"><input type="radio" name="school" value="대학교"> 대학교</label>
+        <label class="radio-btn"><input type="radio" name="school" value="안다닌다"> 안다닌다</label>
+        <label class="radio-btn"><input type="radio" name="school" value="고등학교, 대학교 졸업(취직)"> 고등학교, 대학교 졸업(취직)</label>
+        <label class="radio-btn"><input type="radio" name="school" value="고등학교, 대학교 졸업(무직)"> 고등학교, 대학교 졸업(무직)</label>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="prepareSubmit()">제출 내용 확인하기</button>
+  </div>
+
+  <!-- Screen 8: 최종 확인 -->
+  <div class="screen" id="screen-8">
+    <div class="header">
+      <h2>제출 내용 확인</h2>
+      <p>아래 내용을 확인하고 저장해주세요.</p>
+    </div>
+    <div class="summary-list" id="summary-content"></div>
+    <div class="form-group">
+      <label for="adminCode">관리자 확인 코드</label>
+      <input type="password" id="adminCode" class="form-control" inputmode="numeric" placeholder="비밀코드를 입력해주세요 (숫자)">
+    </div>
+    <button class="btn-primary" id="submitBtn" onclick="submitForm()">최종 저장하기</button>
+    <button class="btn-secondary" onclick="nextScreen(7)">뒤로 가기 (개인정보 수정)</button>
+    <button class="btn-danger" onclick="resetSurvey()">다시 작성하기 (초기화)</button>
+  </div>
+</div>
+
 <script>
-    let formData = {
-        quiz1_isCorrect: "",
-        quiz2_isCorrect: "",
-        quiz3_isCorrect: "",
-        quiz4_isCorrect: "",
-        quiz5_isCorrect: ""
-    };
+(() => {
+'use strict';
 
-    function initQuiz() {
-        // 퀴즈 초기화 코드 (다시 작성 시 필요)
-        formData = {
-            quiz1_isCorrect: "",
-            quiz2_isCorrect: "",
-            quiz3_isCorrect: "",
-            quiz4_isCorrect: "",
-            quiz5_isCorrect: ""
-        };
-        nextScreen(1);
+const $ = (id) => document.getElementById(id);
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+// 저사양 기기(코어/메모리 적음)는 배경 효과를 더 줄입니다
+const LITE = REDUCED || (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4;
+
+/* ============ 1. 효과음 (Web Audio) ============ */
+const SoundFX = (() => {
+  let ctx = null, muted = false;
+  function ac() {
+    if (muted) return null;
+    if (!ctx) { const A = window.AudioContext || window.webkitAudioContext; if (A) ctx = new A(); }
+    if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+    return ctx;
+  }
+  function tone(a, freq, start, dur, type, vol, endFreq) {
+    const t = a.currentTime + start;
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, t);
+    if (endFreq) o.frequency.exponentialRampToValueAtTime(endFreq, t + dur);
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g); g.connect(a.destination);
+    o.start(t); o.stop(t + dur + 0.02);
+  }
+  const seq = (list, type, vol, step, dur) => { const a = ac(); if (a) list.forEach((f, i) => tone(a, f, i * step, dur, type, vol)); };
+  return {
+    click(f = 620) { const a = ac(); if (a) tone(a, f, 0, 0.065, 'sine', 0.1, f * 1.45); },
+    transition() { seq([440, 554.37, 659.25], 'triangle', 0.06, 0.035, 0.18); },
+    correct() { seq([523.25, 659.25, 783.99, 1046.5], 'triangle', 0.14, 0.065, 0.36); },
+    wrong() { const a = ac(); if (a) { tone(a, 240, 0, 0.24, 'sawtooth', 0.1, 197); tone(a, 185, 0.12, 0.24, 'sawtooth', 0.1, 152); } },
+    success() { seq([523.25, 659.25, 783.99, 987.77, 1046.5], 'sine', 0.13, 0.07, 0.45); },
+    toggle() {
+      muted = !muted;
+      const b = $('soundToggle');
+      b.textContent = muted ? '🔇' : '🔊';
+      b.classList.toggle('muted', muted);
+      if (!muted) this.click(740);
     }
+  };
+})();
+$('soundToggle').addEventListener('click', (e) => { e.stopPropagation(); SoundFX.toggle(); });
 
-    function toggleRunawayLocation(show) {
-        const group = document.getElementById('runaway-location-group');
-        if (show) {
-            group.classList.add('show');
-        } else {
-            group.classList.remove('show');
-            // 숨길 때 선택되어 있던 라디오 버튼 초기화
-            document.querySelectorAll('input[name="runaway_location"]').forEach(el => el.checked = false);
+/* ============ 2. 배경: CSS 오로라 + 경량 네트워크 캔버스 ============ */
+const BG = (() => {
+  const canvas = $('bgCanvas'), ctx = canvas.getContext('2d');
+  const PAL = {
+    neutral: { node: [94, 129, 255], line: [34, 211, 238] },
+    correct: { node: [16, 185, 129], line: [52, 211, 153] },
+    wrong:   { node: [244, 63, 94],  line: [251, 113, 133] }
+  };
+  let cur = { node: [...PAL.neutral.node], line: [...PAL.neutral.line] };
+  let tgt = PAL.neutral, revert = null;
+  let w = innerWidth, h = innerHeight, nodes = [], raf = 0, last = 0;
+  const FRAME = 1000 / (LITE ? 20 : 30);          // 프레임 제한
+  const MAXD = 120;
+
+  function size() { w = innerWidth; h = innerHeight; canvas.width = w; canvas.height = h; }
+  function init() {
+    const n = LITE ? 14 : Math.min(26, Math.max(14, Math.floor(w * h / 30000)));
+    nodes = Array.from({ length: n }, () => ({
+      x: Math.random() * w, y: Math.random() * h,
+      vx: (Math.random() - .5) * .5, vy: (Math.random() - .5) * .5, r: Math.random() * 1.8 + 1
+    }));
+  }
+  function setMood(mood, ms = 0) {
+    tgt = PAL[mood] || PAL.neutral;
+    document.body.classList.toggle('mood-correct', mood === 'correct');
+    document.body.classList.toggle('mood-wrong', mood === 'wrong');
+    clearTimeout(revert);
+    if (ms > 0) revert = setTimeout(() => setMood('neutral'), ms);
+  }
+  const lerp3 = (a, b) => { for (let i = 0; i < 3; i++) a[i] += (b[i] - a[i]) * 0.08; };
+
+  function frame(t) {
+    raf = requestAnimationFrame(frame);
+    if (t - last < FRAME) return;
+    last = t;
+    lerp3(cur.node, tgt.node); lerp3(cur.line, tgt.line);
+    const [nr, ng, nb] = cur.node.map(Math.round), [lr, lg, lb] = cur.line.map(Math.round);
+    ctx.clearRect(0, 0, w, h);
+    for (let i = 0; i < nodes.length; i++) {
+      const a = nodes[i];
+      a.x += a.vx; a.y += a.vy;
+      if (a.x < 0 || a.x > w) a.vx *= -1;
+      if (a.y < 0 || a.y > h) a.vy *= -1;
+      for (let j = i + 1; j < nodes.length; j++) {
+        const b = nodes[j], dx = a.x - b.x, dy = a.y - b.y;
+        if (Math.abs(dx) > MAXD || Math.abs(dy) > MAXD) continue;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < MAXD * MAXD) {
+          ctx.strokeStyle = `rgba(${lr},${lg},${lb},${(1 - Math.sqrt(d2) / MAXD) * 0.25})`;
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
         }
+      }
+      ctx.fillStyle = `rgba(${nr},${ng},${nb},.5)`;
+      ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, 6.2832); ctx.fill();
     }
+  }
+  function start() { if (!raf && !REDUCED) raf = requestAnimationFrame(frame); }
+  function stop() { cancelAnimationFrame(raf); raf = 0; }
 
-    function nextScreen(screenNumber) {
-        window.scrollTo(0, 0);
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('screen-' + screenNumber).classList.add('active');
+  let lastW = innerWidth;
+  addEventListener('resize', () => {
+    size();                                    // 주소창 높이 변화로 인한 리셋(깜빡임) 방지: 폭이 바뀔 때만 재배치
+    if (innerWidth !== lastW) { lastW = innerWidth; init(); }
+  });
+  document.addEventListener('visibilitychange', () => document.hidden ? stop() : start());  // 탭이 숨겨지면 정지
+
+  size(); init(); start();
+  return { setMood };
+})();
+
+/* ============ 3. 전경 이펙트: 입자 + 링 (필요할 때만 구동) ============ */
+const FX = (() => {
+  const canvas = $('fxCanvas'), ctx = canvas.getContext('2d');
+  let w = innerWidth, h = innerHeight, running = false;
+  const parts = [], rings = [];
+  const COLORS = {
+    default: ['#60a5fa', '#22d3ee', '#a78bfa', '#f472b6', '#ffffff'],
+    correct: ['#10b981', '#34d399', '#6ee7b7', '#22d3ee', '#fde047'],
+    wrong:   ['#f43f5e', '#fb7185', '#fda4af', '#f97316', '#ef4444']
+  };
+  function size() {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    w = innerWidth; h = innerHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function loop() {
+    ctx.clearRect(0, 0, w, h);
+    for (let i = rings.length - 1; i >= 0; i--) {
+      const r = rings[i];
+      r.r += (r.max - r.r) * 0.14 + 1.5; r.a *= 0.91;
+      if (r.a <= 0.03 || r.r >= r.max) { rings.splice(i, 1); continue; }
+      ctx.globalAlpha = r.a; ctx.strokeStyle = r.c; ctx.lineWidth = r.lw * r.a;
+      ctx.beginPath(); ctx.arc(r.x, r.y, r.r, 0, 6.2832); ctx.stroke();
     }
-
-    function answerQuiz(qNum, selected, correct) {
-        // 중복 클릭 방지 (버튼 비활성화)
-        document.getElementById(`btn-q${qNum}-O`).disabled = true;
-        document.getElementById(`btn-q${qNum}-X`).disabled = true;
-        
-        // 정답 체크 및 스타일 변경
-        const selectedBtn = document.getElementById(`btn-q${qNum}-${selected}`);
-        const isCorrect = (selected === correct);
-        
-        if (isCorrect) {
-            selectedBtn.classList.add('correct');
-        } else {
-            selectedBtn.classList.add('wrong');
-            // 오답일 경우 정답 버튼도 표시해줌
-            document.getElementById(`btn-q${qNum}-${correct}`).classList.add('correct');
-        }
-
-        // 해설 노출 및 다음 버튼 활성화
-        document.getElementById(`exp-${qNum}`).classList.add('show');
-        document.getElementById(`next-${qNum}`).disabled = false;
-
-        // 결과 저장
-        formData[`quiz${qNum}_isCorrect`] = isCorrect ? "정답" : "오답";
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const p = parts[i];
+      p.vx *= 0.96; p.vy = p.vy * 0.96 + 0.12; p.x += p.vx; p.y += p.vy; p.a -= p.d;
+      if (p.a <= 0.02) { parts.splice(i, 1); continue; }
+      ctx.globalAlpha = p.a; ctx.fillStyle = p.c;
+      ctx.fillRect(p.x - p.s / 2, p.y - p.s / 2, p.s, p.s);
     }
-
-    function validateScreen6() {
-        const satisfaction = document.querySelector('input[name="satisfaction"]:checked');
-        if (!satisfaction) {
-            alert("프로그램 만족도를 선택해주세요.");
-            return;
-        }
-        formData.satisfaction = satisfaction.value;
-        nextScreen(7);
+    ctx.globalAlpha = 1;
+    if (parts.length || rings.length) requestAnimationFrame(loop);
+    else { running = false; ctx.clearRect(0, 0, w, h); }   // 끝나면 루프 완전 정지
+  }
+  function burst(x, y, mode = 'default') {
+    if (REDUCED) return;
+    const pal = COLORS[mode] || COLORS.default;
+    const big = mode !== 'default';
+    const count = LITE ? (big ? 16 : 8) : (big ? 30 : 12);
+    rings.push({ x, y, r: 6, max: big ? 150 : 80, a: .9, c: pal[0], lw: big ? 5 : 3 });
+    for (let i = 0; i < count; i++) {
+      const ang = (6.2832 * i) / count + (Math.random() - .5) * .35;
+      const sp = (big ? 4 : 2.5) + Math.random() * (big ? 6 : 4);
+      parts.push({
+        x, y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
+        s: Math.random() * 4 + 3, a: 1, d: Math.random() * .02 + .02,
+        c: pal[(Math.random() * pal.length) | 0]
+      });
     }
+    if (!running) { running = true; requestAnimationFrame(loop); }
+  }
+  addEventListener('resize', size);
+  size();
+  return { burst };
+})();
 
-    function prepareSubmit() {
-        const agree = document.getElementById('agree').checked;
-        const name = document.getElementById('name').value.trim();
-        const gender = document.querySelector('input[name="gender"]:checked');
-        const age = document.getElementById('age').value;
-        const runaway = document.querySelector('input[name="runaway"]:checked');
-        const runawayLocation = document.querySelector('input[name="runaway_location"]:checked');
-        const school = document.querySelector('input[name="school"]:checked');
+let lastPointer = { x: innerWidth / 2, y: innerHeight / 2 };
+addEventListener('pointerdown', (e) => {
+  lastPointer = { x: e.clientX, y: e.clientY };
+  const el = e.target.closest('button, .radio-btn, .checkbox-label');
+  if (el && !el.disabled && !el.classList.contains('btn-ox') && el.id !== 'soundToggle') {
+    FX.burst(e.clientX, e.clientY, 'default');
+    SoundFX.click(640);
+  }
+}, { passive: true });
 
-        if (!agree) {
-            alert("개인정보 수집 및 이용에 동의해주세요.");
-            return;
-        }
-        if (!name) {
-            alert("이름을 입력해주세요.");
-            document.getElementById('name').focus();
-            return;
-        }
-        if (!gender) {
-            alert("성별을 선택해주세요.");
-            return;
-        }
-        if (!age || age < 9 || age > 24) {
-            alert("만 9~24세 청소년만 참여 가능합니다. 숫자를 정확히 입력해주세요.");
-            document.getElementById('age').focus();
-            return;
-        }
-        if (!runaway) {
-            alert("가출 경험 여부를 선택해주세요.");
-            return;
-        }
-        
-        // 가출중 선택 시 현재 지내는 곳 필수 체크
-        let locationValue = "해당없음";
-        if (runaway.value === "가출중") {
-            if (!runawayLocation) {
-                alert("현재 지내는 곳을 선택해주세요.");
-                return;
-            }
-            locationValue = runawayLocation.value;
-        }
+/* ============ 4. 화면 전환 ============ */
+const STAGGER_SEL = '.header, .quiz-title, .btn-ox, .form-group > label, .form-control, .checkbox-label, .summary-item, .btn-primary, .btn-secondary, .btn-danger';
+function stagger(screen) {
+  const els = screen.querySelectorAll(STAGGER_SEL);
+  els.forEach((el, i) => { el.style.setProperty('--i', Math.min(i, 9)); el.classList.remove('st'); });
+  void screen.offsetWidth;                       // 리플로우 1회만
+  els.forEach((el) => el.classList.add('st'));
+}
 
-        if (!school) {
-            alert("학교 재학 여부를 선택해주세요.");
-            return;
-        }
+let navLock = false;
+function nextScreen(n) {
+  const target = $('screen-' + n);
+  const cur = document.querySelector('.screen.active');
+  if (!target || cur === target || navLock) return;
+  navLock = true;
+  BG.setMood('neutral');
+  SoundFX.transition();
+  const show = () => {
+    window.scrollTo(0, 0);
+    target.classList.add('active');
+    stagger(target);
+    navLock = false;
+  };
+  if (cur) {
+    cur.classList.add('exiting');
+    setTimeout(() => { cur.classList.remove('active', 'exiting'); show(); }, 160);
+  } else show();
+}
 
-        formData.name = name;
-        formData.gender = gender.value;
-        formData.age = age;
-        formData.runaway = runaway.value;
-        formData.runawayLocation = locationValue;
-        formData.school = school.value;
-        
-        const satisfactionMap = {
-            '5': '매우 만족 (5점)',
-            '4': '만족 (4점)',
-            '3': '보통 (3점)',
-            '2': '불만족 (2점)',
-            '1': '매우 불만족 (1점)'
-        };
+/* ============ 5. 퀴즈 ============ */
+const QUIZ = [
+  { q: "1) ‘문화상품권’이나 ‘게임 아이템’을 걸고 하는 내기는 도박이 아니다.", a: 'X',
+    sub: '팩트체크! 진실 혹은 거짓',
+    exp: `<strong>해설) 도박이란?</strong><br>대상에 상관없이, 불확실한 결과에 돈이나 재산상의 가치를 걸고 얻거나 잃는 행위입니다.<br>현금이 아니어도 가치 있는 것을 걸고 우연에 따라 얻거나 잃는다면 도박이 될 수 있어요.` },
+  { q: "2) 도박 사이트 링크를 친구에게 공유할 경우, 처벌받을 수 있다?", a: 'O',
+    exp: `<strong>해설)</strong><br>도박 사이트 링크를 친구에게 공유할 경우, ‘도박을 돕거나 홍보하는 행위’로 처벌받을 수 있으니 절대 공유하거나 접속하지 마세요!` },
+  { q: "3) 불법 도박으로 진 빚이라도, 돈을 빌렸다면 무조건 갚아야 한다?", a: 'X',
+    exp: `<strong>해설)</strong><br>불법 도박으로 생긴 빚은 일반적인 빚과 달리 무조건 갚아야 하는 것은 아닙니다. 도박 빚을 갚으려고 2차 범죄(사기, 대리입금 등)에 빠지지 말고, 즉시 믿을 수 있는 어른이나 전문기관에 도움을 요청하세요!<br>*대리입금 : 제 3자가 도박자금을 빌려주고 수배에 달하는 수고비, 지각비를 요구하는 불법 사채 행위` },
+  { q: "4) 도박은 분석하고 공부하면 돈을 벌 수 있다?", a: 'X',
+    exp: `<strong>해설)</strong><br>도박은 실력이나 공부를 이기는 게임이 아닙니다. 처음부터 사이트가 돈을 버는 구조로 설계되어 있어요. '내 실력으로 땄다'는 생각은 뇌의 착각일 뿐, 판을 거듭할수록 도박 사이트만 돈을 벌고 참가자는 빚만 남게 됩니다.` },
+  { q: "5) 온라인에서 '꽁머니(공짜포인트, 게임머니)'를 받아 게임에 베팅하는 것은 도박이다?", a: 'O',
+    exp: `<strong>해설)</strong><br>내 돈을 쓰지 않았어도 베팅을 하는 순간 도박입니다. 불법 도박 사이트는 '꽁머니(꽁쿠폰, 코인 등)'로 도박을 하게 한 뒤, 진짜 돈을 걸도록 유도하는 미끼입니다.<br>* 베팅(Betting) : 승부나 결과에 돈(또는 가치 있는 것)을 거는 행위` }
+];
 
-        // 요약 화면 구성
-        const summaryContent = document.getElementById('summary-content');
-        
-        const getResultStyle = (val) => val === '정답' ? `<span class="correct-txt">O 맞힘</span>` : `<span class="wrong-txt">X 틀림</span>`;
-        
-        let runawayText = formData.runaway;
-        if (formData.runaway === '가출중') {
-            runawayText += ` <span style="font-size: 13px; color: #666;">(${formData.runawayLocation})</span>`;
-        }
+(function buildQuiz() {
+  $('quiz-root').innerHTML = QUIZ.map((it, i) => {
+    const n = i + 1;
+    const nextLabel = n === 5 ? '개인정보 동의 및 만족도 조사' : '다음 문제';
+    const nextTarget = n === 5 ? 6 : n + 1;
+    return `
+  <div class="screen" id="screen-${n}">
+    <div class="progress-bar"><div class="progress-fill" style="width:${n * 20}%"></div></div>
+    <div class="header"><h2>도박예방퀴즈 (${n}/5)</h2>${it.sub ? `<p>${it.sub}</p>` : ''}</div>
+    <div class="quiz-title">${it.q}</div>
+    <div class="ox-container">
+      <button class="btn-ox" id="btn-q${n}-O" data-q="${n}" data-v="O">O</button>
+      <button class="btn-ox" id="btn-q${n}-X" data-q="${n}" data-v="X">X</button>
+    </div>
+    <div class="explanation" id="exp-${n}">
+      <strong class="ans ${it.a === 'X' ? 'ans-x' : 'ans-o'}">정답 : ${it.a}</strong><br><br>${it.exp}
+    </div>
+    <button class="btn-primary" id="next-${n}" disabled data-next="${nextTarget}">${nextLabel}</button>
+  </div>`;
+  }).join('');
 
-        summaryContent.innerHTML = `
-            <div class="summary-item"><strong>이름</strong> ${formData.name}</div>
-            <div class="summary-item"><strong>성별/나이</strong> ${formData.gender} / 만 ${formData.age}세</div>
-            <div class="summary-item"><strong>가출경험</strong> ${runawayText}</div>
-            <div class="summary-item"><strong>재학상태</strong> ${formData.school}</div>
-            <div class="summary-item"><strong>만족도</strong> ${satisfactionMap[formData.satisfaction]}</div>
-            <div class="summary-item" style="margin-top: 10px;">
-                <strong>퀴즈 결과</strong><br>
-                Q1: ${getResultStyle(formData.quiz1_isCorrect)} | 
-                Q2: ${getResultStyle(formData.quiz2_isCorrect)} | 
-                Q3: ${getResultStyle(formData.quiz3_isCorrect)} <br>
-                Q4: ${getResultStyle(formData.quiz4_isCorrect)} | 
-                Q5: ${getResultStyle(formData.quiz5_isCorrect)}
-            </div>
-        `;
+  // 이벤트 위임
+  $('quiz-root').addEventListener('click', (e) => {
+    const ox = e.target.closest('.btn-ox');
+    if (ox && !ox.disabled) return answerQuiz(+ox.dataset.q, ox.dataset.v, QUIZ[ox.dataset.q - 1].a);
+    const nx = e.target.closest('[data-next]');
+    if (nx && !nx.disabled) nextScreen(+nx.dataset.next);
+  });
+})();
 
-        document.getElementById('adminCode').value = ""; // 코드 입력창 초기화
-        nextScreen(8);
-    }
+const emptyData = () => ({ quiz1_isCorrect: "", quiz2_isCorrect: "", quiz3_isCorrect: "", quiz4_isCorrect: "", quiz5_isCorrect: "" });
+let formData = emptyData();
 
-    function submitForm() {
-        const adminCode = document.getElementById('adminCode').value;
-        if (adminCode !== '2015') {
-            alert("비밀코드가 일치하지 않습니다. 관리자에게 문의하세요.");
-            document.getElementById('adminCode').focus();
-            return;
-        }
+function initQuiz() { formData = emptyData(); BG.setMood('neutral'); nextScreen(1); }
 
-        // 로딩 화면 표시
-        document.getElementById('loading').style.display = 'flex';
-        
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzrUktVaWCvo-GXL0D56hFEp5ALK9LBIYp7S1sHAlT8YZ086V5Ot9naCe-KPbB8kK8R/exec'; // ★ 여기에 구글 앱스 스크립트 웹 앱 URL을 입력하세요. ★
+function answerQuiz(q, selected, correct) {
+  const btnO = $(`btn-q${q}-O`), btnX = $(`btn-q${q}-X`);
+  btnO.disabled = btnX.disabled = true;
+  const sel = $(`btn-q${q}-${selected}`);
+  const ok = selected === correct;
+  const rect = sel.getBoundingClientRect();
+  const x = lastPointer.x || rect.left + rect.width / 2;
+  const y = lastPointer.y || rect.top + rect.height / 2;
 
-        if (SCRIPT_URL) {
-            fetch(SCRIPT_URL, {
-                method: 'POST', // no-cors 모드를 쓰면 서버 응답을 읽을 수 없음
-                headers: {
-                    'Content-Type': 'text/plain;charset=utf-8', // CORS 회피를 위해 text/plain 사용
-                },
-                body: JSON.stringify(formData)
-            }).then(response => {
-                 completeSubmission();
-            }).catch(e => {
-                console.error('Error!', e.message);
-                completeSubmission(); // 에러가 나도 진행
-            });
-        } else {
-            // URL 설정이 안 되어 있을 경우, 1초 대기 후 완료 시뮬레이션
-            setTimeout(completeSubmission, 1000);
-        }
-    }
-    
-    function resetSurvey() {
-        if(confirm("작성하신 모든 내용이 삭제되고 처음으로 돌아갑니다. 다시 작성하시겠습니까?")) {
-            // 폼 초기화
-            document.querySelectorAll('input[type="text"], input[type="number"], input[type="password"]').forEach(el => el.value = '');
-            document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(el => el.checked = false);
-            toggleRunawayLocation(false);
-            
-            // 퀴즈 초기화
-            for(let i=1; i<=5; i++) {
-                document.getElementById(`btn-q${i}-O`).className = 'btn-ox';
-                document.getElementById(`btn-q${i}-O`).disabled = false;
-                document.getElementById(`btn-q${i}-X`).className = 'btn-ox';
-                document.getElementById(`btn-q${i}-X`).disabled = false;
-                document.getElementById(`exp-${i}`).classList.remove('show');
-                document.getElementById(`next-${i}`).disabled = true;
-            }
-            formData = {
-                quiz1_isCorrect: "", quiz2_isCorrect: "", quiz3_isCorrect: "", quiz4_isCorrect: "", quiz5_isCorrect: ""
-            };
-            
-            nextScreen(0);
-        }
-    }
+  if (ok) {
+    sel.classList.add('correct');
+    BG.setMood('correct'); FX.burst(x, y, 'correct'); SoundFX.correct();
+  } else {
+    sel.classList.add('wrong');
+    $(`btn-q${q}-${correct}`).classList.add('correct');
+    BG.setMood('wrong'); FX.burst(x, y, 'wrong'); SoundFX.wrong();
+  }
+  $(`exp-${q}`).classList.add('show');
+  $(`next-${q}`).disabled = false;
+  formData[`quiz${q}_isCorrect`] = ok ? "정답" : "오답";
+}
 
-    function completeSubmission() {
-        document.getElementById('loading').style.display = 'none';
-        alert("성공적으로 저장되었습니다!");
-        
-        // 제출 완료 시 데이터 초기화는 resetSurvey 함수를 재사용
-        // 확인창 없이 바로 초기화하기 위해 로직 분리
-        document.querySelectorAll('input[type="text"], input[type="number"], input[type="password"]').forEach(el => el.value = '');
-        document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(el => el.checked = false);
-        toggleRunawayLocation(false);
-        
-        for(let i=1; i<=5; i++) {
-            document.getElementById(`btn-q${i}-O`).className = 'btn-ox';
-            document.getElementById(`btn-q${i}-O`).disabled = false;
-            document.getElementById(`btn-q${i}-X`).className = 'btn-ox';
-            document.getElementById(`btn-q${i}-X`).disabled = false;
-            document.getElementById(`exp-${i}`).classList.remove('show');
-            document.getElementById(`next-${i}`).disabled = true;
-        }
-        formData = {
-            quiz1_isCorrect: "", quiz2_isCorrect: "", quiz3_isCorrect: "", quiz4_isCorrect: "", quiz5_isCorrect: ""
-        };
+/* ============ 6. 설문 ============ */
+function toggleRunawayLocation(show) {
+  const g = $('runaway-location-group');
+  g.classList.toggle('show', show);
+  if (!show) document.querySelectorAll('input[name="runaway_location"]').forEach((el) => el.checked = false);
+}
 
-        // 첫 화면으로 이동
-        nextScreen(0);
-    }
+function warn(msg, focusId) {
+  BG.setMood('wrong', 1500);
+  SoundFX.wrong();
+  alert(msg);
+  if (focusId) $(focusId).focus();
+}
+
+function validateScreen6() {
+  const s = document.querySelector('input[name="satisfaction"]:checked');
+  if (!s) return warn("프로그램 만족도를 선택해주세요.");
+  formData.satisfaction = s.value;
+  nextScreen(7);
+}
+
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function prepareSubmit() {
+  const agree = $('agree').checked;
+  const name = $('name').value.trim();
+  const gender = document.querySelector('input[name="gender"]:checked');
+  const age = Number($('age').value);
+  const runaway = document.querySelector('input[name="runaway"]:checked');
+  const runawayLoc = document.querySelector('input[name="runaway_location"]:checked');
+  const school = document.querySelector('input[name="school"]:checked');
+
+  if (!agree) return warn("개인정보 수집 및 이용에 동의해주세요.");
+  if (!name) return warn("이름을 입력해주세요.", 'name');
+  if (!gender) return warn("성별을 선택해주세요.");
+  if (!$('age').value || !Number.isInteger(age) || age < 9 || age > 24)
+    return warn("만 9~24세 청소년만 참여 가능합니다. 숫자를 정확히 입력해주세요.", 'age');
+  if (!runaway) return warn("가출 경험 여부를 선택해주세요.");
+
+  let loc = "해당없음";
+  if (runaway.value === "가출중") {
+    if (!runawayLoc) return warn("현재 지내는 곳을 선택해주세요.");
+    loc = runawayLoc.value;
+  }
+  if (!school) return warn("학교 재학 여부를 선택해주세요.");
+
+  Object.assign(formData, {
+    name, gender: gender.value, age: String(age), runaway: runaway.value, runawayLocation: loc, school: school.value
+  });
+
+  const SAT = { '5': '매우 만족 (5점)', '4': '만족 (4점)', '3': '보통 (3점)', '2': '불만족 (2점)', '1': '매우 불만족 (1점)' };
+  const res = (v) => v === '정답' ? `<span class="correct-txt">O 맞힘</span>` : `<span class="wrong-txt">X 틀림</span>`;
+  const runawayText = esc(formData.runaway) + (formData.runaway === '가출중'
+    ? ` <span style="font-size:13px;color:#94a3b8">(${esc(formData.runawayLocation)})</span>` : '');
+
+  $('summary-content').innerHTML = `
+    <div class="summary-item"><strong>이름</strong> ${esc(formData.name)}</div>
+    <div class="summary-item"><strong>성별/나이</strong> ${esc(formData.gender)} / 만 ${esc(formData.age)}세</div>
+    <div class="summary-item"><strong>가출경험</strong> ${runawayText}</div>
+    <div class="summary-item"><strong>재학상태</strong> ${esc(formData.school)}</div>
+    <div class="summary-item"><strong>만족도</strong> ${SAT[formData.satisfaction]}</div>
+    <div class="summary-item" style="margin-top:10px">
+      <strong>퀴즈 결과</strong><br>
+      Q1: ${res(formData.quiz1_isCorrect)} | Q2: ${res(formData.quiz2_isCorrect)} | Q3: ${res(formData.quiz3_isCorrect)}<br>
+      Q4: ${res(formData.quiz4_isCorrect)} | Q5: ${res(formData.quiz5_isCorrect)}
+    </div>`;
+  $('adminCode').value = "";
+  nextScreen(8);
+}
+
+/* ============ 7. 저장 / 초기화 ============ */
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzrUktVaWCvo-GXL0D56hFEp5ALK9LBIYp7S1sHAlT8YZ086V5Ot9naCe-KPbB8kK8R/exec';
+let submitting = false;
+
+async function submitForm() {
+  if (submitting) return;                                   // 중복 전송 방지
+  if ($('adminCode').value !== '2015') return warn("비밀코드가 일치하지 않습니다. 관리자에게 문의하세요.", 'adminCode');
+
+  submitting = true;
+  $('submitBtn').disabled = true;
+  $('loading').style.display = 'flex';
+
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 20000);      // 무한 대기 방지
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',                                      // 응답은 읽지 않으므로 CORS 오류 없이 전송
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(formData),
+      signal: ctrl.signal
+    });
+    clearTimeout(timer);
+    $('loading').style.display = 'none';
+    BG.setMood('correct', 1500); SoundFX.success(); FX.burst(innerWidth / 2, innerHeight / 2, 'correct');
+    alert("성공적으로 저장되었습니다!");
+    clearAll();
+    nextScreen(0);
+  } catch (err) {
+    clearTimeout(timer);
+    console.error('저장 실패:', err);
+    $('loading').style.display = 'none';
+    // 실패 시 입력 내용을 지우지 않고 다시 시도할 수 있게 유지
+    warn("저장에 실패했습니다. 인터넷 연결을 확인한 뒤 '최종 저장하기'를 다시 눌러주세요. (입력 내용은 유지됩니다)");
+  } finally {
+    submitting = false;
+    $('submitBtn').disabled = false;
+  }
+}
+
+function clearAll() {
+  document.querySelectorAll('input[type="text"], input[type="number"], input[type="password"]').forEach((el) => el.value = '');
+  document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach((el) => el.checked = false);
+  toggleRunawayLocation(false);
+  for (let i = 1; i <= 5; i++) {
+    ['O', 'X'].forEach((v) => { const b = $(`btn-q${i}-${v}`); b.className = 'btn-ox'; b.disabled = false; });
+    $(`exp-${i}`).classList.remove('show');
+    $(`next-${i}`).disabled = true;
+  }
+  formData = emptyData();
+  BG.setMood('neutral');
+}
+
+function resetSurvey() {
+  if (confirm("작성하신 모든 내용이 삭제되고 처음으로 돌아갑니다. 다시 작성하시겠습니까?")) {
+    clearAll();
+    nextScreen(0);
+  }
+}
+
+// 인라인 onclick에서 호출하는 함수만 전역으로 노출
+Object.assign(window, { initQuiz, nextScreen, validateScreen6, prepareSubmit, submitForm, resetSurvey, toggleRunawayLocation });
+
+addEventListener('DOMContentLoaded', () => stagger($('screen-0')));
+if (document.readyState !== 'loading') stagger($('screen-0'));
+})();
 </script>
 </body>
 </html>
