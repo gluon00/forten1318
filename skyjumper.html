@@ -1,814 +1,534 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Sky Jumper - 심플 클라이밍 웹게임</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    body {
-      background: #0f172a;
-      color: #f8fafc;
-      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      overflow: hidden;
-      touch-action: manipulation;
-    }
-
-    #game-container {
-      position: relative;
-      width: 100%;
-      max-width: 420px;
-      height: 100vh;
-      max-height: 760px;
-      background: #1e293b;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
-
-    canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-
-    /* 상단 심플 HUD */
-    #hud {
-      position: absolute;
-      top: 16px;
-      left: 16px;
-      right: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      pointer-events: none;
-      z-index: 5;
-    }
-
-    .hud-box {
-      background: rgba(15, 23, 42, 0.75);
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-
-    #level-text {
-      color: #38bdf8;
-    }
-
-    /* 오버레이 모달 (시작 / 게임오버 및 랭킹) */
-    #overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.88);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      z-index: 10;
-    }
-
-    #overlay.hidden {
-      display: none;
-    }
-
-    .card {
-      width: 100%;
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .title {
-      font-size: 24px;
-      font-weight: 800;
-      margin-bottom: 6px;
-      color: #f8fafc;
-    }
-
-    .subtitle {
-      font-size: 13px;
-      color: #94a3b8;
-      margin-bottom: 16px;
-    }
-
-    .final-score {
-      font-size: 32px;
-      font-weight: 800;
-      color: #38bdf8;
-      margin: 8px 0 16px;
-    }
-
-    /* 이름 입력 및 저장 영역 */
-    #save-form {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    #save-form.hidden {
-      display: none;
-    }
-
-    #player-name {
-      flex: 1;
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1px solid #475569;
-      background: #0f172a;
-      color: #f8fafc;
-      font-size: 14px;
-      outline: none;
-      user-select: text;
-      -webkit-user-select: text;
-    }
-
-    #player-name:focus {
-      border-color: #38bdf8;
-    }
-
-    .btn {
-      padding: 10px 16px;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: opacity 0.15s;
-    }
-
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .btn-save {
-      background: #10b981;
-      color: #ffffff;
-      white-space: nowrap;
-    }
-
-    .btn-start {
-      width: 100%;
-      padding: 13px;
-      background: #3b82f6;
-      color: #ffffff;
-      font-size: 16px;
-      margin-top: 12px;
-    }
-
-    /* 순위표 (Top 10) */
-    .board-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 13px;
-      font-weight: 700;
-      color: #cbd5e1;
-    }
-
-    #status-msg {
-      font-size: 12px;
-      color: #94a3b8;
-      font-weight: 400;
-    }
-
-    .leaderboard-wrap {
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      max-height: 250px;
-      overflow-y: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
-    th, td {
-      padding: 7px 10px;
-      text-align: left;
-      border-bottom: 1px solid #1e293b;
-    }
-
-    th {
-      color: #64748b;
-      font-weight: 600;
-      position: sticky;
-      top: 0;
-      background: #0f172a;
-    }
-
-    td.rank {
-      width: 48px;
-      font-weight: 700;
-      color: #94a3b8;
-    }
-
-    td.score-col {
-      text-align: right;
-      font-weight: 700;
-      color: #38bdf8;
-    }
-
-    tr.top-rank td.rank {
-      color: #fbbf24;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>Sky Jumper</title>
+<style>
+:root{--ink:#eef2ff;--mute:#9aa4c7;--line:rgba(255,255,255,.12);--glass:rgba(15,18,45,.62);--accent:#7dd3fc;--mint:#34d399;--gold:#fbbf24}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:#05061a;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo","Segoe UI",Roboto,sans-serif;display:flex;justify-content:center;align-items:center;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+.hidden{display:none!important}
+#game{position:relative;width:min(100vw,calc(100dvh*4/7),460px);aspect-ratio:4/7;background:#10123a;overflow:hidden;border-radius:clamp(0px,2vw,22px);box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px var(--line)}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+#hud{position:absolute;top:12px;left:12px;right:12px;z-index:5;pointer-events:none}
+.pill{display:flex;justify-content:space-between;align-items:center;background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:14px;padding:9px 14px}
+#alt{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+#alt small{font-size:12px;font-weight:600;color:var(--mute);margin-left:2px}
+#best{font-size:11px;color:var(--mute);margin-top:1px}
+#lv{font-size:13px;font-weight:800;color:#0b1030;background:linear-gradient(135deg,#7dd3fc,#a5b4fc);padding:5px 11px;border-radius:999px}
+#bar{height:3px;margin:7px 6px 0;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden}
+#bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7dd3fc,#a5b4fc);transition:width .2s}
+#toast{position:absolute;left:50%;top:24%;transform:translate(-50%,0);z-index:6;font-size:30px;font-weight:900;letter-spacing:1px;color:#fff;text-shadow:0 0 24px rgba(125,211,252,.9);opacity:0;pointer-events:none}
+#toast.show{animation:pop 1.3s ease-out}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,10px) scale(.8)}15%{opacity:1;transform:translate(-50%,0) scale(1.05)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-18px) scale(1)}}
+#overlay{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto;background:radial-gradient(120% 80% at 50% 0%,rgba(76,70,180,.35),rgba(5,6,26,.9))}
+.card{width:100%;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:20px;padding:20px 18px;text-align:center}
+.title{font-size:30px;font-weight:900;letter-spacing:-.5px;background:linear-gradient(135deg,#e0f2fe,#a5b4fc 60%,#f0abfc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-size:12.5px;color:var(--mute);margin:6px 0 12px;line-height:1.5}
+.legend{display:flex;justify-content:center;gap:12px;font-size:11px;color:var(--mute);margin-bottom:14px;flex-wrap:wrap}
+.legend span::before{content:"";display:inline-block;width:14px;height:6px;border-radius:3px;margin-right:5px;vertical-align:middle;background:var(--c)}
+.final{margin:4px 0 14px}
+.final b{display:block;font-size:44px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--accent);line-height:1.1}
+.final em{font-style:normal;font-size:12px;font-weight:700;color:var(--gold)}
+#save-form{display:flex;gap:8px;margin-bottom:14px}
+#player-name{flex:1;min-width:0;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.35);color:var(--ink);font-size:16px;outline:none;user-select:text;-webkit-user-select:text}
+#player-name:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(125,211,252,.2)}
+.btn{border:0;border-radius:12px;font-weight:800;cursor:pointer;font-size:14px;padding:11px 16px;transition:transform .1s,opacity .15s}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.btn-save{background:linear-gradient(135deg,#34d399,#10b981);color:#04231a;white-space:nowrap}
+.btn-start{width:100%;margin-top:14px;padding:14px;font-size:16px;color:#0b1030;background:linear-gradient(135deg,#7dd3fc,#a5b4fc)}
+.bh{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:700;color:#cbd5f5;margin-bottom:7px}
+#status{font-size:11px;font-weight:500;color:var(--mute)}
+.lb{background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:12px;max-height:210px;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:7px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.06)}
+tr:last-child td{border-bottom:0}
+th{position:sticky;top:0;background:#171a45;color:var(--mute);font-weight:600;font-size:11px}
+td.r{width:52px;font-weight:800;color:var(--mute)}
+td.s{text-align:right;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+tr.t1 td.r{color:#fbbf24}tr.t2 td.r{color:#cbd5e1}tr.t3 td.r{color:#f59e6b}
+.empty{text-align:center!important;color:var(--mute);padding:16px!important}
+@media (prefers-reduced-motion:reduce){#toast.show{animation-duration:.01s}}
+</style>
 </head>
 <body>
-  <div id="game-container">
-    <div id="hud">
-      <div class="hud-box">고도: <span id="score-text">0</span>m</div>
-      <div class="hud-box" id="level-text">LV.1</div>
+<div id="game">
+  <div id="hud">
+    <div class="pill">
+      <div><div id="alt">0<small>m</small></div><div id="best">최고 0m</div></div>
+      <div id="lv">LV.1</div>
     </div>
+    <div id="bar"><i id="barfill"></i></div>
+  </div>
+  <div id="toast"></div>
+  <canvas id="canvas"></canvas>
 
-    <canvas id="canvas"></canvas>
-
-    <!-- 시작 및 게임오버 오버레이 -->
-    <div id="overlay">
-      <div class="card">
-        <div class="title" id="modal-title">SKY JUMPER</div>
-        <div class="subtitle" id="modal-subtitle">스페이스바 / 클릭 / 화면 터치로 점프 (2단 점프 가능)</div>
-        <div class="final-score hidden" id="final-score-box">0m</div>
-
-        <!-- 게임 종료 후 이름 저장 폼 -->
-        <form id="save-form" class="hidden">
-          <input
-            type="text"
-            id="player-name"
-            placeholder="이름 입력 (최대 12자)"
-            maxlength="12"
-            autocomplete="off"
-            required
-          />
-          <button type="submit" class="btn btn-save" id="save-btn">기록 저장</button>
-        </form>
-
-        <!-- Top 10 순위표 -->
-        <div class="board-header">
-          <span>TOP 10 순위표</span>
-          <span id="status-msg">불러오는 중...</span>
-        </div>
-        <div class="leaderboard-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>순위</th>
-                <th>이름</th>
-                <th style="text-align: right;">점수</th>
-              </tr>
-            </thead>
-            <tbody id="leaderboard-body">
-              <tr>
-                <td colspan="3" style="text-align: center; color: #64748b; padding: 16px;">데이터가 없습니다.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <button type="button" class="btn btn-start" id="start-btn">게임 시작</button>
+  <div id="overlay">
+    <div class="card">
+      <div class="title" id="m-title">SKY JUMPER</div>
+      <div class="sub" id="m-sub">화면을 탭하거나 스페이스바로 점프하세요.<br>공중에서 한 번 더 점프할 수 있어요.</div>
+      <div class="legend" id="legend">
+        <span style="--c:#34d399">일반</span><span style="--c:#60a5fa">이동</span><span style="--c:#fbbf24">부서짐</span><span style="--c:#f472b6">스프링</span>
       </div>
+      <div class="final hidden" id="final"><b id="final-score">0m</b><em id="final-new" class="hidden">신기록!</em></div>
+
+      <form id="save-form" class="hidden">
+        <input type="text" id="player-name" placeholder="이름 (최대 12자)" maxlength="12" autocomplete="off" required />
+        <button type="submit" class="btn btn-save" id="save-btn">기록 저장</button>
+      </form>
+
+      <div class="bh"><span>TOP 10</span><span id="status">불러오는 중...</span></div>
+      <div class="lb">
+        <table>
+          <thead><tr><th>순위</th><th>이름</th><th style="text-align:right">점수</th></tr></thead>
+          <tbody id="lb-body"><tr><td colspan="3" class="empty">데이터가 없습니다.</td></tr></tbody>
+        </table>
+      </div>
+      <button type="button" class="btn btn-start" id="start-btn">게임 시작</button>
     </div>
   </div>
+</div>
 
-  <script>
-    /**
-     * [구글 앱스크립트 웹앱 URL 설정]
-     * 배포한 Google Apps Script의 웹앱 URL(https://script.google.com/macros/s/.../exec)을 아래에 입력하세요.
-     * 비워둘 경우 브라우저 내부 저장소(localStorage)에 임시 저장됩니다.
-     */
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzOpLKBQzU6Yj4H8Y6nSub1OoLUQjn49W3HTrIj6ogybMGp4JhYk01cNxf8qrLg82i/exec";
+<script>
+/* 구글 앱스크립트 웹앱 URL (비워두면 브라우저 localStorage에만 저장) */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzOpLKBQzU6Yj4H8Y6nSub1OoLUQjn49W3HTrIj6ogybMGp4JhYk01cNxf8qrLg82i/exec";
 
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
+const $ = (id) => document.getElementById(id);
+const canvas = $("canvas"), ctx = canvas.getContext("2d");
+const altEl = $("alt"), bestEl = $("best"), lvEl = $("lv"), barFill = $("barfill"), toast = $("toast");
+const overlay = $("overlay"), mTitle = $("m-title"), mSub = $("m-sub"), legend = $("legend");
+const finalBox = $("final"), finalScore = $("final-score"), finalNew = $("final-new");
+const saveForm = $("save-form"), nameInput = $("player-name"), saveBtn = $("save-btn");
+const startBtn = $("start-btn"), lbBody = $("lb-body"), statusEl = $("status");
 
-    const scoreText = document.getElementById("score-text");
-    const levelText = document.getElementById("level-text");
-    const overlay = document.getElementById("overlay");
-    const modalTitle = document.getElementById("modal-title");
-    const modalSubtitle = document.getElementById("modal-subtitle");
-    const finalScoreBox = document.getElementById("final-score-box");
-    const saveForm = document.getElementById("save-form");
-    const playerNameInput = document.getElementById("player-name");
-    const saveBtn = document.getElementById("save-btn");
-    const startBtn = document.getElementById("start-btn");
-    const leaderboardBody = document.getElementById("leaderboard-body");
-    const statusMsg = document.getElementById("status-msg");
+/* 고정 논리 해상도 → 화면 크기가 바뀌어도 게임 로직이 변하지 않음 */
+const W = 400, H = 700;
+const dpr = Math.min(window.devicePixelRatio || 1, 2);
+canvas.width = W * dpr; canvas.height = H * dpr;
+ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    let width = 400;
-    let height = 700;
+if (!ctx.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    this.moveTo(x + r, y); this.arcTo(x + w, y, x + w, y + h, r); this.arcTo(x + w, y + h, x, y + h, r);
+    this.arcTo(x, y + h, x, y, r); this.arcTo(x, y, x + w, y, r); this.closePath();
+  };
+}
 
-    function resizeCanvas() {
-      const rect = canvas.parentElement.getBoundingClientRect();
-      width = Math.max(300, Math.floor(rect.width));
-      height = Math.max(500, Math.floor(rect.height));
-      canvas.width = width;
-      canvas.height = height;
+const GRAVITY = 1350, JUMP = -560, SPRING = -900, MAX_FALL = 950;
+const LEVEL_STEP = 200;           // 200m마다 레벨업
+const MAX_LEVEL = 10;
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+};
+
+let state = "READY", score = 0, best = Number(store.get("sky_jumper_best", 0)) || 0;
+let cameraY = 0, lastTime = 0, saved = false, baseY = 0, lastLevel = 1, restartAt = 0, time = 0;
+let platforms = [], particles = [], topY = 0, lastCenter = W / 2, lastType = "NORMAL";
+const player = { x: 0, y: 0, r: 13, dir: 1, vy: 0, jumps: 0, platform: null, sq: 0 };
+
+/* ---------- 난이도 ----------
+   레벨 1: 일반 발판 + 스프링만 (적응 구간)
+   레벨 2~: 이동 발판 / 레벨 3~: 부서지는 발판
+   간격은 한 번 점프로 닿는 높이(약 116px)보다 항상 작게 유지 */
+function getDifficulty(s) {
+  const level = Math.min(MAX_LEVEL, Math.floor(s / LEVEL_STEP) + 1);
+  const t = (level - 1) / (MAX_LEVEL - 1);
+  return {
+    level, t,
+    w: Math.round(104 - t * 40),
+    speed: Math.round(150 + t * 55),
+    moveSpeed: Math.round(50 + t * 85),
+    moveChance: level >= 2 ? 0.08 + t * 0.24 : 0,
+    fragileChance: level >= 3 ? 0.06 + t * 0.16 : 0,
+    springChance: 0.07,
+    gapMin: Math.round(60 + t * 12),
+    gapMax: Math.round(86 + t * 22)
+  };
+}
+
+function makePlatform(y, first) {
+  if (first) return { x: W * 0.1, y, w: W * 0.8, h: 14, type: "NORMAL", vx: 0, broken: false, stepped: false, timer: 0, shake: 0 };
+  const d = getDifficulty(score), w = d.w;
+  /* 이전 발판에서 닿을 수 있는 가로 거리 안에서만 배치 */
+  let c = lastCenter + (Math.random() * 2 - 1) * 150;
+  c = Math.max(14 + w / 2, Math.min(W - 14 - w / 2, c));
+  lastCenter = c;
+
+  let type = "NORMAL", vx = 0, r = Math.random();
+  if (r < d.springChance) type = "SPRING";
+  else if (r < d.springChance + d.fragileChance && lastType !== "FRAGILE") type = "FRAGILE";
+  else if (r < d.springChance + d.fragileChance + d.moveChance) {
+    type = "MOVING"; vx = (Math.random() < 0.5 ? -1 : 1) * d.moveSpeed;
+  }
+  lastType = type;
+  return { x: c - w / 2, y, w, h: 12, type, vx, broken: false, stepped: false, timer: 0.6, shake: 0 };
+}
+
+function spawnPlatform() {
+  const d = getDifficulty(score);
+  topY -= d.gapMin + Math.random() * (d.gapMax - d.gapMin);
+  platforms.push(makePlatform(topY, false));
+}
+
+/* ---------- 배경 장식 ---------- */
+const deco = [];
+for (let i = 0; i < 46; i++) deco.push({ x: Math.random() * W, y: Math.random() * H, r: 0.6 + Math.random() * 1.4, d: 0.03 + Math.random() * 0.08, a: 0.3 + Math.random() * 0.6, star: true });
+for (let i = 0; i < 9; i++) deco.push({ x: Math.random() * W, y: Math.random() * H, r: 18 + Math.random() * 38, d: 0.12 + Math.random() * 0.2, a: 0.04 + Math.random() * 0.06, star: false });
+
+const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+const rgb = (c) => `rgb(${c[0]},${c[1]},${c[2]})`;
+
+function burst(x, y, n, color, speed, up) {
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2, s = speed * (0.4 + Math.random() * 0.6);
+    particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s * (up ? 0.6 : 1) + (up ? -20 : 0), life: 0, max: 0.35 + Math.random() * 0.3, r: 1.5 + Math.random() * 2.5, color });
+  }
+}
+
+/* ---------- 게임 흐름 ---------- */
+function initGame() {
+  score = 0; cameraY = 0; saved = false; platforms = []; particles = [];
+  lastCenter = W / 2; lastType = "NORMAL"; lastLevel = 1;
+  const startY = H - 80;
+  const first = makePlatform(startY, true);
+  platforms.push(first);
+  topY = startY;
+  while (topY > -H) spawnPlatform();
+  Object.assign(player, { x: W / 2, y: startY - player.r, dir: 1, vy: 0, jumps: 0, platform: first, sq: 0 });
+  baseY = startY - player.r;
+  updateHud(true);
+}
+
+function updateHud(force) {
+  const d = getDifficulty(score);
+  altEl.innerHTML = `${score}<small>m</small>`;
+  bestEl.textContent = `최고 ${Math.max(best, score)}m`;
+  lvEl.textContent = d.level >= MAX_LEVEL ? "LV.MAX" : `LV.${d.level}`;
+  const into = d.level >= MAX_LEVEL ? 1 : (score % LEVEL_STEP) / LEVEL_STEP;
+  barFill.style.width = `${Math.round(into * 100)}%`;
+}
+
+function showToast(text) {
+  toast.textContent = text;
+  toast.classList.remove("show"); void toast.offsetWidth; toast.classList.add("show");
+}
+
+function jump() {
+  if (state !== "PLAYING" || player.jumps >= 2) return;
+  const second = player.jumps === 1;
+  player.vy = JUMP; player.jumps++; player.platform = null; player.sq = -0.5;
+  burst(player.x, player.y + player.r, second ? 14 : 7, second ? "#c4b5fd" : "#ffffff", second ? 150 : 90, true);
+}
+
+function update(dt) {
+  const d = getDifficulty(score);
+  const speed = d.speed;
+
+  for (const p of platforms) {
+    if (p.broken) continue;
+    if (p.type === "MOVING") {
+      p.x += p.vx * dt;
+      if (p.x <= 10) { p.x = 10; p.vx = Math.abs(p.vx); }
+      else if (p.x + p.w >= W - 10) { p.x = W - 10 - p.w; p.vx = -Math.abs(p.vx); }
     }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    // 게임 상태 변수
-    let gameState = "READY"; // READY, PLAYING, GAMEOVER
-    let score = 0;
-    let cameraY = 0;
-    let lastTime = 0;
-    let scoreSaved = false;
-
-    const GRAVITY = 1350;
-    const JUMP_FORCE = -560;
-    const SPRING_FORCE = -900;
-
-    const player = {
-      x: 0,
-      y: 0,
-      r: 13,
-      vx: 165,
-      vy: 0,
-      jumps: 0,
-      maxJumps: 2,
-      platform: null
-    };
-
-    let platforms = [];
-    let highestPlatformY = 0;
-
-    // 난이도 계산 (고도가 올라갈수록 단계 상승)
-    function getDifficulty(currentScore) {
-      const level = Math.min(10, Math.floor(currentScore / 150) + 1);
-      const ratio = (level - 1) / 9; // 0.0 ~ 1.0
-      return {
-        level,
-        platWidth: Math.round(96 - ratio * 40),       // 96px -> 56px
-        moveSpeed: Math.round(65 + ratio * 110),      // 이동 발판 속도 증가
-        moveChance: 0.15 + ratio * 0.4,               // 이동 발판 등장 확률 증가
-        fragileChance: level >= 2 ? 0.1 + ratio * 0.25 : 0, // 부서지는 발판 확률
-        gapMin: 68 + ratio * 15,
-        gapMax: 100 + ratio * 25
-      };
-    }
-
-    function createPlatform(y, isFirst = false) {
-      if (isFirst) {
-        return {
-          x: width * 0.15,
-          y: y,
-          w: width * 0.7,
-          h: 14,
-          type: "NORMAL",
-          vx: 0,
-          broken: false,
-          stepped: false,
-          timer: 0
-        };
-      }
-
-      const diff = getDifficulty(score);
-      const w = diff.platWidth;
-      const x = 16 + Math.random() * Math.max(10, width - w - 32);
-
-      const rand = Math.random();
-      let type = "NORMAL";
-      let vx = 0;
-
-      if (rand < 0.08) {
-        type = "SPRING";
-      } else if (rand < 0.08 + diff.fragileChance) {
-        type = "FRAGILE";
-      } else if (rand < 0.08 + diff.fragileChance + diff.moveChance) {
-        type = "MOVING";
-        vx = (Math.random() < 0.5 ? -1 : 1) * diff.moveSpeed;
-      }
-
-      return {
-        x,
-        y,
-        w,
-        h: 12,
-        type,
-        vx,
-        broken: false,
-        stepped: false,
-        timer: 0.45 // 부서지는 발판 지속시간(초)
-      };
-    }
-
-    function initGame() {
-      resizeCanvas();
-      score = 0;
-      cameraY = 0;
-      scoreSaved = false;
-      platforms = [];
-
-      const startY = height - 80;
-      const firstPlat = createPlatform(startY, true);
-      platforms.push(firstPlat);
-      highestPlatformY = startY;
-
-      while (highestPlatformY > -height) {
-        const diff = getDifficulty(0);
-        const gap = diff.gapMin + Math.random() * (diff.gapMax - diff.gapMin);
-        highestPlatformY -= gap;
-        platforms.push(createPlatform(highestPlatformY, false));
-      }
-
-      player.x = width / 2;
-      player.y = startY - player.r;
-      player.vx = 165;
-      player.vy = 0;
-      player.jumps = 0;
-      player.platform = firstPlat;
-
-      scoreText.textContent = "0";
-      levelText.textContent = "LV.1";
-    }
-
-    function triggerJump() {
-      if (gameState !== "PLAYING") return;
-
-      if (player.jumps < player.maxJumps) {
-        player.vy = JUMP_FORCE;
-        player.jumps++;
-        player.platform = null;
+    if (p.type === "FRAGILE" && p.stepped) {
+      p.timer -= dt; p.shake = Math.sin(time * 70) * 1.6;
+      if (p.timer <= 0) {
+        p.broken = true;
+        burst(p.x + p.w / 2, p.y + 6, 12, "#fbbf24", 120, false);
+        if (player.platform === p) { player.platform = null; player.jumps = 1; player.vy = 0; }
       }
     }
+  }
 
-    function update(dt) {
-      const diff = getDifficulty(score);
-      levelText.textContent = `LV.${diff.level}`;
+  const prevBottom = player.y + player.r;
+  if (player.platform) {
+    const p = player.platform;
+    player.x += (player.dir * speed + p.vx) * dt;
+    player.y = p.y - player.r;
+    if (player.x <= p.x + player.r) { player.x = p.x + player.r; player.dir = 1; }
+    else if (player.x >= p.x + p.w - player.r) { player.x = p.x + p.w - player.r; player.dir = -1; }
+  } else {
+    player.x += player.dir * speed * dt;
+    player.vy = Math.min(MAX_FALL, player.vy + GRAVITY * dt);
+    player.y += player.vy * dt;
+    if (player.x <= player.r) { player.x = player.r; player.dir = 1; }
+    else if (player.x >= W - player.r) { player.x = W - player.r; player.dir = -1; }
 
-      // 발판 업데이트
-      for (let i = 0; i < platforms.length; i++) {
-        const p = platforms[i];
+    if (player.vy > 0) {
+      const bottom = player.y + player.r;
+      for (const p of platforms) {
         if (p.broken) continue;
-
-        if (p.type === "MOVING") {
-          p.x += p.vx * dt;
-          if (p.x <= 10) {
-            p.x = 10;
-            p.vx = Math.abs(p.vx);
-          } else if (p.x + p.w >= width - 10) {
-            p.x = width - 10 - p.w;
-            p.vx = -Math.abs(p.vx);
+        if (prevBottom <= p.y + 10 && bottom >= p.y && player.x >= p.x - 4 && player.x <= p.x + p.w + 4) {
+          player.y = p.y - player.r; player.sq = 0.5;
+          if (p.type === "SPRING") {
+            player.vy = SPRING; player.jumps = 1; player.platform = null;
+            burst(player.x, p.y, 16, "#f9a8d4", 170, true);
+          } else {
+            player.vy = 0; player.jumps = 0; player.platform = p;
+            if (p.type === "FRAGILE") p.stepped = true;
+            burst(player.x, p.y, 6, "#ffffff", 80, true);
           }
-        }
-
-        if (p.type === "FRAGILE" && p.stepped) {
-          p.timer -= dt;
-          if (p.timer <= 0) {
-            p.broken = true;
-            if (player.platform === p) {
-              player.platform = null;
-            }
-          }
+          break;
         }
       }
-
-      // 플레이어가 발판 위에 서 있는 경우
-      if (player.platform) {
-        const p = player.platform;
-        player.x += (player.vx + p.vx) * dt;
-        player.y = p.y - player.r;
-
-        // 발판 양 끝에서 자동 방향 전환
-        if (player.x <= p.x + player.r) {
-          player.x = p.x + player.r;
-          player.vx = Math.abs(player.vx);
-        } else if (player.x >= p.x + p.w - player.r) {
-          player.x = p.x + p.w - player.r;
-          player.vx = -Math.abs(player.vx);
-        }
-      } else {
-        // 공중 이동 및 중력 적용
-        const prevBottom = player.y + player.r;
-        player.x += player.vx * dt;
-        player.vy += GRAVITY * dt;
-        player.y += player.vy * dt;
-
-        // 좌우 벽 반사
-        if (player.x <= player.r) {
-          player.x = player.r;
-          player.vx = Math.abs(player.vx);
-        } else if (player.x >= width - player.r) {
-          player.x = width - player.r;
-          player.vx = -Math.abs(player.vx);
-        }
-
-        // 낙하 중 발판 착지 판정
-        if (player.vy > 0) {
-          const currBottom = player.y + player.r;
-          for (let i = 0; i < platforms.length; i++) {
-            const p = platforms[i];
-            if (p.broken) continue;
-
-            if (
-              prevBottom <= p.y + 8 &&
-              currBottom >= p.y &&
-              player.x >= p.x - 4 &&
-              player.x <= p.x + p.w + 4
-            ) {
-              if (p.type === "SPRING") {
-                player.y = p.y - player.r;
-                player.vy = SPRING_FORCE;
-                player.jumps = 1;
-                player.platform = null;
-              } else {
-                player.y = p.y - player.r;
-                player.vy = 0;
-                player.jumps = 0;
-                player.platform = p;
-                if (p.type === "FRAGILE") {
-                  p.stepped = true;
-                }
-              }
-              break;
-            }
-          }
-        }
-      }
-
-      // 카메라 상승 및 점수 갱신
-      const targetCamY = player.y - height * 0.55;
-      if (targetCamY < cameraY) {
-        cameraY += (targetCamY - cameraY) * Math.min(1, dt * 10);
-      }
-
-      const currentAltitude = Math.max(0, Math.floor((height - 80 - player.y) / 10));
-      if (currentAltitude > score) {
-        score = currentAltitude;
-        scoreText.textContent = String(score);
-      }
-
-      // 상단 새 발판 생성
-      while (highestPlatformY > cameraY - 120) {
-        const gap = diff.gapMin + Math.random() * (diff.gapMax - diff.gapMin);
-        highestPlatformY -= gap;
-        platforms.push(createPlatform(highestPlatformY, false));
-      }
-
-      // 화면 아래로 벗어난 발판 정리
-      platforms = platforms.filter((p) => p.y < cameraY + height + 100 && !p.broken);
-
-      // 추락 시 게임 오버
-      if (player.y - cameraY > height + 50) {
-        endGame();
-      }
     }
+    if (Math.random() < 0.5) particles.push({ x: player.x, y: player.y + 4, vx: (Math.random() - .5) * 20, vy: 10, life: 0, max: 0.3, r: 2.5, color: "#a5b4fc" });
+  }
+  player.sq *= Math.max(0, 1 - dt * 12);
 
-    function draw() {
-      ctx.fillStyle = "#1e293b";
-      ctx.fillRect(0, 0, width, height);
+  const targetCam = player.y - H * 0.55;
+  if (targetCam < cameraY) cameraY += (targetCam - cameraY) * Math.min(1, dt * 10);
 
-      ctx.save();
-      ctx.translate(0, -cameraY);
+  const alt = Math.floor((baseY - player.y) / 10);
+  if (alt > score) {
+    score = alt;
+    const lv = getDifficulty(score).level;
+    if (lv > lastLevel) { lastLevel = lv; showToast(lv >= MAX_LEVEL ? "LEVEL MAX" : `LEVEL ${lv}`); }
+    updateHud();
+  }
 
-      // 발판 렌더링
-      for (let i = 0; i < platforms.length; i++) {
-        const p = platforms[i];
-        if (p.broken) continue;
+  while (topY > cameraY - 150) spawnPlatform();
+  platforms = platforms.filter((p) => p.y < cameraY + H + 100 && !p.broken);
 
-        if (p.type === "NORMAL") ctx.fillStyle = "#10b981";
-        else if (p.type === "MOVING") ctx.fillStyle = "#38bdf8";
-        else if (p.type === "FRAGILE") ctx.fillStyle = p.stepped ? "#ef4444" : "#f59e0b";
-        else if (p.type === "SPRING") ctx.fillStyle = "#ec4899";
+  if (player.y - cameraY > H + 50) endGame();
+}
 
-        ctx.beginPath();
-        ctx.roundRect(p.x, p.y, p.w, p.h, 6);
-        ctx.fill();
-      }
+/* ---------- 렌더링 ---------- */
+const SKY_LOW_TOP = [43, 38, 120], SKY_LOW_BOT = [92, 70, 170];
+const SKY_HI_TOP = [4, 5, 22], SKY_HI_BOT = [22, 24, 70];
 
-      // 플레이어 렌더링
-      ctx.fillStyle = "#f8fafc";
-      ctx.beginPath();
-      ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2);
-      ctx.fill();
+function drawBackground() {
+  const t = Math.min(1, score / 2400);
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, rgb(mix(SKY_LOW_TOP, SKY_HI_TOP, t)));
+  g.addColorStop(1, rgb(mix(SKY_LOW_BOT, SKY_HI_BOT, t)));
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 
-      ctx.restore();
-    }
+  for (const o of deco) {
+    const y = (((o.y - cameraY * o.d) % H) + H) % H;
+    if (o.star) { ctx.globalAlpha = o.a * (0.5 + t * 0.5); ctx.fillStyle = "#fff"; ctx.fillRect(o.x, y, o.r, o.r); }
+    else { ctx.globalAlpha = o.a; ctx.fillStyle = "#c7d2fe"; ctx.beginPath(); ctx.arc(o.x, y, o.r, 0, 6.2832); ctx.fill(); }
+  }
+  ctx.globalAlpha = 1;
+}
 
-    function gameLoop(timestamp) {
-      if (!lastTime) lastTime = timestamp;
-      // 탭 전환 등으로 프레임 간격이 커져도 최대 0.04초로 제한하여 충돌 누락 방지
-      const dt = Math.min((timestamp - lastTime) / 1000, 0.04);
-      lastTime = timestamp;
+const PAL = {
+  NORMAL: ["#5eead4", "#10b981"],
+  MOVING: ["#93c5fd", "#3b82f6"],
+  FRAGILE: ["#fde68a", "#f59e0b"],
+  SPRING: ["#f9a8d4", "#ec4899"]
+};
 
-      if (gameState === "PLAYING") {
-        update(dt);
-        draw();
-      }
-      requestAnimationFrame(gameLoop);
-    }
+function drawPlatform(p) {
+  let c = PAL[p.type];
+  if (p.type === "FRAGILE" && p.stepped) c = ["#fca5a5", "#ef4444"];
+  const x = p.x + p.shake, y = p.y;
+  const g = ctx.createLinearGradient(0, y, 0, y + p.h);
+  g.addColorStop(0, c[0]); g.addColorStop(1, c[1]);
+  ctx.save();
+  ctx.shadowColor = c[1]; ctx.shadowBlur = 12;
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.roundRect(x, y, p.w, p.h, p.h / 2); ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = "rgba(255,255,255,.45)";
+  ctx.beginPath(); ctx.roundRect(x + 5, y + 2, p.w - 10, 2, 1); ctx.fill();
 
-    function startGame() {
-      initGame();
-      gameState = "PLAYING";
-      overlay.classList.add("hidden");
-      draw();
-    }
+  ctx.strokeStyle = "rgba(255,255,255,.85)"; ctx.lineWidth = 2; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  const cx = x + p.w / 2, cy = y + p.h / 2 + 0.5;
+  if (p.type === "SPRING") {
+    ctx.beginPath(); ctx.moveTo(cx - 6, cy + 2); ctx.lineTo(cx, cy - 3); ctx.lineTo(cx + 6, cy + 2); ctx.stroke();
+  } else if (p.type === "FRAGILE") {
+    ctx.strokeStyle = "rgba(120,53,15,.55)"; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(cx - 8, y + 1); ctx.lineTo(cx - 3, cy); ctx.lineTo(cx - 7, y + p.h - 1);
+    ctx.moveTo(cx + 9, y + 1); ctx.lineTo(cx + 4, cy); ctx.lineTo(cx + 8, y + p.h - 1); ctx.stroke();
+  } else if (p.type === "MOVING") {
+    const a = p.vx > 0 ? 1 : -1;
+    ctx.lineWidth = 1.8;
+    ctx.beginPath(); ctx.moveTo(cx - 3 * a, cy - 3); ctx.lineTo(cx + 1 * a, cy); ctx.lineTo(cx - 3 * a, cy + 3); ctx.stroke();
+  }
+}
 
-    function endGame() {
-      gameState = "GAMEOVER";
-      overlay.classList.remove("hidden");
-      modalTitle.textContent = "GAME OVER";
-      modalSubtitle.textContent = "이름을 입력하고 점수를 기록하세요.";
-      finalScoreBox.textContent = `${score}m`;
-      finalScoreBox.classList.remove("hidden");
+function drawPlayer() {
+  const stretch = Math.min(0.25, Math.abs(player.vy) / 900 * 0.25);
+  const sx = 1 + player.sq * 0.35 - stretch * 0.5, sy = 1 - player.sq * 0.35 + stretch * 0.5;
+  ctx.save();
+  ctx.translate(player.x, player.y + player.r);
+  ctx.scale(sx, sy);
+  ctx.translate(0, -player.r);
+  ctx.shadowColor = "rgba(165,180,252,.9)"; ctx.shadowBlur = 18;
+  const g = ctx.createRadialGradient(-4, -5, 2, 0, 0, player.r + 2);
+  g.addColorStop(0, "#ffffff"); g.addColorStop(1, "#a5b4fc");
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(0, 0, player.r, 0, 6.2832); ctx.fill();
+  ctx.shadowBlur = 0;
+  const ex = player.dir * 3.5, look = player.platform ? 0 : Math.max(-2, Math.min(2, player.vy / 300));
+  ctx.fillStyle = "#1e1b4b";
+  ctx.beginPath(); ctx.arc(ex - 3, -2 + look, 2, 0, 6.2832); ctx.arc(ex + 4, -2 + look, 2, 0, 6.2832); ctx.fill();
+  ctx.restore();
+}
 
-      saveForm.classList.remove("hidden");
-      saveBtn.disabled = false;
-      saveBtn.textContent = "기록 저장";
-      startBtn.textContent = "다시 시작";
+function drawParticles(dt) {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const q = particles[i];
+    q.life += dt;
+    if (q.life >= q.max) { particles.splice(i, 1); continue; }
+    q.x += q.vx * dt; q.y += q.vy * dt; q.vy += 300 * dt;
+    ctx.globalAlpha = 1 - q.life / q.max;
+    ctx.fillStyle = q.color;
+    ctx.beginPath(); ctx.arc(q.x, q.y, q.r * (1 - q.life / q.max * 0.5), 0, 6.2832); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
 
-      loadLeaderboard();
-    }
+function draw(dt) {
+  drawBackground();
+  ctx.save();
+  ctx.translate(0, -cameraY);
+  for (const p of platforms) if (!p.broken) drawPlatform(p);
+  drawParticles(dt);
+  if (state !== "GAMEOVER" || player.y - cameraY < H + 40) drawPlayer();
+  ctx.restore();
+}
 
-    // --- 순위표 데이터 로드 및 저장 (Google Apps Script + 로컬 폴백) ---
+function loop(ts) {
+  if (!lastTime) lastTime = ts;
+  const dt = Math.min((ts - lastTime) / 1000, 0.04);
+  lastTime = ts; time += dt;
+  if (state === "PLAYING") update(dt);
+  draw(dt);
+  requestAnimationFrame(loop);
+}
 
-    function getLocalScores() {
-      try {
-        const raw = localStorage.getItem("sky_jumper_scores");
-        return raw ? JSON.parse(raw) : [];
-      } catch (e) {
-        return [];
-      }
-    }
+function startGame() {
+  if (state === "PLAYING") return;
+  if (performance.now() < restartAt) return;
+  initGame();
+  state = "PLAYING";
+  overlay.classList.add("hidden");
+  finalBox.classList.add("hidden"); finalNew.classList.add("hidden");
+  saveForm.classList.add("hidden"); legend.classList.remove("hidden");
+  startBtn.blur(); nameInput.blur();
+  lastTime = 0;
+}
 
-    function saveLocalScore(name, scoreVal) {
-      const list = getLocalScores();
-      list.push({ name, score: Number(scoreVal), date: new Date().toISOString() });
-      list.sort((a, b) => b.score - a.score);
-      const top10 = list.slice(0, 10);
-      try {
-        localStorage.setItem("sky_jumper_scores", JSON.stringify(top10));
-      } catch (e) {
-        // storage full or private mode ignore
-      }
-      return top10;
-    }
+function endGame() {
+  state = "GAMEOVER";
+  restartAt = performance.now() + 700;      // 연타로 바로 재시작되는 것 방지
+  const isNew = score > best;
+  if (isNew) { best = score; store.set("sky_jumper_best", String(best)); }
+  updateHud();
+  mTitle.textContent = "GAME OVER";
+  mSub.textContent = "이름을 입력하고 기록을 저장하세요.";
+  legend.classList.add("hidden");
+  finalScore.textContent = `${score}m`;
+  finalNew.classList.toggle("hidden", !isNew);
+  finalBox.classList.remove("hidden");
+  saveForm.classList.remove("hidden");
+  nameInput.value = store.get("sky_jumper_name", "");
+  saveBtn.disabled = false; saveBtn.textContent = "기록 저장";
+  startBtn.textContent = "다시 시작";
+  overlay.classList.remove("hidden");
+  loadLeaderboard();
+}
 
-    function renderLeaderboard(list) {
-      leaderboardBody.innerHTML = "";
-      if (!Array.isArray(list) || list.length === 0) {
-        leaderboardBody.innerHTML =
-          '<tr><td colspan="3" style="text-align:center;color:#64748b;padding:16px;">아직 등록된 기록이 없습니다.</td></tr>';
-        return;
-      }
+/* ---------- 순위표 (Google Apps Script + 로컬 백업) ---------- */
+function fetchT(url, opt = {}, ms = 9000) {
+  const c = new AbortController(), t = setTimeout(() => c.abort(), ms);
+  return fetch(url, { ...opt, signal: c.signal }).finally(() => clearTimeout(t));
+}
+function localScores() {
+  try { const l = JSON.parse(store.get("sky_jumper_scores", "[]")); return Array.isArray(l) ? l : []; } catch (e) { return []; }
+}
+function saveLocal(name, s) {
+  const l = localScores(); l.push({ name, score: Number(s), date: new Date().toISOString() });
+  l.sort((a, b) => b.score - a.score);
+  const top = l.slice(0, 10); store.set("sky_jumper_scores", JSON.stringify(top)); return top;
+}
+function renderBoard(list) {
+  lbBody.innerHTML = "";
+  if (!Array.isArray(list) || !list.length) {
+    lbBody.innerHTML = '<tr><td colspan="3" class="empty">아직 등록된 기록이 없습니다.</td></tr>'; return;
+  }
+  list.slice(0, 10).forEach((it, i) => {
+    const tr = document.createElement("tr");
+    if (i < 3) tr.className = "t" + (i + 1);
+    const a = document.createElement("td"); a.className = "r"; a.textContent = `${i + 1}위`;
+    const b = document.createElement("td"); b.textContent = String(it.name || "익명");
+    const c = document.createElement("td"); c.className = "s"; c.textContent = `${Number(it.score) || 0}m`;
+    tr.append(a, b, c); lbBody.appendChild(tr);
+  });
+}
+let loadSeq = 0;
+async function loadLeaderboard() {
+  const seq = ++loadSeq;
+  if (!SCRIPT_URL.trim()) { statusEl.textContent = "로컬 모드"; renderBoard(localScores()); return; }
+  statusEl.textContent = "동기화 중...";
+  try {
+    const res = await fetchT(`${SCRIPT_URL}?action=getTop10&t=${Date.now()}`, { redirect: "follow" });
+    if (!res.ok) throw new Error("network");
+    const data = await res.json();
+    if (seq !== loadSeq) return;
+    if (!data || !Array.isArray(data.leaderboard)) throw new Error("format");
+    renderBoard(data.leaderboard); statusEl.textContent = "온라인";
+  } catch (e) {
+    if (seq !== loadSeq) return;
+    statusEl.textContent = "오프라인 (로컬 기록 표시)"; renderBoard(localScores());
+  }
+}
 
-      list.slice(0, 10).forEach((item, idx) => {
-        const tr = document.createElement("tr");
-        if (idx < 3) tr.className = "top-rank";
+saveForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (saved) return;
+  const name = nameInput.value.trim().slice(0, 12);
+  if (!name) return;
+  store.set("sky_jumper_name", name);
+  saveBtn.disabled = true; saveBtn.textContent = "저장 중...";
+  const top = saveLocal(name, score);
 
-        const tdRank = document.createElement("td");
-        tdRank.className = "rank";
-        tdRank.textContent = `${idx + 1}위`;
-
-        const tdName = document.createElement("td");
-        tdName.textContent = String(item.name || "익명");
-
-        const tdScore = document.createElement("td");
-        tdScore.className = "score-col";
-        tdScore.textContent = `${Number(item.score) || 0}m`;
-
-        tr.appendChild(tdRank);
-        tr.appendChild(tdName);
-        tr.appendChild(tdScore);
-        leaderboardBody.appendChild(tr);
-      });
-    }
-
-    async function loadLeaderboard() {
-      if (!SCRIPT_URL.trim()) {
-        statusMsg.textContent = "로컬 모드 (URL 미설정)";
-        renderLeaderboard(getLocalScores());
-        return;
-      }
-
-      statusMsg.textContent = "동기화 중...";
-      try {
-        const response = await fetch(`${SCRIPT_URL}?action=getTop10&t=${Date.now()}`, {
-          method: "GET",
-          redirect: "follow"
-        });
-        if (!response.ok) throw new Error("네트워크 응답 오류");
-        const data = await response.json();
-        if (data && Array.isArray(data.leaderboard)) {
-          renderLeaderboard(data.leaderboard);
-          statusMsg.textContent = "구글 드라이브 연동됨";
-        } else {
-          throw new Error("데이터 형식 오류");
-        }
-      } catch (err) {
-        statusMsg.textContent = "오프라인 (로컬 표시)";
-        renderLeaderboard(getLocalScores());
-      }
-    }
-
-    saveForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (scoreSaved) return;
-
-      const cleanName = playerNameInput.value.trim().slice(0, 12);
-      if (!cleanName) return;
-
-      saveBtn.disabled = true;
-      saveBtn.textContent = "저장 중...";
-
-      // 로컬에도 백업 저장
-      const localTop10 = saveLocalScore(cleanName, score);
-
-      if (!SCRIPT_URL.trim()) {
-        scoreSaved = true;
-        saveBtn.textContent = "저장 완료";
-        statusMsg.textContent = "로컬 저장됨";
-        renderLeaderboard(localTop10);
-        playerNameInput.blur();
-        return;
-      }
-
-      try {
-        // Apps Script CORS 에러 방지를 위해 text/plain으로 JSON 문자열 전송
-        const response = await fetch(SCRIPT_URL, {
-          method: "POST",
-          redirect: "follow",
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-          },
-          body: JSON.stringify({
-            name: cleanName,
-            score: score
-          })
-        });
-
-        if (!response.ok) throw new Error("서버 저장 실패");
-        const result = await response.json();
-
-        scoreSaved = true;
-        saveBtn.textContent = "저장 완료";
-        statusMsg.textContent = "드라이브 저장 완료";
-        playerNameInput.blur();
-
-        if (result && Array.isArray(result.leaderboard)) {
-          renderLeaderboard(result.leaderboard);
-        } else {
-          await loadLeaderboard();
-        }
-      } catch (err) {
-        saveBtn.disabled = false;
-        saveBtn.textContent = "다시 시도";
-        statusMsg.textContent = "전송 실패 (로컬 백업됨)";
-        renderLeaderboard(localTop10);
-      }
+  if (!SCRIPT_URL.trim()) {
+    saved = true; saveBtn.textContent = "저장 완료"; statusEl.textContent = "로컬 저장됨"; renderBoard(top); nameInput.blur(); return;
+  }
+  try {
+    const res = await fetchT(SCRIPT_URL, {
+      method: "POST", redirect: "follow",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },   // CORS 사전요청 방지
+      body: JSON.stringify({ name, score })
     });
+    if (!res.ok) throw new Error("save");
+    const result = await res.json();
+    saved = true; saveBtn.textContent = "저장 완료"; statusEl.textContent = "저장 완료"; nameInput.blur();
+    if (result && Array.isArray(result.leaderboard)) renderBoard(result.leaderboard); else await loadLeaderboard();
+  } catch (err) {
+    saveBtn.disabled = false; saveBtn.textContent = "다시 시도";
+    statusEl.textContent = "전송 실패 (로컬에는 저장됨)"; renderBoard(top);
+  }
+});
 
-    // --- 입력 이벤트 핸들러 (오류 및 중복 입력 방지) ---
-    window.addEventListener("keydown", (e) => {
-      // 이름 입력창 포커스 중에는 스페이스바 등 게임 단축키 차단
-      if (document.activeElement && document.activeElement.tagName === "INPUT") {
-        return;
-      }
-      if (e.code === "Space" || e.code === "ArrowUp") {
-        e.preventDefault();
-        if (gameState === "PLAYING") {
-          triggerJump();
-        }
-      }
-    });
+/* ---------- 입력 ---------- */
+window.addEventListener("keydown", (e) => {
+  if (document.activeElement && document.activeElement.tagName === "INPUT") return;
+  if (e.code === "Space" || e.code === "ArrowUp") {
+    e.preventDefault();
+    if (e.repeat) return;
+    if (state === "PLAYING") jump(); else startGame();
+  }
+});
+canvas.addEventListener("pointerdown", (e) => { e.preventDefault(); if (state === "PLAYING") jump(); });
+startBtn.addEventListener("click", startGame);
+document.addEventListener("visibilitychange", () => { lastTime = 0; });
 
-    canvas.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      if (gameState === "PLAYING") {
-        triggerJump();
-      }
-    });
-
-    startBtn.addEventListener("click", () => {
-      startGame();
-    });
-
-    // 초기 실행
-    initGame();
-    draw();
-    loadLeaderboard();
-    requestAnimationFrame(gameLoop);
-  </script>
+/* ---------- 시작 ---------- */
+bestEl.textContent = `최고 ${best}m`;
+initGame();
+loadLeaderboard();
+requestAnimationFrame(loop);
+</script>
 </body>
 </html>
