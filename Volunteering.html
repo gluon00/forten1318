@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>의정부시일시청소년쉼터(이동형) 자원활동가 신청서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --night: #2f80ed;
+    --night-soft: #1f6fdb;
+    --lamp: #ffd666;
+    --bg: #eef6ff;
+    --card: #ffffff;
+    --line: #d3e4fa;
+    --text: #1c2237;
+    --muted: #5f7394;
+    --err: #c8372d;
+    --ok: #1f8a5b;
+    --focus: #1f6fdb;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Noto Sans KR", -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    line-height: 1.65;
+    font-size: 16px;
+  }
+  header.top {
+    background: var(--night);
+    color: #fff;
+    padding: 44px 20px 64px;
+    text-align: center;
+    position: relative;
+  }
+  header.top::after {
+    content: "";
+    position: absolute; left: 50%; bottom: 28px;
+    width: 56px; height: 4px; margin-left: -28px;
+    background: var(--lamp); border-radius: 2px;
+  }
+  header.top .org { margin: 0 0 6px; font-size: 14px; opacity: .8; }
+  header.top h1 { margin: 0; font-size: clamp(24px, 5vw, 34px); font-weight: 900; letter-spacing: -.02em; }
+  header.top .sub { margin: 10px 0 0; font-size: 14px; opacity: .85; }
+
+  main { max-width: 680px; margin: -28px auto 60px; padding: 0 16px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 24px 22px;
+    margin-bottom: 16px;
+  }
+  .card h2 { margin: 0 0 14px; font-size: 18px; font-weight: 700; }
+
+  .consent-box {
+    max-height: 220px; overflow-y: auto;
+    background: #f4f9ff; border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; font-size: 14px; color: #3b4f70;
+  }
+  .consent-box p { margin: 0 0 10px; }
+  .consent-box h3 { margin: 12px 0 4px; font-size: 14px; }
+  .consent-box h3:first-child { margin-top: 0; }
+
+  .field { margin-bottom: 22px; }
+  .field:last-child { margin-bottom: 0; }
+  label.lbl, .lbl { display: block; font-weight: 700; margin-bottom: 6px; font-size: 15px; }
+  .req { color: var(--err); margin-left: 3px; }
+  .hint { font-size: 13px; color: var(--muted); margin: 0 0 8px; }
+
+  input[type=text], input[type=tel], input[type=email], input[type=date], textarea {
+    width: 100%;
+    font: inherit;
+    padding: 12px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--text);
+    -webkit-appearance: none; appearance: none;
+    min-height: 48px;
+  }
+  textarea { resize: vertical; min-height: 92px; }
+  input:focus, textarea:focus { outline: 3px solid rgba(31,111,219,.25); border-color: var(--focus); }
+  input:disabled { background: #eaf1fb; color: #9ab0cf; }
+  .invalid input, .invalid textarea { border-color: var(--err); }
+  .invalid .choices, .invalid .consent-check { outline: 2px solid var(--err); outline-offset: 3px; border-radius: 10px; }
+  .err-msg { display: none; color: var(--err); font-size: 13px; margin-top: 6px; }
+  .invalid .err-msg { display: block; }
+
+  .choices { display: flex; gap: 10px; flex-wrap: wrap; }
+  .choice { position: relative; flex: 1 1 140px; }
+  .choice input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .choice span {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    min-height: 48px; padding: 10px 14px;
+    border: 1.5px solid var(--line); border-radius: 10px; background: #fff;
+    font-weight: 500;
+  }
+  .choice input:checked + span { background: var(--night); border-color: var(--night); color: #fff; }
+  .choice input:focus-visible + span { outline: 3px solid rgba(31,111,219,.35); outline-offset: 2px; }
+
+  .days { display: grid; gap: 10px; }
+  .day { position: relative; }
+  .day input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .day span {
+    display: flex; flex-direction: column; gap: 2px;
+    padding: 12px 16px 12px 52px; position: relative;
+    border: 1.5px solid var(--line); border-radius: 10px; background: #fff;
+  }
+  .day span::before {
+    content: ""; position: absolute; left: 16px; top: 50%; margin-top: -11px;
+    width: 22px; height: 22px; border: 2px solid #a9c4ea; border-radius: 6px; background: #fff;
+  }
+  .day input:checked + span { border-color: var(--night); background: #eaf3ff; }
+  .day input:checked + span::before {
+    background: var(--night) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/16px no-repeat;
+    border-color: var(--night);
+  }
+  .day input:focus-visible + span { outline: 3px solid rgba(31,111,219,.35); outline-offset: 2px; }
+  .day b { font-size: 16px; }
+  .day small { color: var(--muted); font-size: 13px; }
+
+  .check-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: 15px; cursor: pointer; }
+  .check-row input { width: 22px; height: 22px; accent-color: var(--night); flex: none; }
+  .consent-check { margin-top: 14px; padding: 4px 0; font-weight: 700; }
+
+  .note { background: #fff8e6; border: 1px solid #f2dca0; border-radius: 10px; padding: 10px 14px; font-size: 14px; margin-bottom: 14px; }
+
+  button.submit {
+    width: 100%; min-height: 56px; border: 0; border-radius: 12px;
+    background: var(--night); color: #fff; font: inherit; font-size: 17px; font-weight: 700;
+    cursor: pointer;
+  }
+  button.submit:hover { background: var(--night-soft); }
+  button.submit:focus-visible { outline: 3px solid rgba(31,111,219,.4); outline-offset: 3px; }
+  button.submit:disabled { background: #9bbbe6; cursor: wait; }
+  .form-error { display: none; margin-top: 12px; color: var(--err); font-size: 14px; text-align: center; }
+
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+  #done { display: none; text-align: center; padding: 48px 22px; }
+  #done .mark {
+    width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 50%;
+    background: var(--ok) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='white' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/34px no-repeat;
+  }
+  #done h2 { font-size: 22px; margin: 0 0 8px; }
+  #done p { color: var(--muted); margin: 0; }
+
+  @media (min-width: 720px) {
+    .card { padding: 30px 32px; }
+    .days { grid-template-columns: repeat(3, 1fr); }
+    .day span { padding: 14px 14px 14px 50px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .row2 .field { margin-bottom: 22px; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    button.submit, .choice span, .day span { transition: background .15s, border-color .15s; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <p class="org">의정부시일시청소년쉼터(이동형)</p>
+  <h1>자원활동가 신청서</h1>
+</header>
+
+<main>
+  <form id="form" novalidate autocomplete="on">
+    <div class="hp" aria-hidden="true">
+      <label>웹사이트<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+    </div>
+
+    <section class="card">
+      <h2>개인정보 수집 및 이용 동의</h2>
+      <div class="consent-box" tabindex="0" aria-label="개인정보 수집 및 이용 안내">
+        <p>의정부시일시청소년쉼터(이동형)(이하 '기관'이라 한다)는 개인정보 보호법 제30조에 따라 정보 주체의 개인정보를 보호하고, 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 다음과 같이 개인정보 처리지침을 수립하고 공개합니다.</p>
+        <h3>1. 개인정보 수집 및 이용 목적</h3>
+        <p>기관은 수집한 개인정보를 서비스 제공 및 이용자 식별을 위해 사용합니다.</p>
+        <h3>2. 수집하는 개인정보 항목</h3>
+        <p>기관은 서비스 제공을 위해 다음과 같은 개인 정보를 수집합니다.<br>필수 항목: 이름, 성별, 학교(학부), 주소지, 연락처, 생년월일, 이메일, 자격증 등</p>
+        <h3>3. 개인정보 보유 및 이용 기간</h3>
+        <p>수집된 개인정보는 수집 및 이용 목적이 달성된 후 즉시 파기합니다. 다만, 관련 법령에 따라 보관이 필요한 경우 해당 법령에서 정한 기간 동안 보관됩니다.</p>
+        <h3>4. 개인정보의 제3자 제공</h3>
+        <p>기관은 이용자의 동의 없이 개인정보를 제3자에게 제공하지 않습니다. 단, 다음의 경우 예외로 합니다. 이용자가 사전에 동의한 경우 법령에 따라 제공이 요구되는 경우.</p>
+        <h3>5. 동의 거부 시 불이익</h3>
+        <p>개인정보 제공 및 이용동의는 필수 사항입니다. 동의하지 않을 경우 신청이 제한될 수 있습니다.</p>
+      </div>
+      <div class="field" id="f-consent">
+        <label class="check-row consent-check">
+          <input type="checkbox" id="consent" name="consent">
+          <span>개인정보 수집 및 이용에 동의합니다.<span class="req">*</span></span>
+        </label>
+        <div class="err-msg">동의해야 신청서를 제출할 수 있어요.</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>신청자 정보</h2>
+
+      <div class="row2">
+        <div class="field" id="f-name">
+          <label class="lbl" for="name">성명<span class="req">*</span></label>
+          <input type="text" id="name" name="name" autocomplete="name" maxlength="30">
+          <div class="err-msg">성명을 입력해 주세요.</div>
+        </div>
+
+        <div class="field" id="f-gender">
+          <span class="lbl" id="gender-lbl">성별<span class="req">*</span></span>
+          <div class="choices" role="radiogroup" aria-labelledby="gender-lbl">
+            <label class="choice"><input type="radio" name="gender" value="남"><span>남</span></label>
+            <label class="choice"><input type="radio" name="gender" value="여"><span>여</span></label>
+          </div>
+          <div class="err-msg">성별을 선택해 주세요.</div>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="field" id="f-birth">
+          <label class="lbl" for="birth">생년월일<span class="req">*</span></label>
+          <input type="date" id="birth" name="birth" autocomplete="bday" min="1900-01-01">
+          <div class="err-msg">생년월일을 입력해 주세요.</div>
+        </div>
+
+        <div class="field" id="f-phone">
+          <label class="lbl" for="phone">연락처<span class="req">*</span></label>
+          <input type="tel" id="phone" name="phone" inputmode="numeric" autocomplete="tel" placeholder="010-0000-0000" maxlength="13">
+          <div class="err-msg">연락처를 정확히 입력해 주세요.</div>
+        </div>
+      </div>
+
+      <div class="field" id="f-address">
+        <label class="lbl" for="address">주소지<span class="req">*</span></label>
+        <p class="hint">지역 확인을 위한 주소만 적어 주세요. (예: 의정부시 가능동)</p>
+        <input type="text" id="address" name="address" autocomplete="address-level2" maxlength="60">
+        <div class="err-msg">주소지를 입력해 주세요.</div>
+      </div>
+
+      <div class="field" id="f-email">
+        <label class="lbl" for="email">이메일 주소<span class="req">*</span></label>
+        <input type="email" id="email" name="email" autocomplete="email" inputmode="email" maxlength="80">
+        <div class="err-msg">이메일 주소를 정확히 입력해 주세요.</div>
+      </div>
+
+      <div class="field" id="f-school">
+        <label class="lbl" for="school">학교 및 학부<span class="req">*</span></label>
+        <p class="hint">예) OO대 / 사회복지학과</p>
+        <input type="text" id="school" name="school" maxlength="60">
+        <label class="check-row"><input type="checkbox" id="schoolNA"><span>비해당</span></label>
+        <div class="err-msg">학교 및 학부를 입력하거나 '비해당'을 선택해 주세요.</div>
+      </div>
+
+      <div class="field" id="f-cert">
+        <label class="lbl" for="cert">자격증<span class="req">*</span></label>
+        <p class="hint">여러 개면 쉼표(,)로 구분해 주세요. 없으면 '없음'이라고 적어 주세요.</p>
+        <input type="text" id="cert" name="cert" maxlength="150">
+        <div class="err-msg">자격증을 입력해 주세요.</div>
+      </div>
+
+      <div class="field" id="f-hobby">
+        <label class="lbl" for="hobby">취미 또는 특기<span class="req">*</span></label>
+        <input type="text" id="hobby" name="hobby" maxlength="100">
+        <div class="err-msg">취미 또는 특기를 입력해 주세요.</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>활동 가능일</h2>
+      <div class="note">활동 시간은 <b>19:30~22:30 (3시간)</b>이며, 시간 조율이 가능합니다.</div>
+      <div class="field" id="f-days">
+        <p class="hint">가능한 요일을 모두 선택해 주세요.</p>
+        <div class="days choices-wrap">
+          <label class="day"><input type="checkbox" name="days" value="수요일(금오동 홈플러스)"><span><b>수요일</b><small>금오동 홈플러스</small></span></label>
+          <label class="day"><input type="checkbox" name="days" value="목요일(민락2지구)"><span><b>목요일</b><small>민락2지구</small></span></label>
+          <label class="day"><input type="checkbox" name="days" value="금요일(의정부역)"><span><b>금요일</b><small>의정부역</small></span></label>
+        </div>
+        <div class="err-msg">활동 가능한 요일을 하나 이상 선택해 주세요.</div>
+      </div>
+    </section>
+
+    <button type="submit" class="submit" id="submitBtn">신청서 제출하기</button>
+    <div class="form-error" id="formError" role="alert"></div>
+  </form>
+
+  <section class="card" id="done" role="status">
+    <div class="mark"></div>
+    <h2>신청서가 제출되었습니다</h2>
+    <p>확인 후 입력하신 연락처로 안내드릴게요.</p>
+  </section>
+</main>
+
+<script>
+  // ▼ 앱스 스크립트 웹 앱 배포 후 받은 URL(…/exec)을 아래에 붙여넣으세요.
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyWsAb6za86Ev_4B4-nVfzf8mClGTwv7tUYwVUYkCcPYWFYqoEXlzS-pckwKPUpbgsU/exec";
+
+  const form = document.getElementById("form");
+  const btn = document.getElementById("submitBtn");
+  const formError = document.getElementById("formError");
+  const school = document.getElementById("school");
+  const schoolNA = document.getElementById("schoolNA");
+  const phone = document.getElementById("phone");
+  const birth = document.getElementById("birth");
+
+  // 생년월일 최대값: 오늘
+  birth.max = new Date().toISOString().slice(0, 10);
+
+  // 연락처 자동 하이픈
+  phone.addEventListener("input", () => {
+    const d = phone.value.replace(/\D/g, "").slice(0, 11);
+    let out = d;
+    if (d.length > 7) out = d.slice(0, 3) + "-" + d.slice(3, d.length - 4) + "-" + d.slice(-4);
+    else if (d.length > 3) out = d.slice(0, 3) + "-" + d.slice(3);
+    phone.value = out;
+  });
+
+  // 비해당 처리
+  schoolNA.addEventListener("change", () => {
+    school.disabled = schoolNA.checked;
+    if (schoolNA.checked) school.value = "";
+    setInvalid("f-school", false);
+  });
+
+  function setInvalid(id, bad) {
+    document.getElementById(id).classList.toggle("invalid", bad);
+  }
+
+  // 입력하면 오류 표시 해제
+  form.addEventListener("input", (e) => {
+    const f = e.target.closest(".field");
+    if (f) f.classList.remove("invalid");
+  });
+  form.addEventListener("change", (e) => {
+    const f = e.target.closest(".field");
+    if (f) f.classList.remove("invalid");
+  });
+
+  function collect() {
+    const v = (n) => form.elements[n].value.trim();
+    return {
+      consent: document.getElementById("consent").checked,
+      name: v("name"),
+      gender: (form.querySelector('input[name="gender"]:checked') || {}).value || "",
+      birth: v("birth"),
+      address: v("address"),
+      phone: v("phone"),
+      email: v("email"),
+      school: schoolNA.checked ? "비해당" : school.value.trim(),
+      cert: v("cert"),
+      hobby: v("hobby"),
+      days: [...form.querySelectorAll('input[name="days"]:checked')].map((c) => c.value),
+      website: v("website") // 스팸 방지용(비어 있어야 정상)
+    };
+  }
+
+  function validate(d) {
+    const checks = [
+      ["f-consent", d.consent],
+      ["f-name", d.name.length >= 2],
+      ["f-gender", !!d.gender],
+      ["f-birth", !!d.birth],
+      ["f-phone", /^01[016789]-\d{3,4}-\d{4}$/.test(d.phone)],
+      ["f-address", d.address.length >= 2],
+      ["f-email", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)],
+      ["f-school", d.school.length >= 1],
+      ["f-cert", d.cert.length >= 1],
+      ["f-hobby", d.hobby.length >= 1],
+      ["f-days", d.days.length >= 1]
+    ];
+    let first = null;
+    checks.forEach(([id, ok]) => {
+      setInvalid(id, !ok);
+      if (!ok && !first) first = id;
+    });
+    return first;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    formError.style.display = "none";
+    const data = collect();
+    const firstBad = validate(data);
+    if (firstBad) {
+      document.getElementById(firstBad).scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    if (data.website) return; // 봇으로 판단
+    if (SCRIPT_URL.indexOf("script.google.com") === -1) {
+      formError.textContent = "제출 주소가 설정되지 않았어요. 담당자에게 문의해 주세요.";
+      formError.style.display = "block";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "제출 중…";
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      if (!result.ok) throw new Error(result.error || "저장 실패");
+      form.style.display = "none";
+      const done = document.getElementById("done");
+      done.style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      formError.textContent = "제출하지 못했어요. 네트워크를 확인하고 다시 시도해 주세요.";
+      formError.style.display = "block";
+      btn.disabled = false;
+      btn.textContent = "신청서 제출하기";
+    }
+  });
+</script>
+</body>
+</html>
