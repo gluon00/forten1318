@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f5d8a">
+<title>위임장 제출</title>
+<style>
+  :root{--accent:#2f5d8a;--line:#d5dbe1;--bg:#f2f5f8;--text:#1d2630}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple SD Gothic Neo',-apple-system,sans-serif;font-size:16px;line-height:1.6;padding:12px 12px calc(96px + env(safe-area-inset-bottom));}
+  .wrap{max-width:560px;margin:0 auto}
+  .card{background:#fff;border-radius:14px;padding:18px 16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  h1{margin:4px 0 2px;font-size:22px;text-align:center;letter-spacing:.4em}
+  .sub{text-align:center;color:#6b7783;font-size:14px;margin:0 0 4px}
+  dl{margin:0}
+  dt{font-size:13px;color:#6b7783;margin-top:12px}
+  dd{margin:2px 0 0;font-weight:600;word-break:keep-all}
+  .text{background:#f7f9fb;border-radius:10px;padding:14px;line-height:1.9;word-break:keep-all;margin-top:14px}
+  label,.lbl{display:block;font-weight:700;margin-bottom:8px}
+  .lbl small{font-weight:400;color:#c0392b}
+  input[type=text],input[type=date]{width:100%;font-size:18px;font-family:inherit;padding:14px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--text);appearance:none;-webkit-appearance:none;min-height:52px}
+  input:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+  .field+.field{margin-top:18px}
+  .pad{position:relative;border:2px dashed #9aa6b2;border-radius:12px;background:#fff;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;aspect-ratio:2/1;touch-action:none;-webkit-user-select:none;user-select:none}
+  .hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#b5bec7;font-size:18px;pointer-events:none}
+  .padbar{display:flex;justify-content:flex-end;margin-top:8px}
+  .link{background:none;border:0;color:var(--accent);font:inherit;font-weight:700;padding:10px 6px;min-height:44px}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -2px 8px rgba(0,0,0,.05)}
+  .bar .in{max-width:560px;margin:0 auto}
+  #send{width:100%;min-height:54px;border:0;border-radius:12px;background:var(--accent);color:#fff;font:inherit;font-size:18px;font-weight:700}
+  #send:disabled{opacity:.55}
+  #msg{color:#c0392b;font-size:14px;text-align:center;min-height:0;margin:0 0 6px}
+  #msg:empty{display:none}
+  .done{text-align:center;padding:70px 10px;font-size:19px;line-height:1.9}
+  .done b{display:block;font-size:44px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="card">
+    <h1>위 임 장</h1>
+    <p class="sub">2026년 4회 운영위원회</p>
+    <dl>
+      <dt>수신</dt><dd>의정부시청소년쉼터 운영위원 귀하</dd>
+      <dt>제목</dt><dd>2026년 4회 운영위원회 회의 불참에 따른 권한 위임장</dd>
+    </dl>
+    <div class="text">부득이한 사정으로 2026년 11월 12일에 개최되는 2026년 4회 운영위원회에 불참하게 되었으므로, 본 회의에서 다루어지는 모든 내용에 대해서는 운영위원회 회의 자체에 모든 권한을 위임합니다.</div>
+  </div>
+
+  <div class="card">
+    <div class="field">
+      <label for="date">작성일</label>
+      <input id="date" type="date">
+    </div>
+    <div class="field">
+      <label for="name">위원명</label>
+      <input id="name" type="text" maxlength="30" autocomplete="name" enterkeyhint="done" placeholder="이름을 입력하세요">
+    </div>
+    <div class="field">
+      <div class="lbl">자필 서명 <small>(아래 칸에 손가락으로 서명)</small></div>
+      <div class="pad">
+        <canvas id="cv" width="800" height="400"></canvas>
+        <div class="hint" id="hint">여기에 서명하세요</div>
+      </div>
+      <div class="padbar"><button class="link" id="clear" type="button">서명 지우기</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="bar"><div class="in">
+  <p id="msg" role="alert"></p>
+  <button id="send" type="button">제출하기</button>
+</div></div>
+
+<script>
+(function(){
+  var API_URL='https://script.google.com/macros/s/AKfycbyEl3Mltkyh2xGTglXvFOwudNscWfvPoJ1C1LMj2le5GEgvgJyL9sSZrnJvU_2SBAEg/exec';
+
+  // 오늘 날짜 기본값 (로컬 기준)
+  var dateEl=document.getElementById('date'), t=new Date();
+  dateEl.value=t.getFullYear()+'-'+('0'+(t.getMonth()+1)).slice(-2)+'-'+('0'+t.getDate()).slice(-2);
+
+  // 서명 캔버스
+  var cv=document.getElementById('cv'), ctx=cv.getContext('2d'), drawing=false, dirty=false, hint=document.getElementById('hint');
+  function reset(){ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);ctx.strokeStyle='#111';ctx.lineWidth=5;ctx.lineCap='round';ctx.lineJoin='round';}
+  reset();
+  function pos(e){var r=cv.getBoundingClientRect();return {x:(e.clientX-r.left)*cv.width/r.width,y:(e.clientY-r.top)*cv.height/r.height};}
+  cv.addEventListener('pointerdown',function(e){
+    e.preventDefault();drawing=true;cv.setPointerCapture(e.pointerId);
+    var p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+.1,p.y+.1);ctx.stroke();
+    dirty=true;hint.style.display='none';
+  });
+  cv.addEventListener('pointermove',function(e){if(!drawing)return;e.preventDefault();var p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();});
+  ['pointerup','pointercancel','pointerleave'].forEach(function(n){cv.addEventListener(n,function(){drawing=false;});});
+  document.getElementById('clear').onclick=function(){reset();dirty=false;hint.style.display='flex';};
+
+  // 제출
+  var msg=document.getElementById('msg'), btn=document.getElementById('send');
+  function fail(text){msg.textContent=text;}
+  btn.onclick=function(){
+    msg.textContent='';
+    var name=document.getElementById('name').value.trim();
+    var v=dateEl.value; // YYYY-MM-DD
+    if(!v){fail('작성일을 선택해주세요.');return;}
+    if(!name){fail('위원명을 입력해주세요.');document.getElementById('name').focus();return;}
+    if(!dirty){fail('서명을 해주세요.');return;}
+    var parts=v.split('-');
+    btn.disabled=true;btn.textContent='제출 중...';
+    fetch(API_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({name:name,month:parseInt(parts[1],10),day:parseInt(parts[2],10),signature:cv.toDataURL('image/png')})
+    })
+    .then(function(r){return r.json();})
+    .then(function(res){
+      if(!res.ok) throw new Error(res.error||'제출에 실패했습니다.');
+      document.querySelector('.bar').remove();
+      document.getElementById('app').innerHTML='<div class="card done"><b>✅</b>제출이 완료되었습니다.<br>감사합니다.</div>';
+      window.scrollTo(0,0);
+    })
+    .catch(function(err){
+      btn.disabled=false;btn.textContent='제출하기';
+      fail((err&&err.message)||'제출에 실패했습니다. 다시 시도해주세요.');
+    });
+  };
+})();
+</script>
+</body>
+</html>
