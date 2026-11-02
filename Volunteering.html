@@ -296,7 +296,7 @@
 
 <script>
   // ▼ 앱스 스크립트 웹 앱 배포 후 받은 URL(…/exec)을 아래에 붙여넣으세요.
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyWsAb6za86Ev_4B4-nVfzf8mClGTwv7tUYwVUYkCcPYWFYqoEXlzS-pckwKPUpbgsU/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCwk08M-Js6zKdDdznEPSfgK_KwREdPIy-XEa-DxJ3hHEHn5rnWLreMMX9tpziz0RNtg/exec";
 
   const form = document.getElementById("form");
   const btn = document.getElementById("submitBtn");
@@ -410,7 +410,8 @@
       done.style.display = "block";
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
-      formError.textContent = "제출하지 못했어요. 네트워크를 확인하고 다시 시도해 주세요.";
+      console.error(err);
+      formError.textContent = "제출하지 못했어요. 네트워크를 확인하고 다시 시도해 주세요. (" + (err && err.message ? err.message : err) + ")";
       formError.style.display = "block";
       btn.disabled = false;
       btn.textContent = "신청서 제출하기";
