@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>전문자원활동가 활동일지</title>
+<style>
+  :root{--bg:#f4f6f8;--card:#fff;--ink:#1f2933;--sub:#6b7785;--line:#d5dbe1;--accent:#2f6fed;--ok:#1a8f4c;--err:#d33}
+  @media (prefers-color-scheme:dark){:root{--bg:#14181d;--card:#1d232a;--ink:#e8ecf0;--sub:#98a4b0;--line:#34404b;--accent:#5b92ff}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;line-height:1.5}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 16px 60px}
+  h1{font-size:22px;text-align:center;margin:12px 0 4px}
+  .badge{display:block;text-align:center;color:var(--sub);font-size:13px;margin-bottom:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+  label.t{display:block;font-weight:700;margin-bottom:6px}
+  label.t small{font-weight:400;color:var(--sub);font-style:italic;margin-left:4px}
+  .req{color:var(--err)}
+  input[type=text],input[type=date],select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:16px}
+  textarea{resize:vertical;min-height:110px}
+  textarea.big{min-height:220px}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);border-color:transparent}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .row>*{flex:1;min-width:70px}
+  .row .sep{flex:0 0 auto;min-width:0;color:var(--sub)}
+  .seg{display:flex;gap:8px;margin-bottom:8px}
+  .seg label{flex:1;text-align:center;padding:10px;border:1px solid var(--line);border-radius:8px;cursor:pointer;background:var(--bg)}
+  .seg input{display:none}
+  .seg input:checked+span{font-weight:700;color:var(--accent)}
+  .seg label:has(input:checked){border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+  .hint{font-size:13px;color:var(--sub);margin-top:6px}
+  .timeblock{margin-bottom:10px}
+  .timeblock b{display:block;font-size:14px;margin-bottom:6px;color:var(--sub)}
+  button{width:100%;padding:15px;border:0;border-radius:10px;background:var(--accent);color:#fff;font:inherit;font-size:17px;font-weight:700;cursor:pointer}
+  button:disabled{opacity:.55;cursor:wait}
+  .msg{display:none;margin-top:14px;padding:14px;border-radius:10px;text-align:center}
+  .msg.ok{display:block;background:rgba(26,143,76,.12);color:var(--ok)}
+  .msg.err{display:block;background:rgba(211,51,51,.12);color:var(--err)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>전문자원활동가 활동일지</h1>
+  <span class="badge">봉사분야 : 아웃리치 전문자원활동</span>
+
+  <form id="f" novalidate>
+    <div class="card">
+      <label class="t" for="name">성명 <span class="req">*</span></label>
+      <input type="text" id="name" autocomplete="name" placeholder="이름을 입력하세요">
+    </div>
+
+    <div class="card">
+      <label class="t">장소 <span class="req">*</span></label>
+      <select id="placeSel">
+        <option value="">선택하세요</option>
+        <option>홈플러스</option>
+        <option>민락2지구</option>
+        <option>의정부역</option>
+        <option value="__etc">직접 작성</option>
+      </select>
+      <input type="text" id="placeEtc" placeholder="장소를 직접 입력하세요" style="display:none;margin-top:8px">
+    </div>
+
+    <div class="card">
+      <label class="t" for="writeDate">작성일 <span class="req">*</span></label>
+      <input type="date" id="writeDate">
+      <div class="hint" id="writeDateText"></div>
+    </div>
+
+    <div class="card">
+      <label class="t" for="actDate">활동일 <span class="req">*</span></label>
+      <input type="date" id="actDate">
+      <div class="hint" id="actDateText">기본값은 오늘이며 다른 날짜로 변경할 수 있어요.</div>
+    </div>
+
+    <div class="card">
+      <label class="t">활동시간 <span class="req">*</span></label>
+      <div class="timeblock">
+        <b>시작</b>
+        <div class="seg">
+          <label><input type="radio" name="sAP" value="오전"><span>오전</span></label>
+          <label><input type="radio" name="sAP" value="오후" checked><span>오후</span></label>
+        </div>
+        <div class="row"><select id="sH"></select><span class="sep">시</span><select id="sM"></select><span class="sep">분</span></div>
+      </div>
+      <div class="timeblock" style="margin-bottom:0">
+        <b>종료</b>
+        <div class="seg">
+          <label><input type="radio" name="eAP" value="오전"><span>오전</span></label>
+          <label><input type="radio" name="eAP" value="오후" checked><span>오후</span></label>
+        </div>
+        <div class="row"><select id="eH"></select><span class="sep">시</span><select id="eM"></select><span class="sep">분</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="t" for="content">1. 활동내용 및 소감 <small>(예. 만난 청소년, 상담 시 주요 내용 및 활동 등)</small> <span class="req">*</span></label>
+      <textarea id="content" class="big"></textarea>
+    </div>
+
+    <div class="card">
+      <label class="t" for="opinion">2. 기타의견 및 평가 <small>(예. 활동 관련 피드백, 질문 등)</small></label>
+      <textarea id="opinion"></textarea>
+    </div>
+
+    <div class="card">
+      <label class="t" for="suggestion">3. 건의사항 <small>(예. 개인적으로 봉사활동을 통해 얻고 싶은 점, 요청사항 등)</small></label>
+      <textarea id="suggestion"></textarea>
+    </div>
+
+    <button type="submit" id="btn">제출하기</button>
+    <div class="msg" id="msg"></div>
+  </form>
+</div>
+
+<script>
+// ▼ 앱스 스크립트 웹 앱 URL(…/exec)을 붙여넣으세요
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxWq9tsfXEiSB3YC7bV-ZjfWaZNA_oI3SHkFeZAAlVU0ao4mMCKHrfA7Bb5cAlf5fs-VA/exec';
+
+const $ = id => document.getElementById(id);
+const DAYS = ['일','월','화','수','목','금','토'];
+
+function pad(n){return String(n).padStart(2,'0');}
+function today(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function kdate(v){ // 'YYYY-MM-DD' -> '2026년 11월 9일(월)'
+  if(!v) return '';
+  const [y,m,d]=v.split('-').map(Number);
+  const w=DAYS[new Date(y,m-1,d).getDay()];
+  return y+'년 '+m+'월 '+d+'일('+w+')';
+}
+function fill(sel,from,to,step,labelFn){
+  sel.innerHTML='<option value="">선택</option>';
+  for(let i=from;i<=to;i+=step){const o=document.createElement('option');o.value=pad(i);o.textContent=labelFn?labelFn(i):pad(i);sel.appendChild(o);}
+}
+fill($('sH'),1,12,1); fill($('eH'),1,12,1);
+fill($('sM'),0,55,5); fill($('eM'),0,55,5);
+
+$('writeDate').value=today(); $('actDate').value=today();
+const refresh=()=>{ $('writeDateText').textContent=kdate($('writeDate').value);
+                    $('actDateText').textContent=kdate($('actDate').value); };
+$('writeDate').addEventListener('input',refresh);
+$('actDate').addEventListener('input',refresh);
+refresh();
+
+$('placeSel').addEventListener('change',()=>{
+  const etc=$('placeSel').value==='__etc';
+  $('placeEtc').style.display=etc?'block':'none';
+  if(etc) $('placeEtc').focus();
+});
+
+const radio = n => document.querySelector('input[name="'+n+'"]:checked').value;
+
+function show(type,text){const m=$('msg');m.className='msg '+type;m.innerHTML=text;m.scrollIntoView({behavior:'smooth',block:'center'});}
+
+$('f').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const place = $('placeSel').value==='__etc' ? $('placeEtc').value.trim() : $('placeSel').value;
+  const name=$('name').value.trim();
+  const content=$('content').value.trim();
+  if(!name) return show('err','성명을 입력해 주세요.');
+  if(!place) return show('err','장소를 선택하거나 입력해 주세요.');
+  if(!$('writeDate').value||!$('actDate').value) return show('err','날짜를 선택해 주세요.');
+  if(!$('sH').value||!$('sM').value||!$('eH').value||!$('eM').value) return show('err','활동 시작/종료 시간을 모두 선택해 주세요.');
+  if(!content) return show('err','활동내용 및 소감을 입력해 주세요.');
+  if(SCRIPT_URL.includes('여기에_배포_ID')) return show('err','SCRIPT_URL이 설정되지 않았습니다. 관리자에게 문의하세요.');
+
+  const timeText = radio('sAP')+' '+$('sH').value+'시 '+$('sM').value+'분 ~ '+radio('eAP')+' '+$('eH').value+'시 '+$('eM').value+'분';
+  const payload = {
+    name, place,
+    writeDate: $('writeDate').value,
+    writeDateText: kdate($('writeDate').value),
+    activityDateText: kdate($('actDate').value),
+    timeText,
+    content,
+    opinion: $('opinion').value.trim(),
+    suggestion: $('suggestion').value.trim()
+  };
+
+  const btn=$('btn'); btn.disabled=true; btn.textContent='제출 중…'; $('msg').className='msg';
+  try{
+    // 앱스 스크립트는 CORS 응답 헤더가 없어 no-cors + text/plain 으로 전송합니다.
+    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+    show('ok','✅ 제출되었습니다. 수고하셨습니다!');
+    $('f').reset(); $('placeEtc').style.display='none';
+    $('writeDate').value=today(); $('actDate').value=today(); refresh();
+  }catch(err){
+    show('err','제출에 실패했습니다. 네트워크를 확인하고 다시 시도해 주세요.');
+  }finally{
+    btn.disabled=false; btn.textContent='제출하기';
+  }
+});
+</script>
+</body>
+</html>
