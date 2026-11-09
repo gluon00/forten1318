@@ -62,13 +62,7 @@
     </div>
 
     <div class="card">
-      <label class="t" for="writeDate">작성일 <span class="req">*</span></label>
-      <input type="date" id="writeDate">
-      <div class="hint" id="writeDateText"></div>
-    </div>
-
-    <div class="card">
-      <label class="t" for="actDate">활동일 <span class="req">*</span></label>
+      <label class="t" for="actDate">활동일(작성일) <span class="req">*</span></label>
       <input type="date" id="actDate">
       <div class="hint" id="actDateText">기본값은 오늘이며 다른 날짜로 변경할 수 있어요.</div>
     </div>
@@ -135,10 +129,8 @@ function fill(sel,from,to,step,labelFn){
 fill($('sH'),1,12,1); fill($('eH'),1,12,1);
 fill($('sM'),0,55,5); fill($('eM'),0,55,5);
 
-$('writeDate').value=today(); $('actDate').value=today();
-const refresh=()=>{ $('writeDateText').textContent=kdate($('writeDate').value);
-                    $('actDateText').textContent=kdate($('actDate').value); };
-$('writeDate').addEventListener('input',refresh);
+$('actDate').value=today();
+const refresh=()=>{ $('actDateText').textContent=kdate($('actDate').value); };
 $('actDate').addEventListener('input',refresh);
 refresh();
 
@@ -159,7 +151,7 @@ $('f').addEventListener('submit', async e=>{
   const content=$('content').value.trim();
   if(!name) return show('err','성명을 입력해 주세요.');
   if(!place) return show('err','장소를 선택하거나 입력해 주세요.');
-  if(!$('writeDate').value||!$('actDate').value) return show('err','날짜를 선택해 주세요.');
+  if(!$('actDate').value) return show('err','날짜를 선택해 주세요.');
   if(!$('sH').value||!$('sM').value||!$('eH').value||!$('eM').value) return show('err','활동 시작/종료 시간을 모두 선택해 주세요.');
   if(!content) return show('err','활동내용 및 소감을 입력해 주세요.');
   if(SCRIPT_URL.includes('여기에_배포_ID')) return show('err','SCRIPT_URL이 설정되지 않았습니다. 관리자에게 문의하세요.');
@@ -167,8 +159,8 @@ $('f').addEventListener('submit', async e=>{
   const timeText = radio('sAP')+' '+$('sH').value+'시 '+$('sM').value+'분 ~ '+radio('eAP')+' '+$('eH').value+'시 '+$('eM').value+'분';
   const payload = {
     name, place,
-    writeDate: $('writeDate').value,
-    writeDateText: kdate($('writeDate').value),
+    writeDate: $('actDate').value,
+    writeDateText: kdate($('actDate').value),
     activityDateText: kdate($('actDate').value),
     timeText,
     content,
@@ -182,7 +174,7 @@ $('f').addEventListener('submit', async e=>{
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
     show('ok','✅ 제출되었습니다. 수고하셨습니다!');
     $('f').reset(); $('placeEtc').style.display='none';
-    $('writeDate').value=today(); $('actDate').value=today(); refresh();
+    $('actDate').value=today(); refresh();
   }catch(err){
     show('err','제출에 실패했습니다. 네트워크를 확인하고 다시 시도해 주세요.');
   }finally{
