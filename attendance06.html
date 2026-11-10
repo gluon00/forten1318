@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>전문자원활동가 출석부</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--tx:#1f2937;--mu:#6b7280;--pr:#2f5bd8;--bd:#d9dee8}
+@media (prefers-color-scheme:dark){:root{--bg:#14171f;--card:#1e222d;--tx:#e8eaf0;--mu:#9aa3b5;--pr:#7c9bff;--bd:#343b4b}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Malgun Gothic","Noto Sans KR",sans-serif;padding:16px}
+.wrap{max-width:520px;margin:0 auto}
+h1{font-size:20px;text-align:center;margin:8px 0 4px}
+.who{text-align:center;color:var(--mu);font-size:14px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:14px}
+label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
+label:first-child{margin-top:0}
+input,select{width:100%;padding:12px;font-size:16px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx)}
+.row{display:flex;gap:8px;align-items:center}
+.row span{color:var(--mu)}
+#hrs{font-size:13px;color:var(--pr);margin-top:6px;font-weight:700}
+canvas{width:100%;height:150px;border:1px dashed var(--bd);border-radius:10px;background:#fff;touch-action:none;display:block}
+.sub{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:12px;color:var(--mu)}
+button{width:100%;padding:14px;font-size:16px;font-weight:700;border:0;border-radius:12px;background:var(--pr);color:#fff;cursor:pointer}
+button:disabled{opacity:.5}
+.lnk{background:none;color:var(--mu);width:auto;padding:0;font-size:12px;font-weight:400;text-decoration:underline}
+#msg{text-align:center;margin-top:10px;font-size:14px;min-height:20px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:7px 4px;border-bottom:1px solid var(--bd);text-align:center}
+.hd{font-size:14px;font-weight:700;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>전문자원활동가 출석부</h1>
+  <div class="who" id="who">불러오는 중…</div>
+
+  <div class="card">
+    <label>날짜</label><input type="date" id="date">
+    <label>활동시간</label>
+    <div class="row"><select id="st"></select><span>~</span><select id="en"></select></div>
+    <div id="hrs"></div>
+    <label>활동장소</label>
+    <select id="placeSel">
+      <option>의정부 홈플러스</option>
+      <option>민락2지구</option>
+      <option>의정부역</option>
+      <option value="__etc">직접 작성</option>
+    </select>
+    <input type="text" id="place" placeholder="활동장소를 직접 입력" style="display:none;margin-top:8px">
+    <label>봉사자 서명</label>
+    <canvas id="sig"></canvas>
+    <div class="sub"><span>손가락/마우스로 서명해 주세요</span><button class="lnk" type="button" id="clr">지우기</button></div>
+  </div>
+
+  <button id="go">제출하기</button>
+  <div id="msg"></div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="hd">내 누적 활동 (<span id="cnt">0</span>회 · <span id="tot">0</span>시간)</div>
+    <table><thead><tr><th>연번</th><th>날짜</th><th>시간</th><th>장소</th></tr></thead><tbody id="list"></tbody></table>
+  </div>
+</div>
+
+<script>
+// ▼ 여기만 수정하세요 ▼
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyYc0vvUllrU0FzYUySy7EXhaQM5pwkMdTUOAddhjSdBwtQ1TS6GXVM6vM4WSTHOjFv/exec";
+// ▲▲▲
+
+const $ = id => document.getElementById(id);
+const today = new Date(); today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+$("date").value = today.toISOString().slice(0, 10);
+// 시간 선택: 19:30 ~ 22:30, 30분 단위 (기본 19:30 ~ 22:30)
+const TIMES = ["19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30"];
+const label = t => { const [h, m] = t.split(":").map(Number); return "오후 " + (h - 12) + "시" + (m ? " 30분" : ""); };
+[$("st"), $("en")].forEach(el => el.innerHTML = TIMES.map(t => `<option value="${t}">${label(t)}</option>`).join(""));
+$("st").value = "19:30"; $("en").value = "22:30";
+const getPlace = () => $("placeSel").value === "__etc" ? $("place").value.trim() : $("placeSel").value;
+$("placeSel").onchange = () => {
+  const etc = $("placeSel").value === "__etc";
+  $("place").style.display = etc ? "block" : "none";
+  if (etc) $("place").focus();
+};
+
+function calc() {
+  if (!$("st").value || !$("en").value) { $("hrs").textContent = ""; return null; }
+  const [a, b] = $("st").value.split(":").map(Number), [c, d] = $("en").value.split(":").map(Number);
+  let m = (c * 60 + d) - (a * 60 + b);
+  if (m <= 0) { $("hrs").textContent = "종료 시간이 시작 시간보다 늦어야 합니다."; return null; }
+  const h = Math.round(m / 6) / 10;
+  $("hrs").textContent = "활동시간 합계: " + h + "시간";
+  return h;
+}
+$("st").onchange = $("en").onchange = calc;
+calc();
+
+// 서명 캔버스
+const cv = $("sig"), ctx = cv.getContext("2d");
+let drawing = false, signed = false;
+function fit() {
+  const r = cv.getBoundingClientRect(), s = window.devicePixelRatio || 1;
+  cv.width = r.width * s; cv.height = r.height * s;
+  ctx.scale(s, s); ctx.lineWidth = 2.2; ctx.lineCap = "round"; ctx.strokeStyle = "#111"; signed = false;
+}
+fit();
+const pos = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+cv.onpointerdown = e => { drawing = true; cv.setPointerCapture(e.pointerId); ctx.beginPath(); ctx.moveTo(...pos(e)); };
+cv.onpointermove = e => { if (!drawing) return; ctx.lineTo(...pos(e)); ctx.stroke(); signed = true; };
+cv.onpointerup = cv.onpointercancel = () => { drawing = false; };
+$("clr").onclick = fit;
+
+// 내 정보·누적 기록 불러오기
+function load() {
+  fetch(SCRIPT_URL).then(r => r.json()).then(d => {
+    if (d.error) { $("who").textContent = d.error; return; }
+    $("who").textContent = d.name + " 님";
+    $("cnt").textContent = d.records.length;
+    $("tot").textContent = Math.round(d.records.reduce((s, r) => s + Number(r.hours || 0), 0) * 10) / 10;
+    $("list").innerHTML = d.records.map((r, i) =>
+      `<tr><td>${i + 1}</td><td>${r.date}</td><td>${r.hours}h</td><td>${r.place}</td></tr>`).join("");
+  }).catch(() => { $("who").textContent = "연결 오류 – 새로고침 해주세요"; });
+}
+load();
+
+$("go").onclick = async () => {
+  const h = calc(), msg = $("msg");
+  if (!$("date").value || h === null || !getPlace()) { msg.textContent = "날짜·시간·장소를 모두 입력해 주세요."; return; }
+  if (!signed) { msg.textContent = "서명을 해주세요."; return; }
+  $("go").disabled = true; msg.textContent = "제출 중…";
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ date: $("date").value, start: $("st").value, end: $("en").value,
+        hours: h, place: getPlace(), signature: cv.toDataURL("image/png") })
+    });
+    const r = await res.json();
+    if (!r.ok) throw new Error(r.error || "저장 실패");
+    msg.textContent = "✅ 제출되었습니다." + (r.warn ? " (" + r.warn + ")" : "");
+    $("st").value = "19:30"; $("en").value = "22:30"; calc(); fit();
+    load();
+  } catch (e) { msg.textContent = "❌ 제출 실패: " + e.message; }
+  $("go").disabled = false;
+};
+</script>
+</body>
+</html>
