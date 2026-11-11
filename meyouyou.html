@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>담벼락</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--wall:#d9e0e5;--ink:#1f2a37;--sub:#5b6b7a;--accent:#d8452b;--n1:#fff2a8;--n2:#ffd6d6;--n3:#cdeedd;--n4:#d6e4ff}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--wall);min-height:100vh;
+background-image:linear-gradient(rgba(255,255,255,.35) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.35) 1px,transparent 1px);background-size:48px 48px}
+.hidden{display:none!important}
+button,input,textarea{font:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+#login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.gate{background:var(--n1);padding:36px 32px 28px;width:min(360px,100%);transform:rotate(-1.5deg);box-shadow:0 10px 24px rgba(31,42,55,.18);position:relative}
+.gate::before{content:"";position:absolute;top:-10px;left:50%;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:var(--accent);box-shadow:0 3px 4px rgba(0,0,0,.3)}
+.gate h1{font-family:'Gaegu',cursive;font-size:44px;margin:0 0 4px}
+.gate p{margin:0 0 18px;color:var(--sub);font-size:14px}
+.gate input{width:100%;padding:12px;border:2px solid var(--ink);background:#fff;border-radius:4px;font-size:16px}
+.btn{background:var(--ink);color:#fff;border:0;padding:12px 18px;border-radius:4px;cursor:pointer;font-weight:700}
+.btn:disabled{opacity:.5;cursor:default}
+.gate .btn{width:100%;margin-top:12px}
+.err{color:var(--accent);font-size:14px;min-height:20px;margin:8px 0 0}
+
+header{max-width:980px;margin:0 auto;padding:28px 20px 8px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+header h1{font-family:'Gaegu',cursive;font-size:48px;margin:0;line-height:1}
+.link{background:none;border:0;color:var(--sub);text-decoration:underline;cursor:pointer;font-size:14px}
+main{max-width:980px;margin:0 auto;padding:0 20px 60px}
+
+.compose{background:#fff;border:2px solid var(--ink);padding:16px;margin:16px 0 28px;box-shadow:6px 6px 0 var(--ink)}
+.compose .row{display:flex;gap:10px;margin-bottom:10px}
+.compose input,.compose textarea{width:100%;padding:10px;border:1px solid #b7c2cc;border-radius:4px;font-size:15px}
+.compose input{max-width:200px}
+.compose textarea{min-height:84px;resize:vertical}
+.bar{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:10px}
+.count{color:var(--sub);font-size:13px}
+
+.day{margin:28px 0 12px;display:flex;align-items:center;gap:12px;font-weight:700}
+.day::after{content:"";flex:1;border-top:2px dashed #9fb0bd}
+.day small{color:var(--sub);font-weight:400}
+.notes{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:22px}
+.note{padding:22px 16px 14px;min-height:130px;box-shadow:0 6px 14px rgba(31,42,55,.15);display:flex;flex-direction:column;justify-content:space-between;position:relative}
+.note:nth-child(4n+1){background:var(--n1);transform:rotate(-1.2deg)}
+.note:nth-child(4n+2){background:var(--n2);transform:rotate(.9deg)}
+.note:nth-child(4n+3){background:var(--n3);transform:rotate(-.6deg)}
+.note:nth-child(4n+4){background:var(--n4);transform:rotate(1.3deg)}
+.note::before{content:"";position:absolute;top:-6px;left:50%;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--accent);box-shadow:0 2px 3px rgba(0,0,0,.3)}
+.note p{font-family:'Gaegu',cursive;font-size:22px;line-height:1.3;margin:0 0 12px;white-space:pre-wrap;word-break:break-word}
+.note footer{font-size:12px;color:var(--sub);display:flex;justify-content:space-between}
+.empty{color:var(--sub);padding:30px 0}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px}
+.nav span{color:var(--sub);font-size:13px}
+.nav .btn:disabled{visibility:hidden}
+.photo-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--ink);padding:8px 14px;font-weight:500}
+.preview{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--sub)}
+.preview img{height:56px;width:56px;object-fit:cover;border:1px solid #b7c2cc}
+.ph{width:100%;max-height:200px;object-fit:cover;background:rgba(255,255,255,.5);margin-bottom:10px;min-height:60px}
+@media (prefers-reduced-motion:no-preference){.note.new{animation:drop .5s ease-out}}
+@keyframes drop{from{transform:translateY(-30px) rotate(-4deg);opacity:0}}
+</style>
+</head>
+<body>
+
+<section id="login">
+  <div class="gate">
+    <h1>담벼락</h1>
+    <p>비밀번호를 입력하면 들어갈 수 있어요.</p>
+    <input id="pw" type="password" placeholder="비밀번호" autocomplete="current-password">
+    <p class="err" id="loginErr"></p>
+    <button class="btn" id="enter">입장하기</button>
+  </div>
+</section>
+
+<section id="app" class="hidden">
+  <header>
+    <h1>담벼락</h1>
+    <button class="link" id="logout">나가기</button>
+  </header>
+  <main>
+    <div class="compose">
+      <div class="row"><input id="name" maxlength="20" placeholder="이름 또는 별명"></div>
+      <textarea id="text" maxlength="300" placeholder="오늘 하루, 한마디 남겨 주세요."></textarea>
+      <div class="photo-row">
+        <button class="btn ghost" id="pickPhoto" type="button">사진 추가</button>
+        <input id="photo" type="file" accept="image/*" class="hidden">
+        <div class="preview hidden" id="preview">
+          <img id="previewImg" alt="선택한 사진">
+          <span id="previewInfo"></span>
+          <button class="link" id="clearPhoto" type="button">삭제</button>
+        </div>
+      </div>
+      <div class="bar">
+        <span class="count" id="count">0 / 300</span>
+        <button class="btn" id="post">붙이기</button>
+      </div>
+      <p class="err" id="postErr"></p>
+    </div>
+    <div class="nav">
+      <button class="btn ghost" id="prevDay" type="button">← 이전 날</button>
+      <span id="navLabel"></span>
+      <button class="btn ghost" id="nextDay" type="button">다음 날 →</button>
+    </div>
+    <div id="wall"></div>
+  </main>
+</section>
+
+<script>
+// ▼ 구글 앱스 스크립트 웹앱 URL을 붙여 넣으세요
+const API_URL = "https://script.google.com/macros/s/AKfycbzAjfE7iUzDBmS3uTXVhSNIwU9mI_G6MZKoviaMZTFzxgf_IfCnOTEj8ufLtfTbEXSb/exec";
+
+const $ = id => document.getElementById(id);
+let PW = sessionStorage.getItem("wallpw") || "";
+
+async function api(method, payload){
+  if(method === "GET"){
+    const r = await fetch(API_URL + "?pw=" + encodeURIComponent(PW) + "&days=14");
+    return r.json();
+  }
+  const r = await fetch(API_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify({pw:PW, ...payload})});
+  return r.json();
+}
+
+function fmtDay(d){
+  const [y,m,dd] = d.split("-").map(Number);
+  const w = ["일","월","화","수","목","금","토"][new Date(y,m-1,dd).getDay()];
+  return `${m}월 ${dd}일 (${w})`;
+}
+
+let DAYS = [], idx = 0;   // DAYS: 최신 날짜 순, idx: 지금 보고 있는 날
+
+function updateNav(){
+  $("prevDay").disabled = idx >= DAYS.length - 1;
+  $("nextDay").disabled = idx <= 0;
+  $("navLabel").textContent = DAYS.length ? (idx + 1) + " / " + DAYS.length : "";
+}
+$("prevDay").onclick = () => { if(idx < DAYS.length - 1){ idx++; render(); window.scrollTo(0, 0); } };
+$("nextDay").onclick = () => { if(idx > 0){ idx--; render(); window.scrollTo(0, 0); } };
+
+function render(newDays, newId){
+  if(newDays){ DAYS = newDays; if(newId || idx >= DAYS.length) idx = 0; }
+  const days = DAYS.slice(idx, idx + 1);   // 한 페이지에 하루 분량만
+  updateNav();
+  const wall = $("wall");
+  wall.textContent = "";
+  if(!days.length){
+    const e = document.createElement("div");
+    e.className = "empty";
+    e.textContent = "아직 붙은 메모가 없어요. 첫 메시지를 남겨 보세요.";
+    wall.appendChild(e);
+    return;
+  }
+  days.forEach(day => {
+    const h = document.createElement("div");
+    h.className = "day";
+    h.textContent = fmtDay(day.date);
+    const s = document.createElement("small");
+    s.textContent = day.messages.length + "개";
+    h.appendChild(s);
+    wall.appendChild(h);
+    const grid = document.createElement("div");
+    grid.className = "notes";
+    day.messages.slice().reverse().forEach(m => {
+      const n = document.createElement("div");
+      n.className = "note" + (m.id === newId ? " new" : "");
+      const p = document.createElement("p");
+      p.textContent = m.text;
+      const f = document.createElement("footer");
+      const a = document.createElement("span");
+      a.textContent = m.name;
+      const t = document.createElement("span");
+      t.textContent = m.time;
+      f.append(a, t);
+      if(m.img){
+        const im = document.createElement("img");
+        im.className = "ph";
+        im.alt = "첨부 사진";
+        loadImg(m.img, im);
+        n.append(im);
+      }
+      n.append(p, f);
+      grid.appendChild(n);
+    });
+    wall.appendChild(grid);
+  });
+}
+
+async function load(newId){
+  const res = await api("GET");
+  if(!res.ok) throw new Error(res.error);
+  render(res.days, newId);
+}
+
+async function enter(){
+  PW = $("pw").value || PW;
+  $("loginErr").textContent = "";
+  $("enter").disabled = true;
+  try{
+    await load();
+    sessionStorage.setItem("wallpw", PW);
+    $("login").classList.add("hidden");
+    $("app").classList.remove("hidden");
+    $("name").value = localStorage.getItem("wallname") || "";
+  }catch(e){
+    $("loginErr").textContent = e.message === "auth" ? "비밀번호가 맞지 않아요." : "연결에 실패했어요. 잠시 후 다시 시도해 주세요.";
+    sessionStorage.removeItem("wallpw");
+  }
+  $("enter").disabled = false;
+}
+
+$("enter").onclick = enter;
+$("pw").addEventListener("keydown", e => { if(e.key === "Enter") enter(); });
+$("logout").onclick = () => { sessionStorage.removeItem("wallpw"); location.reload(); };
+$("text").addEventListener("input", () => { $("count").textContent = $("text").value.length + " / 300"; });
+
+// ---- 사진: 브라우저에서 줄여서(가로세로 최대 800px, 약 150KB 이하) 올립니다 ----
+let photoData = "";
+const MAX_SIDE = 800, MAX_BYTES = 150 * 1024;
+
+function compress(file){
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, MAX_SIDE / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * scale);
+      c.height = Math.round(img.height * scale);
+      const ctx = c.getContext("2d");
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      let q = 0.8, data = c.toDataURL("image/jpeg", q);
+      while(data.length * 0.75 > MAX_BYTES && q > 0.3){ q -= 0.1; data = c.toDataURL("image/jpeg", q); }
+      resolve(data);
+    };
+    img.onerror = () => reject(new Error("img"));
+    img.src = url;
+  });
+}
+
+function clearPhoto(){
+  photoData = "";
+  $("photo").value = "";
+  $("preview").classList.add("hidden");
+}
+
+$("pickPhoto").onclick = () => $("photo").click();
+$("clearPhoto").onclick = clearPhoto;
+$("photo").addEventListener("change", async () => {
+  const f = $("photo").files[0];
+  if(!f) return;
+  $("postErr").textContent = "";
+  try{
+    photoData = await compress(f);
+    $("previewImg").src = photoData;
+    $("previewInfo").textContent = Math.round(photoData.length * 0.75 / 1024) + "KB로 줄였어요";
+    $("preview").classList.remove("hidden");
+  }catch(e){
+    clearPhoto();
+    $("postErr").textContent = "사진을 불러오지 못했어요. 다른 사진을 골라 주세요.";
+  }
+});
+
+const imgCache = {};
+async function loadImg(id, el){
+  if(imgCache[id]){ el.src = imgCache[id]; return; }
+  try{
+    const r = await fetch(API_URL + "?action=img&id=" + encodeURIComponent(id) + "&pw=" + encodeURIComponent(PW));
+    const res = await r.json();
+    if(res.ok){ imgCache[id] = res.data; el.src = res.data; }
+    else el.remove();
+  }catch(e){ el.remove(); }
+}
+
+$("post").onclick = async () => {
+  const name = $("name").value.trim(), text = $("text").value.trim();
+  $("postErr").textContent = "";
+  if(!name || !text){ $("postErr").textContent = "이름과 메시지를 모두 입력해 주세요."; return; }
+  $("post").disabled = true;
+  try{
+    const res = await api("POST", {name, text, image: photoData});
+    if(!res.ok) throw new Error(res.error);
+    localStorage.setItem("wallname", name);
+    $("text").value = ""; $("count").textContent = "0 / 300"; clearPhoto();
+    await load(res.id);
+  }catch(e){
+    $("postErr").textContent = "저장에 실패했어요. 다시 시도해 주세요.";
+  }
+  $("post").disabled = false;
+};
+
+if(PW){ $("pw").value = PW; enter(); }
+</script>
+</body>
+</html>
