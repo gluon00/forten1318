@@ -70,11 +70,11 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxiG6KZI_J0XprtU0kLc
 const $ = id => document.getElementById(id);
 const today = new Date(); today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
 $("date").value = today.toISOString().slice(0, 10);
-// 시간 선택: 19:30 ~ 22:30, 30분 단위 (기본 19:30 ~ 22:30)
+// 시간 선택: 19:30 ~ 22:30, 30분 단위 (기본 20:00 ~ 22:00)
 const TIMES = ["19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30"];
 const label = t => { const [h, m] = t.split(":").map(Number); return "오후 " + (h - 12) + "시" + (m ? " 30분" : ""); };
 [$("st"), $("en")].forEach(el => el.innerHTML = TIMES.map(t => `<option value="${t}">${label(t)}</option>`).join(""));
-$("st").value = "19:30"; $("en").value = "22:30";
+$("st").value = "20:00"; $("en").value = "22:00";
 const getPlace = () => $("placeSel").value === "__etc" ? $("place").value.trim() : $("placeSel").value;
 $("placeSel").onchange = () => {
   const etc = $("placeSel").value === "__etc";
@@ -136,7 +136,7 @@ $("go").onclick = async () => {
     const r = await res.json();
     if (!r.ok) throw new Error(r.error || "저장 실패");
     msg.textContent = "✅ 제출되었습니다." + (r.warn ? " (" + r.warn + ")" : "");
-    $("st").value = "19:30"; $("en").value = "22:30"; calc(); fit();
+    $("st").value = "20:00"; $("en").value = "22:00"; calc(); fit();
     load();
   } catch (e) { msg.textContent = "❌ 제출 실패: " + e.message; }
   $("go").disabled = false;
