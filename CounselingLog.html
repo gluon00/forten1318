@@ -15,6 +15,7 @@
     .panel { background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px; margin:14px 0; }
     h2 { font-size:18px; margin:0 0 16px; }
     .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
     label.field { display:block; font-size:14px; font-weight:700; margin-bottom:7px; }
     input,select,textarea { width:100%; border:1px solid #cbd2dc; border-radius:8px; padding:11px 12px; font:inherit; background:#fff; }
     textarea { min-height:100px; resize:vertical; }
@@ -24,18 +25,19 @@
     .checks input { width:auto; }
     .participant { border:1px solid var(--line); border-radius:10px; padding:15px; margin:12px 0; }
     .participant-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; font-weight:700; }
+    .sec { margin-top:16px; }
+    .sec input[type=text] { margin-top:8px; }
     .btn { border:0; border-radius:8px; padding:11px 16px; cursor:pointer; font:inherit; font-weight:700; }
     .btn:disabled { opacity:.6; cursor:default; }
     .primary { color:#fff; background:var(--blue); }
-    .secondary { color:var(--blue); background:#eaf1fc; white-space:nowrap; }
+    .secondary { color:var(--blue); background:#eaf1fc; }
     .danger { color:#b42318; background:#fff0ee; padding:7px 10px; }
     .actions { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .actions input { flex:1; min-width:140px; }
     .status { margin-top:12px; font-size:14px; white-space:pre-wrap; line-height:1.6; }
     .status.err { color:#b42318; }
     .muted { color:var(--muted); font-size:12px; }
     .hidden { display:none; }
-    @media(max-width:650px) { .grid { grid-template-columns:1fr; } .panel { padding:15px; } h1 { font-size:21px; } }
+    @media(max-width:650px) { .grid,.grid3 { grid-template-columns:1fr; } .panel { padding:15px; } h1 { font-size:21px; } }
   </style>
 </head>
 <body>
@@ -68,64 +70,14 @@
         <label class="field" for="instructor">강사</label>
         <select id="instructor"><option value="">강사 선택</option></select>
       </div>
-      <div>
-        <label class="field" for="newInstructor">강사 추가</label>
-        <div class="actions">
-          <input id="newInstructor" placeholder="새 강사명 입력">
-          <button class="btn secondary" id="addInstBtn" type="button">추가</button>
-        </div>
-      </div>
     </div>
   </section>
 
   <section class="panel">
     <h2>참가자</h2>
-    <p class="help">작성 안내: 참여자 전원을 빠짐없이 작성해 주세요. 참가자별로 위기개입 필요, 추가상담 필요, 해당사업 없음 여부를 선택할 수 있습니다.</p>
+    <p class="help">작성 안내: 참여자 전원을 빠짐없이 작성해 주세요. 참가자별로 인적사항, 제공서비스, 상담주제를 선택하고 상담내용을 작성합니다.</p>
     <div id="participants"></div>
     <button class="btn secondary" type="button" id="addPartBtn">＋ 참가자 추가</button>
-  </section>
-
-  <section class="panel">
-    <h2>제공서비스</h2>
-    <div class="checks" id="services">
-      <label><input type="checkbox" value="심리검사"> 심리검사</label>
-      <label><input type="checkbox" value="프로그램"> 프로그램</label>
-      <label><input type="checkbox" value="상담"> 상담</label>
-    </div>
-  </section>
-
-  <section class="panel">
-    <h2>상담주제</h2>
-    <div class="checks" id="topics">
-      <label><input type="checkbox" value="학교중단"> 학교중단</label>
-      <label><input type="checkbox" value="가정 밖"> 가정 밖</label>
-      <label><input type="checkbox" value="대인관계"> 대인관계</label>
-      <label><input type="checkbox" value="학업/진로"> 학업/진로</label>
-      <label><input type="checkbox" value="과의존 중독"> 과의존 중독</label>
-      <label><input type="checkbox" value="정신건강"> 정신건강</label>
-      <label><input type="checkbox" value="폭력피해"> 폭력피해</label>
-      <label><input type="checkbox" value="폭력가해/비행"> 폭력가해/비행</label>
-      <label><input type="checkbox" value="성"> 성</label>
-      <label><input type="checkbox" value="노동/근로"> 노동/근로</label>
-      <label><input type="checkbox" value="결핍"> 결핍</label>
-      <label><input type="checkbox" value="빈곤"> 빈곤</label>
-      <label><input type="checkbox" value="신체건강/인식"> 신체건강/인식</label>
-      <label><input type="checkbox" value="이주배경"> 이주배경</label>
-      <label><input type="checkbox" value="기타" id="topicEtcCheck"> 기타</label>
-    </div>
-    <input id="topicEtc" class="hidden" style="margin-top:10px" placeholder="기타 상담주제를 입력하세요">
-  </section>
-
-  <section class="panel">
-    <h2>활동내역</h2>
-    <p class="help">작성 안내: 당일 진행한 심리검사, 프로그램, 상담에 관한 주요 활동내용을 간략히 작성해 주세요.</p>
-    <textarea id="activitySummary" placeholder="당일 주요 활동내용을 간략히 작성"></textarea>
-  </section>
-
-  <section class="panel">
-    <h2>활동내용</h2>
-    <p class="help">작성 안내: 청소년별 상황과 욕구 및 반응, 주요상담내용, 실무자가 참고할 만한 청소년 특이사항 등 세부 내용을 작성해 주세요. 위 참가자 정보는 문서에 자동으로 함께 입력됩니다.</p>
-    <p class="muted">각 참가자 카드의 상담내용 칸에 개인별 내용을 작성해 주세요.</p>
   </section>
 
   <section class="panel">
@@ -146,16 +98,16 @@
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycbyGnMfsSrFTI1m8xCb6nIkpuCavrO0ONonCpQyr1bOrwHuDVtzgT29vSYM78su5gLN1/exec';
 const SAVE_LABEL = '상담일지 저장 및 문서 생성';
+const TOPICS = ['학교중단','가정 밖','대인관계','학업/진로','과의존 중독','정신건강','폭력피해','폭력가해/비행','성','노동/근로','결핍','빈곤','신체건강/인식','이주배경','기타'];
+const NOTE_SERVICES = { '심리검사': '검사 종류 (예: MBTI)', '프로그램': '프로그램명 (예: 나무그리기)' };
 const $ = id => document.getElementById(id);
-let instructorNames = [];
 
-/* 서버 통신: 'text/plain'으로 보내야 CORS 사전요청 없이 Apps Script에 전달됩니다 */
+/* 'text/plain'으로 보내야 CORS 사전요청 없이 Apps Script에 전달됩니다 */
 async function api(payload) {
-  const code = $('code').value;
   const res = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(Object.assign({ code: code }, payload))
+    body: JSON.stringify(Object.assign({ code: $('code').value }, payload))
   });
   const json = await res.json();
   if (!json.ok) throw new Error(json.error || '요청에 실패했습니다.');
@@ -167,38 +119,14 @@ async function init() {
   $('date').value = new Date().toLocaleDateString('en-CA');
   updateLocationByDate();
   try {
-    const res = await fetch(API_URL);
-    const json = await res.json();
+    const json = await (await fetch(API_URL)).json();
     if (json.requiresCode) $('codePanel').classList.remove('hidden');
-    instructorNames = json.instructors || [];
-    renderInstructors();
+    (json.instructors || []).forEach(n => {
+      const op = document.createElement('option'); op.value = n; op.textContent = n; $('instructor').appendChild(op);
+    });
   } catch (err) {
     showStatus('강사 목록을 불러오지 못했습니다. 새로고침 후 다시 시도해 주세요.', true);
   }
-}
-
-function renderInstructors(selected) {
-  const el = $('instructor');
-  el.innerHTML = '<option value="">강사 선택</option>';
-  instructorNames.forEach(n => {
-    const op = document.createElement('option'); op.value = n; op.textContent = n; el.appendChild(op);
-  });
-  if (selected) el.value = selected;
-}
-
-async function addNewInstructor() {
-  const input = $('newInstructor');
-  const name = input.value.trim();
-  if (!name) return alert('추가할 강사명을 입력해 주세요.');
-  const btn = $('addInstBtn'); btn.disabled = true;
-  try {
-    const json = await api({ action: 'addInstructor', name: name });
-    instructorNames = json.instructors;
-    renderInstructors(name);
-    input.value = '';
-    alert('강사가 추가되었습니다. 다음 작성부터도 선택할 수 있습니다.');
-  } catch (err) { showStatus('오류: ' + err.message, true); }
-  btn.disabled = false;
 }
 
 function updateLocationByDate() {
@@ -215,28 +143,57 @@ function updateLocationByDate() {
 function toggleLocationEtc() {
   $('locationEtc').classList.toggle('hidden', $('location').value !== '기타');
 }
-function toggleTopicEtc() {
-  $('topicEtc').classList.toggle('hidden', !$('topicEtcCheck').checked);
-}
 
 function addParticipant() {
   const card = document.createElement('div');
   card.className = 'participant';
+  const topicHtml = TOPICS.map(t => `<label><input class="p-topic" type="checkbox" value="${t}"> ${t}</label>`).join('');
+  const noteInputs = Object.keys(NOTE_SERVICES).map(k =>
+    `<input type="text" class="p-note hidden" data-for="${k}" placeholder="${NOTE_SERVICES[k]}">`).join('');
   card.innerHTML = `
     <div class="participant-head"><span></span><button class="btn danger p-del" type="button">삭제</button></div>
-    <div class="grid">
+    <div class="grid3">
       <div><label class="field">이름</label><input class="p-name" placeholder="청소년 이름"></div>
       <div><label class="field">성별</label><select class="p-gender"><option value="">선택</option><option>남</option><option>여</option><option>기타/미기재</option></select></div>
       <div><label class="field">나이</label><input class="p-age" type="number" inputmode="numeric" min="0" max="99" placeholder="만 나이"></div>
     </div>
-    <p class="help" style="margin-top:12px">해당하는 항목을 각각 선택해 주세요.</p>
-    <div class="checks">
-      <label><input class="p-flag" type="checkbox" value="위기개입 필요"> 위기개입 필요</label>
-      <label><input class="p-flag" type="checkbox" value="추가상담 필요"> 추가상담 필요</label>
-      <label><input class="p-flag" type="checkbox" value="해당사업 없음"> 해당사업 없음</label>
+    <div class="sec">
+      <div class="checks">
+        <label><input class="p-flag" type="checkbox" value="위기개입 필요"> 위기개입 필요</label>
+        <label><input class="p-flag" type="checkbox" value="추가상담 필요"> 추가상담 필요</label>
+        <label><input class="p-flag" type="checkbox" value="해당사항 없음"> 해당사항 없음</label>
+      </div>
     </div>
-    <label class="field" style="margin-top:14px">개인별 활동내용 / 상담내용</label>
-    <textarea class="p-detail" placeholder="청소년별 상황, 욕구, 반응, 주요상담내용, 특이사항 등을 작성"></textarea>`;
+    <div class="sec">
+      <label class="field">제공서비스</label>
+      <div class="checks">
+        <label><input class="p-svc" type="checkbox" value="심리검사"> 심리검사</label>
+        <label><input class="p-svc" type="checkbox" value="프로그램"> 프로그램</label>
+        <label><input class="p-svc" type="checkbox" value="상담"> 상담</label>
+      </div>
+      ${noteInputs}
+    </div>
+    <div class="sec">
+      <label class="field">상담주제 (복수 선택 가능)</label>
+      <div class="checks">${topicHtml}</div>
+      <input type="text" class="p-topic-etc hidden" placeholder="기타 상담주제를 입력하세요">
+    </div>
+    <div class="sec">
+      <label class="field">세부내용</label>
+      <textarea class="p-detail" placeholder="청소년별 상황, 욕구, 반응, 주요상담내용, 특이사항 등을 작성"></textarea>
+    </div>`;
+
+  card.addEventListener('change', e => {
+    const t = e.target;
+    if (t.classList.contains('p-svc') && NOTE_SERVICES[t.value]) {
+      const inp = card.querySelector('.p-note[data-for="' + t.value + '"]');
+      inp.classList.toggle('hidden', !t.checked);
+      if (t.checked) inp.focus(); else inp.value = '';
+    }
+    if (t.classList.contains('p-topic') && t.value === '기타') {
+      card.querySelector('.p-topic-etc').classList.toggle('hidden', !t.checked);
+    }
+  });
   card.querySelector('.p-del').addEventListener('click', () => {
     if (document.querySelectorAll('.participant').length === 1) return alert('참가자는 최소 한 명이 필요합니다.');
     card.remove(); renumberParticipants();
@@ -248,9 +205,6 @@ function renumberParticipants() {
   document.querySelectorAll('.participant-head span').forEach((el, i) => el.textContent = '참가자 ' + (i + 1));
 }
 
-function checkedValues(selector) {
-  return Array.from(document.querySelectorAll(selector + ' input:checked')).map(x => x.value);
-}
 function collectData() {
   return {
     date: $('date').value,
@@ -262,12 +216,14 @@ function collectData() {
       gender: card.querySelector('.p-gender').value,
       age: card.querySelector('.p-age').value,
       flags: Array.from(card.querySelectorAll('.p-flag:checked')).map(x => x.value),
+      services: Array.from(card.querySelectorAll('.p-svc:checked')).map(x => {
+        const inp = card.querySelector('.p-note[data-for="' + x.value + '"]');
+        return { type: x.value, note: inp ? inp.value.trim() : '' };
+      }),
+      topics: Array.from(card.querySelectorAll('.p-topic:checked')).map(x => x.value),
+      topicEtc: card.querySelector('.p-topic-etc').value.trim(),
       detail: card.querySelector('.p-detail').value.trim()
     })),
-    services: checkedValues('#services'),
-    topics: checkedValues('#topics'),
-    topicEtc: $('topicEtc').value.trim(),
-    activitySummary: $('activitySummary').value.trim(),
     evaluation: $('evaluation').value.trim()
   };
 }
@@ -301,8 +257,6 @@ function showStatus(msg, isErr) {
 
 $('date').addEventListener('change', updateLocationByDate);
 $('location').addEventListener('change', toggleLocationEtc);
-$('topicEtcCheck').addEventListener('change', toggleTopicEtc);
-$('addInstBtn').addEventListener('click', addNewInstructor);
 $('addPartBtn').addEventListener('click', addParticipant);
 $('saveBtn').addEventListener('click', submitForm);
 window.addEventListener('load', init);
