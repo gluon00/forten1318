@@ -21,14 +21,12 @@
   .num{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;font-size:.85rem;
        display:inline-flex;align-items:center;justify-content:center;flex:none}
 
-  input[type=date],input[type=text],textarea{
+  input[type=date],input[type=text]{
     width:100%;min-height:54px;padding:12px 14px;font-size:1rem;font-family:inherit;color:var(--ink);
     background:#fff;border:1.5px solid var(--line);border-radius:12px}
-  input:focus,textarea:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px var(--pri-bg)}
-  textarea{resize:vertical;min-height:96px}
+  input:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px var(--pri-bg)}
 
   .daytext{margin-top:10px;font-size:1.05rem;font-weight:700;min-height:1.6em}
-  .time{margin-top:2px;color:var(--sub);font-size:.9rem}
 
   .opt{display:flex;align-items:center;gap:12px;min-height:58px;padding:0 14px;margin-top:10px;
        border:1.5px solid var(--line);border-radius:12px;font-size:1.02rem;cursor:pointer}
@@ -62,13 +60,12 @@
 <body>
 <div class="wrap">
   <h1>강사비 지급내역서</h1>
-  <p class="lead">아래 4가지만 입력하면 문서가 만들어져요</p>
+  <p class="lead">아래 3가지만 입력하면 양식이 채워져요</p>
 
   <section class="sec" id="s1">
     <h2><span class="num">1</span>활동일</h2>
     <input type="date" id="date">
     <div class="daytext" id="dayText"></div>
-    <div class="time" id="timeInfo"></div>
   </section>
 
   <section class="sec" id="s2">
@@ -79,12 +76,7 @@
   </section>
 
   <section class="sec" id="s3">
-    <h2><span class="num">3</span>활동내용</h2>
-    <textarea id="content"></textarea>
-  </section>
-
-  <section class="sec" id="s4">
-    <h2><span class="num">4</span>서명<button type="button" class="ghost" id="clear">지우기</button></h2>
+    <h2><span class="num">3</span>서명<button type="button" class="ghost" id="clear">지우기</button></h2>
     <div class="sigbox">
       <canvas id="sig" width="600" height="240"></canvas>
       <div class="ph" id="ph">여기에 손가락으로 서명하세요</div>
@@ -99,17 +91,11 @@
 <script>
 const CONFIG = {
   GAS_URL: 'https://script.google.com/macros/s/AKfycbxJeamFlR7Uj9BMVvXthfOQzPJHN57taLcztPYeJuasySJHE0GWqi2Xi_MZMvcAbHeS/exec',
-  START_HOUR: 20,
-  END_HOUR: 22,
-  DEFAULT_CONTENT: '청소년 상담버스 아웃리치 활동',
   PLACES: ['홈플러스 상담버스', '민락2지구 상담버스', '의정부역 상담버스'],
   DAY_PLACE: { 3: 0, 4: 1, 5: 2 }   // 수→홈플러스, 목→민락2지구, 금→의정부역
 };
 const DAYS = ['일','월','화','수','목','금','토'];
 const $ = id => document.getElementById(id);
-
-$('timeInfo').textContent = `활동시간 ${CONFIG.START_HOUR}시 ~ ${CONFIG.END_HOUR}시 (총 ${CONFIG.END_HOUR - CONFIG.START_HOUR}시간)`;
-$('content').value = CONFIG.DEFAULT_CONTENT;
 
 /* 안내/오류 표시 */
 function clearBad() { document.querySelectorAll('.sec.bad').forEach(s => s.classList.remove('bad')); }
@@ -163,7 +149,6 @@ $('date').addEventListener('change', () => {
   refreshPlace();
 });
 $('etc').addEventListener('input', hideMsg);
-$('content').addEventListener('input', hideMsg);
 
 /* 서명 */
 const cv = $('sig'), ctx = cv.getContext('2d');
@@ -197,16 +182,15 @@ $('submit').addEventListener('click', async () => {
   const date = $('date').value;
   const place = getPlace();
   const etc = $('etc').value.trim();
-  const content = $('content').value.trim();
 
   if (!date) return fail('활동일을 선택해 주세요.', 's1');
   if (!place) return fail('활동장소를 선택해 주세요.', 's2');
   if (place === '기타' && !etc) return fail('기타 활동장소를 입력해 주세요.', 's2');
-  if (!hasSig) return fail('서명해 주세요.', 's4');
+  if (!hasSig) return fail('서명해 주세요.', 's3');
   hideMsg();
 
   const placeText = place === '기타' ? `기타(${etc})` : place;
-  const ok = confirm(`이 내용으로 제출할까요?\n\n활동일: ${$('dayText').textContent}\n활동시간: ${CONFIG.START_HOUR}~${CONFIG.END_HOUR}시\n활동장소: ${placeText}`);
+  const ok = confirm(`이 내용으로 제출할까요?\n\n활동일: ${$('dayText').textContent}\n활동장소: ${placeText}`);
   if (!ok) return;
 
   const btn = $('submit');
@@ -216,8 +200,7 @@ $('submit').addEventListener('click', async () => {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
-        date, place, placeEtc: etc, content,
-        startHour: CONFIG.START_HOUR, endHour: CONFIG.END_HOUR,
+        date, place, placeEtc: etc,
         signature: cv.toDataURL('image/png')
       })
     });
@@ -225,15 +208,15 @@ $('submit').addEventListener('click', async () => {
     if (!data.ok) throw new Error(data.error || '문서 생성 실패');
 
     const m = $('msg'); m.className = 'ok';
-    m.innerHTML = `제출이 완료됐어요.<br><a href="${data.url}" target="_blank" rel="noopener">생성된 문서 열기</a>`;
+    m.innerHTML = `제출이 완료됐어요.<br><a href="${data.url}" target="_blank" rel="noopener">완성된 문서 열기</a>`;
     clearSig();
     $('date').value = ''; $('dayText').textContent = ''; $('note').textContent = '';
     document.querySelectorAll('input[name=place]').forEach(r => r.checked = false);
-    $('etc').value = ''; $('content').value = CONFIG.DEFAULT_CONTENT; refreshPlace();
+    $('etc').value = ''; refreshPlace();
     m.scrollIntoView({ behavior: 'smooth', block: 'center' });
   } catch (err) {
     const m = $('msg'); m.className = 'err';
-    m.innerHTML = '전송 결과를 확인하지 못했어요. 드라이브에 문서가 만들어졌는지 먼저 확인하고, 없을 때만 다시 제출해 주세요.<br><small>' + err.message + '</small>';
+    m.innerHTML = '문서를 만들지 못했어요. 드라이브에 이미 만들어졌는지 확인하고, 없을 때만 다시 제출해 주세요.<br><small>' + err.message + '</small>';
   } finally {
     btn.disabled = false; btn.textContent = '제출하기';
   }
