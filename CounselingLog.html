@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-  <base target="_top">
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>아웃리치 심리상담·상담프로그램 활동일지</title>
   <style>
     :root { --ink:#202733; --muted:#667085; --line:#d8dee8; --blue:#2457a7; --bg:#f4f6fa; }
     * { box-sizing:border-box; }
     body { margin:0; background:var(--bg); color:var(--ink); font-family:Arial,"Noto Sans KR",sans-serif; }
     .wrap { max-width:900px; margin:28px auto; padding:0 16px 40px; }
-    header { margin-bottom:20px; }
     h1 { font-size:25px; margin:0 0 8px; }
-    .sub { color:var(--muted); font-size:14px; }
-    .panel { background:white; border:1px solid var(--line); border-radius:14px; padding:20px; margin:14px 0; }
+    .sub { color:var(--muted); font-size:14px; margin-bottom:20px; }
+    .panel { background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px; margin:14px 0; }
     h2 { font-size:18px; margin:0 0 16px; }
     .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     label.field { display:block; font-size:14px; font-weight:700; margin-bottom:7px; }
@@ -19,42 +20,49 @@
     textarea { min-height:100px; resize:vertical; }
     .help { color:#687385; font-size:12px; line-height:1.55; margin:0 0 8px; }
     .checks { display:flex; flex-wrap:wrap; gap:9px 15px; }
-    .checks label { display:flex; align-items:center; gap:6px; font-size:14px; font-weight:400; }
+    .checks label { display:flex; align-items:center; gap:6px; font-size:14px; }
     .checks input { width:auto; }
     .participant { border:1px solid var(--line); border-radius:10px; padding:15px; margin:12px 0; }
     .participant-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; font-weight:700; }
-    .btn { border:0; border-radius:8px; padding:11px 16px; cursor:pointer; font-weight:700; }
-    .primary { color:white; background:var(--blue); }
-    .secondary { color:var(--blue); background:#eaf1fc; }
+    .btn { border:0; border-radius:8px; padding:11px 16px; cursor:pointer; font:inherit; font-weight:700; }
+    .btn:disabled { opacity:.6; cursor:default; }
+    .primary { color:#fff; background:var(--blue); }
+    .secondary { color:var(--blue); background:#eaf1fc; white-space:nowrap; }
     .danger { color:#b42318; background:#fff0ee; padding:7px 10px; }
     .actions { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .status { margin-top:12px; font-size:14px; white-space:pre-wrap; }
+    .actions input { flex:1; min-width:140px; }
+    .status { margin-top:12px; font-size:14px; white-space:pre-wrap; line-height:1.6; }
+    .status.err { color:#b42318; }
     .muted { color:var(--muted); font-size:12px; }
-    @media(max-width:650px) { .grid { grid-template-columns:1fr; } .panel { padding:15px; } h1 {font-size:21px;} }
+    .hidden { display:none; }
+    @media(max-width:650px) { .grid { grid-template-columns:1fr; } .panel { padding:15px; } h1 { font-size:21px; } }
   </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <h1>아우르치 심리상담·상담프로그램 활동일지</h1>
-    <div class="sub">작성한 내용은 구글 Docs 상담일지로 자동 저장됩니다.</div>
-  </header>
+  <h1>아웃리치 심리상담·상담프로그램 활동일지</h1>
+  <div class="sub">작성한 내용은 구글 Docs 상담일지로 자동 저장됩니다.</div>
+
+  <section class="panel hidden" id="codePanel">
+    <label class="field" for="code">접근 코드</label>
+    <input id="code" type="password" autocomplete="off" placeholder="전달받은 접근 코드를 입력하세요">
+  </section>
 
   <section class="panel">
     <h2>기본정보</h2>
     <div class="grid">
       <div>
         <label class="field" for="date">일시</label>
-        <input id="date" type="date" required onchange="updateLocationByDate()">
+        <input id="date" type="date" required>
         <div class="muted" id="dateHint">날짜를 선택하면 요일과 장소가 표시됩니다.</div>
       </div>
       <div>
         <label class="field" for="location">장소</label>
-        <select id="location" onchange="toggleLocationEtc()">
+        <select id="location">
           <option value="">장소 선택</option>
           <option>홈플러스</option><option>민락2지구</option><option>의정부역</option><option value="기타">기타</option>
         </select>
-        <input id="locationEtc" style="display:none;margin-top:8px" placeholder="기타 장소를 입력하세요">
+        <input id="locationEtc" class="hidden" style="margin-top:8px" placeholder="기타 장소를 입력하세요">
       </div>
       <div>
         <label class="field" for="instructor">강사</label>
@@ -64,7 +72,7 @@
         <label class="field" for="newInstructor">강사 추가</label>
         <div class="actions">
           <input id="newInstructor" placeholder="새 강사명 입력">
-          <button class="btn secondary" type="button" onclick="addNewInstructor()">추가</button>
+          <button class="btn secondary" id="addInstBtn" type="button">추가</button>
         </div>
       </div>
     </div>
@@ -74,7 +82,7 @@
     <h2>참가자</h2>
     <p class="help">작성 안내: 참여자 전원을 빠짐없이 작성해 주세요. 참가자별로 위기개입 필요, 추가상담 필요, 해당사업 없음 여부를 선택할 수 있습니다.</p>
     <div id="participants"></div>
-    <button class="btn secondary" type="button" onclick="addParticipant()">＋ 참가자 추가</button>
+    <button class="btn secondary" type="button" id="addPartBtn">＋ 참가자 추가</button>
   </section>
 
   <section class="panel">
@@ -103,9 +111,9 @@
       <label><input type="checkbox" value="빈곤"> 빈곤</label>
       <label><input type="checkbox" value="신체건강/인식"> 신체건강/인식</label>
       <label><input type="checkbox" value="이주배경"> 이주배경</label>
-      <label><input type="checkbox" value="기타" onchange="toggleTopicEtc()"> 기타</label>
+      <label><input type="checkbox" value="기타" id="topicEtcCheck"> 기타</label>
     </div>
-    <input id="topicEtc" style="display:none;margin-top:10px" placeholder="기타 상담주제를 입력하세요">
+    <input id="topicEtc" class="hidden" style="margin-top:10px" placeholder="기타 상담주제를 입력하세요">
   </section>
 
   <section class="panel">
@@ -128,7 +136,7 @@
 
   <section class="panel">
     <div class="actions">
-      <button class="btn primary" id="saveBtn" type="button" onclick="submitForm()">상담일지 저장 및 문서 생성</button>
+      <button class="btn primary" id="saveBtn" type="button">상담일지 저장 및 문서 생성</button>
       <span class="muted">제출 후 새 Google Docs 문서가 생성됩니다.</span>
     </div>
     <div class="status" id="status" role="status"></div>
@@ -136,65 +144,90 @@
 </div>
 
 <script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbyGnMfsSrFTI1m8xCb6nIkpuCavrO0ONonCpQyr1bOrwHuDVtzgT29vSYM78su5gLN1/exec';
+const SAVE_LABEL = '상담일지 저장 및 문서 생성';
+const $ = id => document.getElementById(id);
 let instructorNames = [];
 
-function init() {
-  google.script.run.withSuccessHandler(function(data) {
-    instructorNames = data.instructors || [];
-    renderInstructors();
-  }).withFailureHandler(showError).getInitialData();
-  addParticipant();
-  document.getElementById('date').value = new Date().toLocaleDateString('en-CA');
-  updateLocationByDate();
+/* 서버 통신: 'text/plain'으로 보내야 CORS 사전요청 없이 Apps Script에 전달됩니다 */
+async function api(payload) {
+  const code = $('code').value;
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(Object.assign({ code: code }, payload))
+  });
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error || '요청에 실패했습니다.');
+  return json;
 }
+
+async function init() {
+  addParticipant();
+  $('date').value = new Date().toLocaleDateString('en-CA');
+  updateLocationByDate();
+  try {
+    const res = await fetch(API_URL);
+    const json = await res.json();
+    if (json.requiresCode) $('codePanel').classList.remove('hidden');
+    instructorNames = json.instructors || [];
+    renderInstructors();
+  } catch (err) {
+    showStatus('강사 목록을 불러오지 못했습니다. 새로고침 후 다시 시도해 주세요.', true);
+  }
+}
+
 function renderInstructors(selected) {
-  const el = document.getElementById('instructor');
+  const el = $('instructor');
   el.innerHTML = '<option value="">강사 선택</option>';
-  instructorNames.forEach(function(name) {
-    const op = document.createElement('option'); op.value = name; op.textContent = name; el.appendChild(op);
+  instructorNames.forEach(n => {
+    const op = document.createElement('option'); op.value = n; op.textContent = n; el.appendChild(op);
   });
   if (selected) el.value = selected;
 }
-function addNewInstructor() {
-  const input = document.getElementById('newInstructor');
+
+async function addNewInstructor() {
+  const input = $('newInstructor');
   const name = input.value.trim();
   if (!name) return alert('추가할 강사명을 입력해 주세요.');
-  google.script.run.withSuccessHandler(function(names) {
-    instructorNames = names; renderInstructors(name); input.value = '';
+  const btn = $('addInstBtn'); btn.disabled = true;
+  try {
+    const json = await api({ action: 'addInstructor', name: name });
+    instructorNames = json.instructors;
+    renderInstructors(name);
+    input.value = '';
     alert('강사가 추가되었습니다. 다음 작성부터도 선택할 수 있습니다.');
-  }).withFailureHandler(showError).addInstructor(name);
+  } catch (err) { showStatus('오류: ' + err.message, true); }
+  btn.disabled = false;
 }
+
 function updateLocationByDate() {
-  const value = document.getElementById('date').value;
+  const value = $('date').value;
   if (!value) return;
-  const d = new Date(value + 'T12:00:00');
-  const day = d.getDay();
-  const map = {3:'홈플러스', 4:'민락2지구', 5:'의정부역'};
+  const day = new Date(value + 'T12:00:00').getDay();
+  const map = { 3: '홈플러스', 4: '민락2지구', 5: '의정부역' };
   const dayNames = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
   const suggested = map[day];
-  document.getElementById('dateHint').textContent = dayNames[day] + (suggested ? ' · 장소가 ' + suggested + '로 자동 선택되었습니다.' : ' · 해당 요일은 장소를 직접 선택해 주세요.');
-  document.getElementById('location').value = suggested || '';
+  $('dateHint').textContent = dayNames[day] + (suggested ? ' · 장소가 ' + suggested + '로 자동 선택되었습니다.' : ' · 해당 요일은 장소를 직접 선택해 주세요.');
+  $('location').value = suggested || '';
   toggleLocationEtc();
 }
 function toggleLocationEtc() {
-  const isEtc = document.getElementById('location').value === '기타';
-  document.getElementById('locationEtc').style.display = isEtc ? 'block' : 'none';
+  $('locationEtc').classList.toggle('hidden', $('location').value !== '기타');
 }
 function toggleTopicEtc() {
-  const checked = Array.from(document.querySelectorAll('#topics input')).some(x => x.value === '기타' && x.checked);
-  document.getElementById('topicEtc').style.display = checked ? 'block' : 'none';
+  $('topicEtc').classList.toggle('hidden', !$('topicEtcCheck').checked);
 }
+
 function addParticipant() {
-  const root = document.getElementById('participants');
-  const index = root.children.length + 1;
   const card = document.createElement('div');
   card.className = 'participant';
   card.innerHTML = `
-    <div class="participant-head"><span>참가자 ${index}</span><button class="btn danger" type="button" onclick="this.closest('.participant').remove(); renumberParticipants()">삭제</button></div>
+    <div class="participant-head"><span></span><button class="btn danger p-del" type="button">삭제</button></div>
     <div class="grid">
       <div><label class="field">이름</label><input class="p-name" placeholder="청소년 이름"></div>
       <div><label class="field">성별</label><select class="p-gender"><option value="">선택</option><option>남</option><option>여</option><option>기타/미기재</option></select></div>
-      <div><label class="field">나이</label><input class="p-age" type="number" min="0" max="99" placeholder="만 나이"></div>
+      <div><label class="field">나이</label><input class="p-age" type="number" inputmode="numeric" min="0" max="99" placeholder="만 나이"></div>
     </div>
     <p class="help" style="margin-top:12px">해당하는 항목을 각각 선택해 주세요.</p>
     <div class="checks">
@@ -204,53 +237,74 @@ function addParticipant() {
     </div>
     <label class="field" style="margin-top:14px">개인별 활동내용 / 상담내용</label>
     <textarea class="p-detail" placeholder="청소년별 상황, 욕구, 반응, 주요상담내용, 특이사항 등을 작성"></textarea>`;
-  root.appendChild(card);
+  card.querySelector('.p-del').addEventListener('click', () => {
+    if (document.querySelectorAll('.participant').length === 1) return alert('참가자는 최소 한 명이 필요합니다.');
+    card.remove(); renumberParticipants();
+  });
+  $('participants').appendChild(card);
   renumberParticipants();
 }
 function renumberParticipants() {
-  Array.from(document.querySelectorAll('.participant-head span')).forEach((el,i)=>el.textContent='참가자 '+(i+1));
+  document.querySelectorAll('.participant-head span').forEach((el, i) => el.textContent = '참가자 ' + (i + 1));
 }
+
 function checkedValues(selector) {
-  return Array.from(document.querySelectorAll(selector + ' input:checked')).map(x=>x.value);
+  return Array.from(document.querySelectorAll(selector + ' input:checked')).map(x => x.value);
 }
 function collectData() {
-  const participants = Array.from(document.querySelectorAll('.participant')).map(card => ({
-    name: card.querySelector('.p-name').value.trim(),
-    gender: card.querySelector('.p-gender').value,
-    age: card.querySelector('.p-age').value,
-    flags: Array.from(card.querySelectorAll('.p-flag:checked')).map(x=>x.value),
-    detail: card.querySelector('.p-detail').value.trim()
-  }));
   return {
-    date: document.getElementById('date').value,
-    location: document.getElementById('location').value,
-    locationEtc: document.getElementById('locationEtc').value.trim(),
-    instructor: document.getElementById('instructor').value,
-    participants: participants,
+    date: $('date').value,
+    location: $('location').value,
+    locationEtc: $('locationEtc').value.trim(),
+    instructor: $('instructor').value,
+    participants: Array.from(document.querySelectorAll('.participant')).map(card => ({
+      name: card.querySelector('.p-name').value.trim(),
+      gender: card.querySelector('.p-gender').value,
+      age: card.querySelector('.p-age').value,
+      flags: Array.from(card.querySelectorAll('.p-flag:checked')).map(x => x.value),
+      detail: card.querySelector('.p-detail').value.trim()
+    })),
     services: checkedValues('#services'),
     topics: checkedValues('#topics'),
-    topicEtc: document.getElementById('topicEtc').value.trim(),
-    activitySummary: document.getElementById('activitySummary').value.trim(),
-    evaluation: document.getElementById('evaluation').value.trim()
+    topicEtc: $('topicEtc').value.trim(),
+    activitySummary: $('activitySummary').value.trim(),
+    evaluation: $('evaluation').value.trim()
   };
 }
-function submitForm() {
-  const data = collectData();
-  const btn = document.getElementById('saveBtn');
-  btn.disabled = true; btn.textContent = '문서 생성 중...';
-  document.getElementById('status').textContent = '';
-  google.script.run.withSuccessHandler(function(result) {
-    btn.disabled = false; btn.textContent = '상담일지 저장 및 문서 생성';
-    const status = document.getElementById('status'); status.textContent = '저장 완료: ';
-    const link = document.createElement('a'); link.href = result.url; link.target = '_blank'; link.rel = 'noopener'; link.textContent = result.fileName; status.appendChild(link);
-  }).withFailureHandler(function(err) {
-    btn.disabled = false; btn.textContent = '상담일지 저장 및 문서 생성';
-    showError(err);
-  }).saveCounselingLog(data);
+
+async function submitForm() {
+  const btn = $('saveBtn');
+  btn.disabled = true; btn.textContent = '문서 생성 중... (최대 20초)';
+  showStatus('');
+  try {
+    const r = await api({ action: 'save', data: collectData() });
+    const st = $('status');
+    st.className = 'status';
+    st.textContent = '저장 완료: ';
+    const a = document.createElement('a');
+    a.href = r.url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = r.fileName;
+    st.appendChild(a);
+    if (r.missing && r.missing.length) {
+      st.appendChild(document.createTextNode('\n⚠ 양식에서 찾지 못한 항목(직접 확인 필요): ' + r.missing.join(', ')));
+    }
+  } catch (err) {
+    showStatus('오류: ' + (err && err.message ? err.message : err), true);
+  }
+  btn.disabled = false; btn.textContent = SAVE_LABEL;
 }
-function showError(err) {
-  document.getElementById('status').textContent = '오류: ' + (err && err.message ? err.message : err);
+
+function showStatus(msg, isErr) {
+  const st = $('status');
+  st.className = 'status' + (isErr ? ' err' : '');
+  st.textContent = msg;
 }
+
+$('date').addEventListener('change', updateLocationByDate);
+$('location').addEventListener('change', toggleLocationEtc);
+$('topicEtcCheck').addEventListener('change', toggleTopicEtc);
+$('addInstBtn').addEventListener('click', addNewInstructor);
+$('addPartBtn').addEventListener('click', addParticipant);
+$('saveBtn').addEventListener('click', submitForm);
 window.addEventListener('load', init);
 </script>
 </body>
