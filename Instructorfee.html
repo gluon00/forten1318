@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>강사비 지급내역서</title>
+<style>
+  :root{--ink:#111827;--sub:#6b7280;--line:#e5e7eb;--bg:#f6f7f9;--pri:#2563eb;--pri-bg:#eff6ff;--err:#dc2626;--err-bg:#fef2f2;--ok:#047857;--ok-bg:#ecfdf5}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{font-size:17px}
+  body{margin:0;background:var(--bg);color:var(--ink);line-height:1.5;
+       font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif}
+  .wrap{max-width:480px;margin:0 auto;padding:22px 16px 130px}
+  h1{font-size:1.45rem;margin:0}
+  .lead{margin:4px 0 0;color:var(--sub);font-size:.92rem}
+
+  .sec{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:18px 16px;margin-top:14px}
+  .sec.bad{border-color:var(--err)}
+  .sec h2{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:1.05rem}
+  .num{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;font-size:.85rem;
+       display:inline-flex;align-items:center;justify-content:center;flex:none}
+
+  input[type=date],input[type=text],textarea{
+    width:100%;min-height:54px;padding:12px 14px;font-size:1rem;font-family:inherit;color:var(--ink);
+    background:#fff;border:1.5px solid var(--line);border-radius:12px}
+  input:focus,textarea:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px var(--pri-bg)}
+  textarea{resize:vertical;min-height:96px}
+
+  .daytext{margin-top:10px;font-size:1.05rem;font-weight:700;min-height:1.6em}
+  .time{margin-top:2px;color:var(--sub);font-size:.9rem}
+
+  .opt{display:flex;align-items:center;gap:12px;min-height:58px;padding:0 14px;margin-top:10px;
+       border:1.5px solid var(--line);border-radius:12px;font-size:1.02rem;cursor:pointer}
+  .opt:first-child{margin-top:0}
+  .opt input{width:22px;height:22px;margin:0;accent-color:var(--pri);flex:none}
+  .opt.on{border-color:var(--pri);background:var(--pri-bg);font-weight:700}
+  #etc{margin-top:10px}
+  .note{margin:10px 0 0;font-size:.88rem;color:var(--pri);min-height:1.3em}
+
+  .sigbox{position:relative}
+  canvas{display:block;width:100%;aspect-ratio:600/240;background:#fff;border:1.5px dashed #9ca3af;
+         border-radius:12px;touch-action:none}
+  .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+      color:#9ca3af;font-size:1rem;pointer-events:none}
+  .ghost{margin-left:auto;min-height:36px;padding:0 14px;font-size:.88rem;color:var(--ink);
+         background:#fff;border:1.5px solid var(--line);border-radius:10px}
+
+  #msg{display:none;margin-top:14px;padding:14px 16px;border-radius:12px;font-size:.95rem}
+  #msg.err{display:block;background:var(--err-bg);color:var(--err)}
+  #msg.ok{display:block;background:var(--ok-bg);color:var(--ok)}
+  #msg a{color:inherit;font-weight:700}
+
+  .bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);border-top:1px solid var(--line);
+       padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+  .bar div{max-width:480px;margin:0 auto}
+  #submit{width:100%;min-height:58px;font-size:1.1rem;font-weight:700;color:#fff;background:var(--pri);
+          border:0;border-radius:14px}
+  #submit:disabled{background:#93c5fd}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>강사비 지급내역서</h1>
+  <p class="lead">아래 4가지만 입력하면 문서가 만들어져요</p>
+
+  <section class="sec" id="s1">
+    <h2><span class="num">1</span>활동일</h2>
+    <input type="date" id="date">
+    <div class="daytext" id="dayText"></div>
+    <div class="time" id="timeInfo"></div>
+  </section>
+
+  <section class="sec" id="s2">
+    <h2><span class="num">2</span>활동장소</h2>
+    <div id="places"></div>
+    <input type="text" id="etc" placeholder="활동장소를 직접 입력" hidden>
+    <p class="note" id="note"></p>
+  </section>
+
+  <section class="sec" id="s3">
+    <h2><span class="num">3</span>활동내용</h2>
+    <textarea id="content"></textarea>
+  </section>
+
+  <section class="sec" id="s4">
+    <h2><span class="num">4</span>서명<button type="button" class="ghost" id="clear">지우기</button></h2>
+    <div class="sigbox">
+      <canvas id="sig" width="600" height="240"></canvas>
+      <div class="ph" id="ph">여기에 손가락으로 서명하세요</div>
+    </div>
+  </section>
+
+  <div id="msg"></div>
+</div>
+
+<div class="bar"><div><button id="submit" type="button">제출하기</button></div></div>
+
+<script>
+const CONFIG = {
+  GAS_URL: 'https://script.google.com/macros/s/AKfycbxJeamFlR7Uj9BMVvXthfOQzPJHN57taLcztPYeJuasySJHE0GWqi2Xi_MZMvcAbHeS/exec',
+  START_HOUR: 20,
+  END_HOUR: 22,
+  DEFAULT_CONTENT: '청소년 상담버스 아웃리치 활동',
+  PLACES: ['홈플러스 상담버스', '민락2지구 상담버스', '의정부역 상담버스'],
+  DAY_PLACE: { 3: 0, 4: 1, 5: 2 }   // 수→홈플러스, 목→민락2지구, 금→의정부역
+};
+const DAYS = ['일','월','화','수','목','금','토'];
+const $ = id => document.getElementById(id);
+
+$('timeInfo').textContent = `활동시간 ${CONFIG.START_HOUR}시 ~ ${CONFIG.END_HOUR}시 (총 ${CONFIG.END_HOUR - CONFIG.START_HOUR}시간)`;
+$('content').value = CONFIG.DEFAULT_CONTENT;
+
+/* 안내/오류 표시 */
+function clearBad() { document.querySelectorAll('.sec.bad').forEach(s => s.classList.remove('bad')); }
+function fail(text, secId) {
+  clearBad();
+  const sec = $(secId);
+  sec.classList.add('bad');
+  const m = $('msg'); m.className = 'err'; m.textContent = text;
+  sec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function hideMsg() { $('msg').className = ''; $('msg').textContent = ''; clearBad(); }
+
+/* 장소 선택 */
+const box = $('places');
+[...CONFIG.PLACES, '기타'].forEach(p => {
+  const l = document.createElement('label');
+  l.className = 'opt';
+  l.innerHTML = `<input type="radio" name="place" value="${p}"><span>${p}</span>`;
+  box.appendChild(l);
+});
+function getPlace() {
+  const r = document.querySelector('input[name=place]:checked');
+  return r ? r.value : '';
+}
+function refreshPlace() {
+  document.querySelectorAll('.opt').forEach(o => o.classList.toggle('on', o.querySelector('input').checked));
+  $('etc').hidden = getPlace() !== '기타';
+}
+box.addEventListener('change', () => {
+  refreshPlace(); $('note').textContent = ''; hideMsg();
+  if (getPlace() === '기타') $('etc').focus();
+});
+
+/* 활동일 → 요일 → 장소 자동 선택 */
+$('date').addEventListener('change', () => {
+  hideMsg();
+  const v = $('date').value;
+  if (!v) { $('dayText').textContent = ''; return; }
+  const [y, m, d] = v.split('-').map(Number);
+  const w = new Date(y, m - 1, d).getDay();
+  $('dayText').textContent = `${y}년 ${m}월 ${d}일 ${DAYS[w]}요일`;
+  const idx = CONFIG.DAY_PLACE[w];
+  const radios = document.querySelectorAll('input[name=place]');
+  if (idx !== undefined) {
+    radios[idx].checked = true;
+    $('note').textContent = `${DAYS[w]}요일이라 "${CONFIG.PLACES[idx]}"이 선택됐어요. 다르면 바꿔주세요.`;
+  } else {
+    radios.forEach(r => r.checked = false);
+    $('note').textContent = '수·목·금이 아니에요. 장소를 직접 선택해 주세요.';
+  }
+  refreshPlace();
+});
+$('etc').addEventListener('input', hideMsg);
+$('content').addEventListener('input', hideMsg);
+
+/* 서명 */
+const cv = $('sig'), ctx = cv.getContext('2d');
+let drawing = false, hasSig = false, last = null;
+ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+ctx.strokeStyle = '#000'; ctx.fillStyle = '#000';
+function pos(e) {
+  const r = cv.getBoundingClientRect();
+  return { x: (e.clientX - r.left) * cv.width / r.width, y: (e.clientY - r.top) * cv.height / r.height };
+}
+cv.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  cv.setPointerCapture(e.pointerId);
+  drawing = true; hasSig = true; $('ph').style.display = 'none'; hideMsg();
+  last = pos(e);
+  ctx.beginPath(); ctx.arc(last.x, last.y, 2, 0, Math.PI * 2); ctx.fill();
+});
+cv.addEventListener('pointermove', e => {
+  if (!drawing) return;
+  e.preventDefault();
+  const p = pos(e);
+  ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+  last = p;
+});
+['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => cv.addEventListener(ev, () => drawing = false));
+function clearSig() { ctx.clearRect(0, 0, cv.width, cv.height); hasSig = false; $('ph').style.display = 'flex'; }
+$('clear').addEventListener('click', clearSig);
+
+/* 제출 */
+$('submit').addEventListener('click', async () => {
+  const date = $('date').value;
+  const place = getPlace();
+  const etc = $('etc').value.trim();
+  const content = $('content').value.trim();
+
+  if (!date) return fail('활동일을 선택해 주세요.', 's1');
+  if (!place) return fail('활동장소를 선택해 주세요.', 's2');
+  if (place === '기타' && !etc) return fail('기타 활동장소를 입력해 주세요.', 's2');
+  if (!hasSig) return fail('서명해 주세요.', 's4');
+  hideMsg();
+
+  const placeText = place === '기타' ? `기타(${etc})` : place;
+  const ok = confirm(`이 내용으로 제출할까요?\n\n활동일: ${$('dayText').textContent}\n활동시간: ${CONFIG.START_HOUR}~${CONFIG.END_HOUR}시\n활동장소: ${placeText}`);
+  if (!ok) return;
+
+  const btn = $('submit');
+  btn.disabled = true; btn.textContent = '제출 중...';
+  try {
+    const res = await fetch(CONFIG.GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        date, place, placeEtc: etc, content,
+        startHour: CONFIG.START_HOUR, endHour: CONFIG.END_HOUR,
+        signature: cv.toDataURL('image/png')
+      })
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || '문서 생성 실패');
+
+    const m = $('msg'); m.className = 'ok';
+    m.innerHTML = `제출이 완료됐어요.<br><a href="${data.url}" target="_blank" rel="noopener">생성된 문서 열기</a>`;
+    clearSig();
+    $('date').value = ''; $('dayText').textContent = ''; $('note').textContent = '';
+    document.querySelectorAll('input[name=place]').forEach(r => r.checked = false);
+    $('etc').value = ''; $('content').value = CONFIG.DEFAULT_CONTENT; refreshPlace();
+    m.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch (err) {
+    const m = $('msg'); m.className = 'err';
+    m.innerHTML = '전송 결과를 확인하지 못했어요. 드라이브에 문서가 만들어졌는지 먼저 확인하고, 없을 때만 다시 제출해 주세요.<br><small>' + err.message + '</small>';
+  } finally {
+    btn.disabled = false; btn.textContent = '제출하기';
+  }
+});
+</script>
+</body>
+</html>
