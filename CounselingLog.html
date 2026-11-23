@@ -98,7 +98,12 @@
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycbyGnMfsSrFTI1m8xCb6nIkpuCavrO0ONonCpQyr1bOrwHuDVtzgT29vSYM78su5gLN1/exec';
 const SAVE_LABEL = '상담일지 저장 및 문서 생성';
-const TOPICS = ['학교중단','가정 밖','대인관계','학업/진로','과의존 중독','정신건강','폭력피해','폭력가해/비행','성','노동/근로','결핍','빈곤','신체건강/인식','이주배경','기타'];
+const GENERAL_SERVICES = ['심리검사','프로그램','상담'];
+const SEX_SERVICES = ['성교육','성상담'];
+const GROUPS = {
+  general: { title: '상담주제 (심리검사·프로그램·상담)', topics: ['학교중단','가정 밖','대인관계','학업/진로','과의존 중독','정신건강','폭력피해','폭력가해/비행','성','노동/근로','결핍','빈곤','신체건강/인식','이주배경','기타'] },
+  sex: { title: '상담주제 (성교육·성상담)', topics: ['성건강 및 성교육','성매매','성적충동/성욕구','임신/출산/낙태','성정체성','성역할 갈등','기타'] }
+};
 const NOTE_SERVICES = { '심리검사': '검사 종류 (예: MBTI)', '프로그램': '프로그램명 (예: 나무그리기)' };
 const $ = id => document.getElementById(id);
 
@@ -147,7 +152,12 @@ function toggleLocationEtc() {
 function addParticipant() {
   const card = document.createElement('div');
   card.className = 'participant';
-  const topicHtml = TOPICS.map(t => `<label><input class="p-topic" type="checkbox" value="${t}"> ${t}</label>`).join('');
+  const groupHtml = Object.keys(GROUPS).map(k => `
+      <div class="tgroup hidden" data-group="${k}" style="margin-top:10px">
+        <div class="muted" style="margin-bottom:6px">${GROUPS[k].title}</div>
+        <div class="checks">${GROUPS[k].topics.map(t => `<label><input class="p-topic" type="checkbox" value="${t}"> ${t}</label>`).join('')}</div>
+        <input type="text" class="p-topic-etc hidden" placeholder="기타 상담주제를 입력하세요">
+      </div>`).join('');
   const noteInputs = Object.keys(NOTE_SERVICES).map(k =>
     `<input type="text" class="p-note hidden" data-for="${k}" placeholder="${NOTE_SERVICES[k]}">`).join('');
   card.innerHTML = `
@@ -170,13 +180,15 @@ function addParticipant() {
         <label><input class="p-svc" type="checkbox" value="심리검사"> 심리검사</label>
         <label><input class="p-svc" type="checkbox" value="프로그램"> 프로그램</label>
         <label><input class="p-svc" type="checkbox" value="상담"> 상담</label>
+        <label><input class="p-svc" type="checkbox" value="성교육"> 성교육</label>
+        <label><input class="p-svc" type="checkbox" value="성상담"> 성상담</label>
       </div>
       ${noteInputs}
     </div>
     <div class="sec">
       <label class="field">상담주제 (복수 선택 가능)</label>
-      <div class="checks">${topicHtml}</div>
-      <input type="text" class="p-topic-etc hidden" placeholder="기타 상담주제를 입력하세요">
+      <div class="muted p-topic-hint">제공서비스를 먼저 선택하면 상담주제가 나타납니다.</div>
+      ${groupHtml}
     </div>
     <div class="sec">
       <label class="field">세부내용</label>
@@ -190,8 +202,9 @@ function addParticipant() {
       inp.classList.toggle('hidden', !t.checked);
       if (t.checked) inp.focus(); else inp.value = '';
     }
+    if (t.classList.contains('p-svc')) updateTopicGroups(card);
     if (t.classList.contains('p-topic') && t.value === '기타') {
-      card.querySelector('.p-topic-etc').classList.toggle('hidden', !t.checked);
+      t.closest('.tgroup').querySelector('.p-topic-etc').classList.toggle('hidden', !t.checked);
     }
   });
   card.querySelector('.p-del').addEventListener('click', () => {
@@ -200,6 +213,32 @@ function addParticipant() {
   });
   $('participants').appendChild(card);
   renumberParticipants();
+}
+// 선택한 제공서비스에 맞는 상담주제 목록만 표시 (숨기는 목록의 선택값은 초기화)
+function updateTopicGroups(card) {
+  const on = list => list.some(v => card.querySelector('.p-svc[value="' + v + '"]').checked);
+  const show = { general: on(GENERAL_SERVICES), sex: on(SEX_SERVICES) };
+  Object.keys(show).forEach(k => {
+    const g = card.querySelector('.tgroup[data-group="' + k + '"]');
+    g.classList.toggle('hidden', !show[k]);
+    if (!show[k]) {
+      g.querySelectorAll('.p-topic').forEach(x => x.checked = false);
+      const etc = g.querySelector('.p-topic-etc'); etc.value = ''; etc.classList.add('hidden');
+    }
+  });
+  card.querySelector('.p-topic-hint').classList.toggle('hidden', show.general || show.sex);
+}
+function collectTopics(card, no) {
+  const out = [];
+  card.querySelectorAll('.tgroup:not(.hidden)').forEach(g => {
+    g.querySelectorAll('.p-topic:checked').forEach(x => {
+      if (x.value !== '기타') return out.push(x.value);
+      const v = g.querySelector('.p-topic-etc').value.trim();
+      if (!v) throw new Error(no + '번째 참가자의 기타 상담주제를 입력해 주세요.');
+      out.push('기타: ' + v);
+    });
+  });
+  return out;
 }
 function renumberParticipants() {
   document.querySelectorAll('.participant-head span').forEach((el, i) => el.textContent = '참가자 ' + (i + 1));
@@ -211,7 +250,7 @@ function collectData() {
     location: $('location').value,
     locationEtc: $('locationEtc').value.trim(),
     instructor: $('instructor').value,
-    participants: Array.from(document.querySelectorAll('.participant')).map(card => ({
+    participants: Array.from(document.querySelectorAll('.participant')).map((card, i) => ({
       name: card.querySelector('.p-name').value.trim(),
       gender: card.querySelector('.p-gender').value,
       age: card.querySelector('.p-age').value,
@@ -220,8 +259,7 @@ function collectData() {
         const inp = card.querySelector('.p-note[data-for="' + x.value + '"]');
         return { type: x.value, note: inp ? inp.value.trim() : '' };
       }),
-      topics: Array.from(card.querySelectorAll('.p-topic:checked')).map(x => x.value),
-      topicEtc: card.querySelector('.p-topic-etc').value.trim(),
+      topics: collectTopics(card, i + 1),
       detail: card.querySelector('.p-detail').value.trim()
     })),
     evaluation: $('evaluation').value.trim()
