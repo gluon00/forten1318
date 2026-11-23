@@ -15,13 +15,13 @@
   h1{font-size:1.45rem;margin:0}
   .lead{margin:4px 0 0;color:var(--sub);font-size:.92rem}
 
-  .sec{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:18px 16px;margin-top:14px}
+  .sec{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:18px 16px;margin-top:14px;overflow:hidden}
   .sec.bad{border-color:var(--err)}
   .sec h2{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:1.05rem}
   .num{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;font-size:.85rem;
        display:inline-flex;align-items:center;justify-content:center;flex:none}
 
-    input[type=date],input[type=text]{
+  input[type=date],input[type=text]{
     display:block;width:100%;max-width:100%;min-width:0;min-height:54px;
     padding:12px 14px;font-size:1rem;font-family:inherit;color:var(--ink);text-align:left;
     background:#fff;border:1.5px solid var(--line);border-radius:12px;
@@ -29,7 +29,9 @@
   input[type=date]::-webkit-date-and-time-value{text-align:left;min-height:1.4em}
   input[type=date]::-webkit-calendar-picker-indicator{margin:0}
   input:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px var(--pri-bg)}
-  .sec{overflow:hidden}
+
+  .who{font-size:1.35rem;font-weight:700;min-height:1.6em}
+  .who.empty{font-size:.95rem;font-weight:400;color:var(--err)}
 
   .daytext{margin-top:10px;font-size:1.05rem;font-weight:700;min-height:1.6em}
 
@@ -65,23 +67,28 @@
 <body>
 <div class="wrap">
   <h1>강사비 지급내역서</h1>
-  <p class="lead">아래 3가지만 입력하면 양식이 채워져요</p>
+  <p class="lead">강사명을 확인하고 아래 3가지를 입력해 주세요</p>
+
+  <section class="sec" id="s0">
+    <h2><span class="num">1</span>강사명 확인</h2>
+    <div class="who" id="who">불러오는 중...</div>
+  </section>
 
   <section class="sec" id="s1">
-    <h2><span class="num">1</span>활동일</h2>
+    <h2><span class="num">2</span>활동일</h2>
     <input type="date" id="date">
     <div class="daytext" id="dayText"></div>
   </section>
 
   <section class="sec" id="s2">
-    <h2><span class="num">2</span>활동장소</h2>
+    <h2><span class="num">3</span>활동장소</h2>
     <div id="places"></div>
     <input type="text" id="etc" placeholder="활동장소를 직접 입력" hidden>
     <p class="note" id="note"></p>
   </section>
 
   <section class="sec" id="s3">
-    <h2><span class="num">3</span>서명<button type="button" class="ghost" id="clear">지우기</button></h2>
+    <h2><span class="num">4</span>서명<button type="button" class="ghost" id="clear">지우기</button></h2>
     <div class="sigbox">
       <canvas id="sig" width="600" height="240"></canvas>
       <div class="ph" id="ph">여기에 손가락으로 서명하세요</div>
@@ -101,6 +108,26 @@ const CONFIG = {
 };
 const DAYS = ['일','월','화','수','목','금','토'];
 const $ = id => document.getElementById(id);
+
+/* 강사명 확인 (기본 양식의 성명을 불러옴) */
+let instructorName = '';
+(async () => {
+  const w = $('who');
+  try {
+    const res = await fetch(CONFIG.GAS_URL + '?action=info');
+    const data = await res.json();
+    if (data.ok && data.name) {
+      instructorName = data.name;
+      w.textContent = data.name;
+    } else {
+      w.textContent = '양식에서 성명을 찾지 못했어요';
+      w.classList.add('empty');
+    }
+  } catch (e) {
+    w.textContent = '이름을 불러오지 못했어요 (제출은 가능해요)';
+    w.classList.add('empty');
+  }
+})();
 
 /* 안내/오류 표시 */
 function clearBad() { document.querySelectorAll('.sec.bad').forEach(s => s.classList.remove('bad')); }
@@ -195,7 +222,7 @@ $('submit').addEventListener('click', async () => {
   hideMsg();
 
   const placeText = place === '기타' ? `기타(${etc})` : place;
-  const ok = confirm(`이 내용으로 제출할까요?\n\n활동일: ${$('dayText').textContent}\n활동장소: ${placeText}`);
+  const ok = confirm(`이 내용으로 제출할까요?\n\n강사명: ${instructorName || '(확인 안 됨)'}\n활동일: ${$('dayText').textContent}\n활동장소: ${placeText}`);
   if (!ok) return;
 
   const btn = $('submit');
