@@ -117,7 +117,7 @@
 </dialog>
 
 <script>
-/* ★ Apps Script 웹앱 배포 URL로 교체 */
+/* Apps Script 웹앱 배포 URL (고정) */
 const API = 'https://script.google.com/macros/s/AKfycbzf81jH4Ud8Wi_7ahYWkhxdgf90kekY4o0stjVMknmuvj8k6b4HyZUCts-PfZMzLwPM/exec';
 
 const $ = id => document.getElementById(id);
@@ -247,10 +247,8 @@ $('btnSave').onclick = async () => {
     currentId = j.id;
     $('cur').innerHTML = '<small class="cur">편집 중인 문서: ' + esc(d.name) + ' · <a href="' + j.url + '" target="_blank">Docs 열기</a></small>';
     let t = '저장되었습니다. <a href="' + j.url + '" target="_blank">구글 Docs 열기</a>';
-    if (j.warnings && j.warnings.length) {
-      t += '<br><small>※ 양식에서 찾지 못한 항목: ' + j.warnings.map(esc).join(', ') + '</small>';
-      if (j.tables && j.tables.length) t += '<details><summary><small>양식 구조 보기 (관리자에게 전달)</small></summary><small>' + j.tables.map(esc).join('<br>') + '</small></details>';
-    }
+    if (j.warnings && j.warnings.length) t += '<br><small>※ 양식에서 찾지 못한 항목: ' + j.warnings.map(esc).join(', ') + '</small>';
+    if (j.tables && j.tables.length) t += '<details><summary><small>양식 구조 보기 (문제 있을 때 관리자에게 전달)</small></summary><small>' + j.tables.map(esc).join('<br>') + '</small></details>';
     show(t, true, true);
   } catch (e) {
     let m = e.message;
