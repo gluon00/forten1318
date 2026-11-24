@@ -6,44 +6,49 @@
   <meta name="robots" content="noindex,nofollow">
   <title>아웃리치 심리상담·상담프로그램 활동일지</title>
   <style>
-    :root { --ink:#202733; --muted:#667085; --line:#d8dee8; --blue:#2457a7; --bg:#f4f6fa; }
-    * { box-sizing:border-box; }
-    body { margin:0; background:var(--bg); color:var(--ink); font-family:Arial,"Noto Sans KR",sans-serif; }
-    .wrap { max-width:900px; margin:28px auto; padding:0 16px 40px; }
-    h1 { font-size:25px; margin:0 0 8px; }
-    .sub { color:var(--muted); font-size:14px; margin-bottom:20px; }
-    .panel { background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px; margin:14px 0; }
-    h2 { font-size:18px; margin:0 0 16px; }
+    :root { --ink:#1d1d1f; --muted:#86868b; --lav:#9FA0FF; --mint:#D5E8E6; --cream:#FFF3E3; --coral:#FF7171; --line:#e5e5ea; }
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body { margin:0; background:var(--mint); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Apple SD Gothic Neo","Noto Sans KR",Helvetica,Arial,sans-serif; -webkit-font-smoothing:antialiased; letter-spacing:-0.01em; }
+    .top { background:rgba(213,232,230,.78); -webkit-backdrop-filter:saturate(180%) blur(20px); backdrop-filter:saturate(180%) blur(20px); padding:14px 12px; position:sticky; top:0; z-index:5; border-bottom:1px solid rgba(0,0,0,.08); }
+    h1 { font-size:17px; margin:0; text-align:center; color:var(--ink); font-weight:600; line-height:1.4; }
+    .wrap { max-width:900px; margin:0 auto; padding:18px 16px 48px; }
+    .panel { background:#fff; border-radius:18px; padding:20px; margin:16px 0; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+    h2 { font-size:22px; font-weight:700; margin:0 0 16px; color:var(--ink); letter-spacing:-0.02em; }
     .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
-    label.field { display:block; font-size:14px; font-weight:700; margin-bottom:7px; }
-    input,select,textarea { width:100%; border:1px solid #cbd2dc; border-radius:8px; padding:11px 12px; font:inherit; background:#fff; }
-    textarea { min-height:100px; resize:vertical; }
-    .help { color:#687385; font-size:12px; line-height:1.55; margin:0 0 8px; }
-    .checks { display:flex; flex-wrap:wrap; gap:9px 15px; }
-    .checks label { display:flex; align-items:center; gap:6px; font-size:14px; }
-    .checks input { width:auto; }
-    .participant { border:1px solid var(--line); border-radius:10px; padding:15px; margin:12px 0; }
-    .participant-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; font-weight:700; }
-    .sec { margin-top:16px; }
+    .grid > div, .grid3 > div { min-width:0; }
+    label.field { display:block; font-size:13px; font-weight:600; color:var(--muted); margin-bottom:7px; }
+    input,select,textarea { width:100%; border:0; border-radius:12px; padding:12px 14px; font:inherit; font-size:16px; background:#f2f2f7; color:var(--ink); }
+    input:focus,select:focus,textarea:focus { outline:2px solid var(--lav); background:#fff; }
+    select { -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%2386868b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:36px; }
+    input[type=date] { display:block; min-width:0; max-width:100%; -webkit-appearance:none; appearance:none; min-height:46px; }
+    textarea { min-height:110px; resize:vertical; line-height:1.5; }
+    .help { color:var(--muted); font-size:13px; line-height:1.55; margin:0 0 12px; }
+    .checks { display:flex; flex-wrap:wrap; gap:10px 16px; }
+    .checks label { display:flex; align-items:center; gap:7px; font-size:15px; }
+    .checks input { width:auto; accent-color:var(--lav); }
+    .participant { background:var(--cream); border-radius:16px; padding:16px; margin:14px 0; }
+    .participant input,.participant select,.participant textarea { background:#fff; }
+    .participant-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; font-weight:600; font-size:17px; }
+    .sec { margin-top:18px; }
     .sec input[type=text] { margin-top:8px; }
-    .btn { border:0; border-radius:8px; padding:11px 16px; cursor:pointer; font:inherit; font-weight:700; }
-    .btn:disabled { opacity:.6; cursor:default; }
-    .primary { color:#fff; background:var(--blue); }
-    .secondary { color:var(--blue); background:#eaf1fc; }
-    .danger { color:#b42318; background:#fff0ee; padding:7px 10px; }
-    .actions { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .btn { border:0; border-radius:980px; padding:12px 22px; cursor:pointer; font:inherit; font-size:15px; font-weight:600; transition:opacity .15s; }
+    .btn:active { opacity:.7; }
+    .btn:disabled { opacity:.5; cursor:default; }
+    .primary { color:#fff; background:var(--coral); }
+    .secondary { color:#3c3cd6; background:rgba(159,160,255,.25); }
+    .danger { color:var(--coral); background:#fff; padding:7px 14px; font-size:14px; }
+    .actions { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
     .status { margin-top:12px; font-size:14px; white-space:pre-wrap; line-height:1.6; }
-    .status.err { color:#b42318; }
-    .muted { color:var(--muted); font-size:12px; }
+    .status.err { color:#d63a3a; }
+    .muted { color:var(--muted); font-size:13px; margin-top:6px; }
     .hidden { display:none; }
-    @media(max-width:650px) { .grid,.grid3 { grid-template-columns:1fr; } .panel { padding:15px; } h1 { font-size:21px; } }
+    @media(max-width:650px) { .grid,.grid3 { grid-template-columns:minmax(0,1fr); } .panel { padding:16px; border-radius:16px; } h2 { font-size:20px; } }
   </style>
 </head>
 <body>
+<div class="top"><h1>아웃리치 심리상담·상담프로그램 활동일지</h1></div>
 <div class="wrap">
-  <h1>아웃리치 심리상담·상담프로그램 활동일지</h1>
-  <div class="sub">작성한 내용은 구글 Docs 상담일지로 자동 저장됩니다.</div>
 
   <section class="panel hidden" id="codePanel">
     <label class="field" for="code">접근 코드</label>
@@ -141,7 +146,7 @@ function updateLocationByDate() {
   const map = { 3: '홈플러스', 4: '민락2지구', 5: '의정부역' };
   const dayNames = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
   const suggested = map[day];
-  $('dateHint').textContent = dayNames[day] + (suggested ? ' · 장소가 ' + suggested + '로 자동 선택되었습니다.' : ' · 해당 요일은 장소를 직접 선택해 주세요.');
+  $('dateHint').textContent = dayNames[day] + (suggested ? ' · 장소가 ' + suggested + '로 자동 선택되었습니다.' : '');
   $('location').value = suggested || '';
   toggleLocationEtc();
 }
