@@ -34,6 +34,7 @@
   dialog ul { list-style:none; padding:0; margin:10px 0; max-height:50vh; overflow:auto; }
   dialog li { padding:12px 8px; border-bottom:1px solid #eee; cursor:pointer; font-size:15px; }
   small.cur { color:#137333; }
+  .hint { color:#c5221f; font-size:12px; }
 </style>
 </head>
 <body>
@@ -91,11 +92,10 @@
 
   <div class="card">
     <h2>서명</h2>
-    <label class="f" style="margin-top:0">수령인 서명</label>
+    <label class="f" style="margin-top:0">수령인 서명 <span class="hint">(이름을 정자로 입력해주세요. 또박또박)</span></label>
     <canvas class="sig" id="sigR"></canvas>
     <div class="sigbar"><span></span><a data-clear="sigR">지우기</a></div>
-    <label class="f">확인자 성명</label><input type="text" id="checker">
-    <label class="f">확인자 서명</label>
+    <label class="f">확인자 서명 <span class="hint">(이름을 정자로 입력해주세요. 또박또박)</span></label>
     <canvas class="sig" id="sigC"></canvas>
     <div class="sigbar"><span></span><a data-clear="sigC">지우기</a></div>
   </div>
@@ -118,7 +118,7 @@
 
 <script>
 /* ★ Apps Script 웹앱 배포 URL로 교체 */
-const API = 'https://script.google.com/macros/s/AKfycbzf81jH4Ud8Wi_7ahYWkhxdgf90kekY4o0stjVMknmuvj8k6b4HyZUCts-PfZMzLwPM/exec';
+const API = 'https://script.google.com/macros/s/여기에_배포_ID/exec';
 
 const $ = id => document.getElementById(id);
 let currentId = null;
@@ -202,7 +202,7 @@ function collect() {
     name: $('name').value.trim(), phone: $('phone').value.trim(),
     birth: $('birth').value.trim(), addr: $('addr').value.trim(),
     items, place: $('place').value.trim(), date: $('date').value,
-    consent: val('consent'), checker: $('checker').value.trim(),
+    consent: val('consent'),
     sigReceiver: sigR.data(), sigChecker: sigC.data()
   };
 }
@@ -214,7 +214,7 @@ function fill(d) {
   $('items').innerHTML = '';
   (d.items && d.items.length ? d.items : [{}]).forEach(addRow);
   $('place').value = d.place || ''; $('date').value = d.date || today();
-  setRadio('consent', d.consent || ''); $('checker').value = d.checker || '';
+  setRadio('consent', d.consent || '');
   sigR.load(d.sigReceiver); sigC.load(d.sigChecker);
 }
 function reset() { currentId = null; $('cur').innerHTML = ''; fill({}); window.scrollTo(0, 0); }
@@ -243,7 +243,9 @@ $('btnSave').onclick = async () => {
     if (!j.ok) throw new Error(j.error);
     currentId = j.id;
     $('cur').innerHTML = '<small class="cur">편집 중인 문서: ' + esc(d.name) + ' · <a href="' + j.url + '" target="_blank">Docs 열기</a></small>';
-    show('저장되었습니다. <a href="' + j.url + '" target="_blank">구글 Docs 열기</a>', true, true);
+    let t = '저장되었습니다. <a href="' + j.url + '" target="_blank">구글 Docs 열기</a>';
+    if (j.warnings && j.warnings.length) t += '<br><small>※ 양식에서 찾지 못한 항목: ' + j.warnings.map(esc).join(', ') + '</small>';
+    show(t, true, true);
   } catch (e) { show('저장 실패: ' + e.message); }
   b.disabled = false; b.textContent = '저장 (구글 Docs에 반영)';
 };
