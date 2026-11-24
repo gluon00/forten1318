@@ -118,7 +118,7 @@
 
 <script>
 /* ★ Apps Script 웹앱 배포 URL로 교체 */
-const API = 'https://script.google.com/macros/s/AKfycbzf81jH4Ud8Wi_7ahYWkhxdgf90kekY4o0stjVMknmuvj8k6b4HyZUCts-PfZMzLwPM/exec';
+const API = 'https://script.google.com/macros/s/여기에_배포_ID/exec';
 
 const $ = id => document.getElementById(id);
 let currentId = null;
@@ -272,7 +272,7 @@ $('btnLoad').onclick = async () => {
       li.onclick = () => loadOne(it.id, it.name);
       $('list').appendChild(li);
     });
-  } catch (e) { $('list').innerHTML = '<li>' + esc(e.message) + '</li>'; }
+  } catch (e) { $('list').innerHTML = '<li>' + esc(e.message) + (/접근 코드/.test(e.message) ? '<br><small>※ 아래 접근 코드 칸 값과 Code.gs의 PASSCODE가 같은지, 새 버전으로 재배포했는지 확인하세요.</small>' : '') + '</li>'; }
 };
 async function loadOne(id, name) {
   $('list').innerHTML = '<li>불러오는 중…</li>';
@@ -283,7 +283,7 @@ async function loadOne(id, name) {
     fill(j.data); currentId = id; dlg.close();
     $('cur').innerHTML = '<small class="cur">편집 중인 문서: ' + esc(name) + ' · <a href="https://docs.google.com/document/d/' + id + '/edit" target="_blank">Docs 열기</a></small>';
     window.scrollTo(0, 0);
-  } catch (e) { $('list').innerHTML = '<li>' + esc(e.message) + '</li>'; }
+  } catch (e) { $('list').innerHTML = '<li>' + esc(e.message) + (/접근 코드/.test(e.message) ? '<br><small>※ 아래 접근 코드 칸 값과 Code.gs의 PASSCODE가 같은지, 새 버전으로 재배포했는지 확인하세요.</small>' : '') + '</li>'; }
 }
 </script>
 </body>
