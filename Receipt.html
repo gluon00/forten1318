@@ -236,6 +236,7 @@ $('btnSave').onclick = async () => {
   if (d.consent === 'N' && !confirm('비동의 시 지급품 수령이 불가합니다. 그래도 저장할까요?')) return;
   if (sigR.isEmpty()) return show('수령인 서명을 해주세요.');
   const key = $('key').value.trim(); sessionStorage.setItem('rc_key', key);
+  if (API.includes('여기에_배포_ID')) return show('Receipt.html 안의 API 주소를 Apps Script 웹앱(/exec) URL로 바꿔주세요.');
   const b = $('btnSave'); b.disabled = true; b.textContent = '저장 중… (10~20초 걸릴 수 있어요)';
   try {
     const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'save', key, id: currentId, data: d }) });
@@ -246,7 +247,11 @@ $('btnSave').onclick = async () => {
     let t = '저장되었습니다. <a href="' + j.url + '" target="_blank">구글 Docs 열기</a>';
     if (j.warnings && j.warnings.length) t += '<br><small>※ 양식에서 찾지 못한 항목: ' + j.warnings.map(esc).join(', ') + '</small>';
     show(t, true, true);
-  } catch (e) { show('저장 실패: ' + e.message); }
+  } catch (e) {
+    let m = e.message;
+    if (/Failed to fetch|NetworkError|Load failed/i.test(m)) m += ' → 웹앱 URL(API)이 올바른지, 배포 액세스가 "모든 사용자"인지, 권한 승인을 했는지 확인하세요.';
+    show('저장 실패: ' + m);
+  }
   b.disabled = false; b.textContent = '저장 (구글 Docs에 반영)';
 };
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
