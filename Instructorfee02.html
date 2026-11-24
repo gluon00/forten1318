@@ -3,122 +3,120 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f4f6fb">
+<meta name="theme-color" content="#9FA0FF">
 <title>강사비 지급내역서</title>
 <style>
   :root{
-    --ink:#0f172a;--sub:#64748b;--line:#e2e8f0;--bg:#f4f6fb;
-    --pri:#2563eb;--pri-dk:#1d4ed8;--pri-bg:#eff6ff;
-    --ok:#059669;--ok-bg:#ecfdf5;--err:#dc2626;--err-bg:#fef2f2;
-    --shadow:0 1px 2px rgba(15,23,42,.04),0 6px 18px rgba(15,23,42,.05)
+    --pri:#9FA0FF;          /* 메인 */
+    --pri-dk:#7f80ee;
+    --mint:#D5E8E6;         /* 보조 */
+    --cream:#FFF3E3;        /* 배경 */
+    --coral:#FF7171;        /* 포인트/오류 */
+    --ink:#2b2a4c;
+    --sub:#7c7b9a;
+    --line:#ece4d6;
+    --card:#ffffff;
+    --shadow:0 2px 4px rgba(43,42,76,.04),0 10px 24px rgba(159,160,255,.16)
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html{font-size:17px}
-  body{margin:0;background:var(--bg);color:var(--ink);line-height:1.5;
+  body{margin:0;background:var(--cream);color:var(--ink);line-height:1.5;
        font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif}
-  .wrap{max-width:480px;margin:0 auto;padding:26px 16px 170px}
 
-  /* 헤더 (가운데 정렬) */
-  header{text-align:center;padding:6px 0 4px}
-  .logo{width:58px;height:58px;margin:0 auto 14px;border-radius:19px;background:var(--pri);
-        display:flex;align-items:center;justify-content:center;font-size:29px;
-        box-shadow:0 8px 20px rgba(37,99,235,.28)}
-  h1{margin:0;font-size:1.6rem;font-weight:800;letter-spacing:-.02em;text-align:center}
-  .lead{margin:6px 0 0;color:var(--sub);font-size:.93rem;text-align:center}
+  /* 상단 앱바 */
+  .appbar{background:var(--pri);color:#fff;border-radius:0 0 32px 32px;
+          padding:calc(34px + env(safe-area-inset-top)) 20px 64px;text-align:center;position:relative;overflow:hidden}
+  h1{position:relative;margin:0;font-size:1.5rem;font-weight:800;letter-spacing:-.02em}
+
+  .wrap{max-width:480px;margin:-40px auto 0;padding:0 16px 170px;position:relative}
 
   /* 카드 */
-  .sec{background:#fff;border:1.5px solid transparent;border-radius:20px;padding:18px 16px 20px;
+  .sec{background:var(--card);border:2px solid transparent;border-radius:24px;padding:18px 16px 20px;
        margin-top:14px;box-shadow:var(--shadow);overflow:hidden;transition:border-color .2s}
-  .sec.done{border-color:#bbf7d0}
-  .sec.bad{border-color:var(--err)}
-  .sec h2{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-size:1.05rem;font-weight:700}
-  .num{width:28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;font-size:.85rem;font-weight:700;
+  .sec.done{border-color:var(--mint)}
+  .sec.bad{border-color:var(--coral)}
+  .sec h2{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-size:1.05rem;font-weight:800}
+  .num{width:30px;height:30px;border-radius:50%;background:var(--pri);color:#fff;font-size:.85rem;font-weight:800;
        display:inline-flex;align-items:center;justify-content:center;flex:none;transition:background .2s}
-  .sec.done .num{background:var(--ok);font-size:0}
+  .sec.done .num{background:#6fbfb4;font-size:0}
   .sec.done .num::after{content:"✓";font-size:.95rem}
 
   /* 입력칸 */
   input[type=date],input[type=text]{
     display:block;width:100%;max-width:100%;min-width:0;min-height:56px;
     padding:12px 16px;font-size:1.02rem;font-family:inherit;color:var(--ink);text-align:left;
-    background:#f8fafc;border:1.5px solid var(--line);border-radius:14px;
+    background:var(--cream);border:2px solid transparent;border-radius:18px;
     -webkit-appearance:none;appearance:none}
   input[type=date]::-webkit-date-and-time-value{text-align:left;min-height:1.4em}
   input[type=date]::-webkit-calendar-picker-indicator{margin:0}
   input[type=date],input[type=text]{transition:border-color .15s,box-shadow .15s,background .15s}
-  input:focus{outline:none;background:#fff;border-color:var(--pri);box-shadow:0 0 0 4px var(--pri-bg)}
+  input:focus{outline:none;background:#fff;border-color:var(--pri);box-shadow:0 0 0 4px rgba(159,160,255,.22)}
 
   /* 강사명 */
   .profile{display:flex;align-items:center;gap:14px}
-  .avatar{width:52px;height:52px;border-radius:50%;background:var(--pri-bg);color:var(--pri);
-          font-size:1.3rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none}
   .who{font-size:1.4rem;font-weight:800;letter-spacing:-.01em;line-height:1.3}
-  .role{font-size:.85rem;color:var(--sub)}
-  .who.empty{font-size:.95rem;font-weight:500;color:var(--err)}
+  .who.empty{font-size:.95rem;font-weight:600;color:var(--coral)}
 
   /* 활동일 */
-  .daytext{margin-top:12px;min-height:1.7em;font-size:1.05rem;font-weight:700;color:var(--pri)}
+  .daytext{margin-top:12px;min-height:1.7em;font-size:1.05rem;font-weight:800;color:var(--pri-dk)}
 
   /* 장소 선택 */
   .opt{position:relative;display:flex;align-items:center;gap:14px;min-height:60px;padding:0 16px;margin-top:10px;
-       background:#f8fafc;border:1.5px solid var(--line);border-radius:14px;font-size:1.03rem;cursor:pointer;
+       background:var(--cream);border:2px solid transparent;border-radius:18px;font-size:1.03rem;cursor:pointer;
        transition:border-color .15s,background .15s}
   .opt:first-child{margin-top:0}
   .opt input{position:absolute;opacity:0;width:0;height:0}
-  .dot{width:24px;height:24px;border-radius:50%;border:2px solid #cbd5e1;background:#fff;flex:none;
+  .dot{width:24px;height:24px;border-radius:50%;border:2px solid #d9cfbd;background:#fff;flex:none;
        transition:border-color .15s,background .15s,box-shadow .15s}
   .opt input:checked + .dot{border-color:var(--pri);background:var(--pri);box-shadow:inset 0 0 0 5px #fff}
-  .opt input:focus-visible + .dot{box-shadow:0 0 0 4px var(--pri-bg)}
-  .opt.on{border-color:var(--pri);background:var(--pri-bg);font-weight:700}
+  .opt input:focus-visible + .dot{box-shadow:0 0 0 4px rgba(159,160,255,.3)}
+  .opt.on{border-color:var(--pri);background:#f1f1ff;font-weight:800}
   #etc{margin-top:10px}
-  .note{margin:12px 0 0;font-size:.88rem;color:var(--pri);min-height:1.3em}
+  .note{margin:12px 0 0;font-size:.88rem;color:var(--pri-dk);min-height:1.3em}
 
   /* 서명 */
   .sigbox{position:relative}
-  canvas{display:block;width:100%;aspect-ratio:600/240;background:#fff;border:1.5px dashed #94a3b8;
-         border-radius:14px;touch-action:none}
-  .sigbox::after{content:"";position:absolute;left:8%;right:8%;bottom:26%;border-bottom:1px solid #e2e8f0;pointer-events:none}
+  canvas{display:block;width:100%;aspect-ratio:600/240;background:#fff;border:2px dashed var(--pri);
+         border-radius:18px;touch-action:none}
+  .sigbox::after{content:"";position:absolute;left:8%;right:8%;bottom:26%;border-bottom:1px solid var(--line);pointer-events:none}
   .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-      color:#94a3b8;font-size:1rem;pointer-events:none;z-index:1}
-  .ghost{margin-left:auto;min-height:38px;padding:0 16px;font-size:.88rem;font-weight:600;color:var(--sub);
-         background:#fff;border:1.5px solid var(--line);border-radius:999px}
-  .ghost:active{background:#f1f5f9}
+      color:#b3b2cf;font-size:1rem;pointer-events:none;z-index:1}
+  .ghost{margin-left:auto;min-height:38px;padding:0 16px;font-size:.88rem;font-weight:700;color:var(--ink);
+         background:var(--mint);border:0;border-radius:999px}
+  .ghost:active{filter:brightness(.95)}
 
   /* 메시지 */
-  #msg{display:none;margin-top:16px;padding:15px 16px;border-radius:14px;font-size:.95rem;line-height:1.55}
-  #msg.err{display:block;background:var(--err-bg);color:var(--err)}
-  #msg.ok{display:block;background:var(--ok-bg);color:var(--ok)}
+  #msg{display:none;margin-top:16px;padding:15px 16px;border-radius:18px;font-size:.95rem;line-height:1.55}
+  #msg.err{display:block;background:#ffe9e9;color:#d64545}
+  #msg.ok{display:block;background:var(--mint);color:#2f6b62}
   #msg a{color:inherit;font-weight:800}
 
   /* 하단 고정 바 */
-  .bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.94);
+  .bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,243,227,.94);
        -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
-       border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+       border-radius:24px 24px 0 0;box-shadow:0 -6px 20px rgba(159,160,255,.18);
+       padding:14px 16px calc(12px + env(safe-area-inset-bottom))}
   .bar > div{max-width:480px;margin:0 auto}
   .prog{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:.85rem;color:var(--sub)}
-  .track{flex:1;height:6px;background:var(--line);border-radius:999px;overflow:hidden}
-  .track i{display:block;height:100%;width:0;background:var(--ok);border-radius:999px;transition:width .25s}
+  .track{flex:1;height:8px;background:var(--mint);border-radius:999px;overflow:hidden}
+  .track i{display:block;height:100%;width:0;background:var(--coral);border-radius:999px;transition:width .25s}
   #submit{width:100%;min-height:58px;font-size:1.1rem;font-weight:800;letter-spacing:-.01em;color:#fff;
-          background:var(--pri);border:0;border-radius:16px;box-shadow:0 6px 16px rgba(37,99,235,.3)}
+          background:var(--pri);border:0;border-radius:20px;box-shadow:0 8px 18px rgba(159,160,255,.45)}
   #submit:active{background:var(--pri-dk)}
-  #submit:disabled{background:#93c5fd;box-shadow:none}
+  #submit:disabled{background:#cfd0ff;box-shadow:none}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="logo" aria-hidden="true">🚌</div>
-    <h1>강사비 지급내역서</h1>
-    <p class="lead">강사명을 확인하고 아래 3가지를 입력해 주세요</p>
-  </header>
+<div class="appbar">
+  <h1>강사비 지급내역서</h1>
+</div>
 
+<div class="wrap">
   <section class="sec" id="s0">
     <h2><span class="num">1</span>강사명 확인</h2>
     <div class="profile">
-      <div class="avatar" id="avatar">·</div>
       <div>
         <div class="who" id="who">불러오는 중...</div>
-        <div class="role">강사</div>
       </div>
     </div>
   </section>
@@ -185,7 +183,6 @@ let instructorName = '';
     if (data.ok && data.name) {
       instructorName = data.name;
       w.textContent = data.name;
-      $('avatar').textContent = data.name.charAt(0);
       mark('s0', true);
     } else {
       w.textContent = '양식에서 성명을 찾지 못했어요';
