@@ -2,46 +2,58 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>전문자원활동가 활동일지</title>
 <style>
-  :root{--bg:#f4f6f8;--card:#fff;--ink:#1f2933;--sub:#6b7785;--line:#d5dbe1;--accent:#2f6fed;--ok:#1a8f4c;--err:#d33}
-  @media (prefers-color-scheme:dark){:root{--bg:#14181d;--card:#1d232a;--ink:#e8ecf0;--sub:#98a4b0;--line:#34404b;--accent:#5b92ff}}
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;line-height:1.5}
-  .wrap{max-width:640px;margin:0 auto;padding:20px 16px 60px}
-  h1{font-size:22px;text-align:center;margin:12px 0 4px}
-  .badge{display:block;text-align:center;color:var(--sub);font-size:13px;margin-bottom:18px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
-  label.t{display:block;font-weight:700;margin-bottom:6px}
-  label.t small{font-weight:400;color:var(--sub);font-style:italic;margin-left:4px}
+  :root{
+    --bg:#FFF3E3;--card:rgba(255,255,255,.82);--ink:#1d1d1f;--sub:#86868b;--line:rgba(60,60,67,.14);
+    --field:#FFFBF5;--accent:#9FA0FF;--accent-ink:#2a2a5c;--mint:#D5E8E6;--mint-ink:#1f5a55;--err:#FF7171;--err-bg:rgba(255,113,113,.14);
+    --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(159,160,255,.12)
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#17161c;--card:rgba(40,39,48,.85);--ink:#f5f5f7;--sub:#9a9aa2;--line:rgba(255,255,255,.12);--field:#1f1e26;--accent:#9FA0FF;--accent-ink:#17163a;--mint:#2a3e3c;--mint-ink:#D5E8E6;--err-bg:rgba(255,113,113,.18);--shadow:0 8px 24px rgba(0,0,0,.35)}
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{background:var(--bg)}
+  body{margin:0;background:radial-gradient(1200px 500px at 50% -10%,var(--mint),transparent 70%),var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;line-height:1.5;
+    padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);min-height:100vh}
+  .wrap{max-width:640px;margin:0 auto;padding:28px 16px 64px}
+  h1{font-size:30px;font-weight:800;letter-spacing:-.02em;text-align:center;margin:20px 0 26px}
+  .card{background:var(--card);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+    border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
+  label.t{display:block;font-weight:700;font-size:15px;margin-bottom:10px}
+  label.t small{font-weight:400;color:var(--sub);margin-left:4px;font-size:13px}
   .req{color:var(--err)}
-  input[type=text],input[type=date],select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:16px}
+  input[type=text],input[type=date],select,textarea{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;
+    background:var(--field);color:var(--ink);font:inherit;font-size:16px;-webkit-appearance:none;appearance:none}
+  select{background-image:linear-gradient(45deg,transparent 50%,var(--sub) 50%),linear-gradient(135deg,var(--sub) 50%,transparent 50%);
+    background-position:calc(100% - 20px) 55%,calc(100% - 14px) 55%;background-size:6px 6px,6px 6px;background-repeat:no-repeat;padding-right:34px}
   textarea{resize:vertical;min-height:110px}
   textarea.big{min-height:220px}
-  input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);border-color:transparent}
-  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .row>*{flex:1;min-width:70px}
-  .row .sep{flex:0 0 auto;min-width:0;color:var(--sub)}
-  .seg{display:flex;gap:8px;margin-bottom:8px}
-  .seg label{flex:1;text-align:center;padding:10px;border:1px solid var(--line);border-radius:8px;cursor:pointer;background:var(--bg)}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(159,160,255,.3)}
+  .row{display:flex;gap:8px;align-items:center}
+  .row>select{flex:1;min-width:0}
+  .row .sep{flex:0 0 auto;color:var(--sub)}
+  .seg{display:flex;gap:4px;padding:3px;margin-bottom:10px;background:var(--mint);border-radius:12px}
+  .seg label{flex:1;text-align:center;padding:8px;border-radius:10px;cursor:pointer;color:var(--mint-ink);font-size:15px;transition:background .2s,box-shadow .2s}
   .seg input{display:none}
-  .seg input:checked+span{font-weight:700;color:var(--accent)}
-  .seg label:has(input:checked){border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-  .hint{font-size:13px;color:var(--sub);margin-top:6px}
-  .timeblock{margin-bottom:10px}
-  .timeblock b{display:block;font-size:14px;margin-bottom:6px;color:var(--sub)}
-  button{width:100%;padding:15px;border:0;border-radius:10px;background:var(--accent);color:#fff;font:inherit;font-size:17px;font-weight:700;cursor:pointer}
+  .seg label:has(input:checked){background:var(--accent);color:var(--accent-ink);font-weight:700;box-shadow:0 2px 8px rgba(159,160,255,.5)}
+  .hint{font-size:13px;color:var(--sub);margin-top:8px}
+  .timeblock{margin-bottom:14px}
+  .timeblock b{display:block;font-size:13px;margin-bottom:8px;color:var(--sub);font-weight:600}
+  button{width:100%;padding:16px;border:0;border-radius:16px;background:var(--accent);color:var(--accent-ink);font:inherit;font-size:17px;font-weight:700;
+    cursor:pointer;box-shadow:0 6px 18px rgba(159,160,255,.45);transition:transform .15s,opacity .2s}
+  button:active{transform:scale(.98)}
   button:disabled{opacity:.55;cursor:wait}
-  .msg{display:none;margin-top:14px;padding:14px;border-radius:10px;text-align:center}
-  .msg.ok{display:block;background:rgba(26,143,76,.12);color:var(--ok)}
-  .msg.err{display:block;background:rgba(211,51,51,.12);color:var(--err)}
+  .msg{display:none;margin-top:14px;padding:14px;border-radius:14px;text-align:center;font-weight:600}
+  .msg.ok{display:block;background:var(--mint);color:var(--mint-ink)}
+  .msg.err{display:block;background:var(--err-bg);color:var(--err)}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>전문자원활동가 활동일지</h1>
-  <span class="badge">봉사분야 : 아웃리치 전문자원활동</span>
 
   <form id="f" novalidate>
     <div class="card">
@@ -50,7 +62,7 @@
     </div>
 
     <div class="card">
-      <label class="t">장소 <span class="req">*</span></label>
+      <label class="t" for="placeSel">장소 <span class="req">*</span></label>
       <select id="placeSel">
         <option value="">선택하세요</option>
         <option>홈플러스</option>
@@ -129,6 +141,15 @@ function fill(sel,from,to,step,labelFn){
 fill($('sH'),1,12,1); fill($('eH'),1,12,1);
 fill($('sM'),0,55,5); fill($('eM'),0,55,5);
 
+// 기본 활동시간: 오후 7시 30분 ~ 오후 10시 30분
+function setDefaultTimes(){
+  document.querySelector('input[name="sAP"][value="오후"]').checked=true;
+  document.querySelector('input[name="eAP"][value="오후"]').checked=true;
+  $('sH').value='07'; $('sM').value='30';
+  $('eH').value='10'; $('eM').value='30';
+}
+setDefaultTimes();
+
 $('actDate').value=today();
 const refresh=()=>{ $('actDateText').textContent=kdate($('actDate').value); };
 $('actDate').addEventListener('input',refresh);
@@ -174,6 +195,7 @@ $('f').addEventListener('submit', async e=>{
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
     show('ok','✅ 제출되었습니다. 수고하셨습니다!');
     $('f').reset(); $('placeEtc').style.display='none';
+    setDefaultTimes();
     $('actDate').value=today(); refresh();
   }catch(err){
     show('err','제출에 실패했습니다. 네트워크를 확인하고 다시 시도해 주세요.');
