@@ -232,6 +232,8 @@ $('btnSave').onclick = async () => {
   if (!d.role) return show('수령인(본인/대리인)을 선택하세요.');
   if (!d.name) return show('성명을 입력하세요.');
   if (!d.phone) return show('연락처를 입력하세요.');
+  if (d.role === '대리인' && d.relType === '본인') return show('대리인인 경우 "본인과의 관계"를 동거인 또는 기타로 선택하세요.');
+  if (d.relType === '기타' && !d.relEtc) return show('기타 관계를 입력하세요.');
   if (!d.consent) return show('개인정보 동의 여부를 선택하세요.');
   if (d.consent === 'N' && !confirm('비동의 시 지급품 수령이 불가합니다. 그래도 저장할까요?')) return;
   if (sigR.isEmpty()) return show('수령인 서명을 해주세요.');
@@ -245,7 +247,10 @@ $('btnSave').onclick = async () => {
     currentId = j.id;
     $('cur').innerHTML = '<small class="cur">편집 중인 문서: ' + esc(d.name) + ' · <a href="' + j.url + '" target="_blank">Docs 열기</a></small>';
     let t = '저장되었습니다. <a href="' + j.url + '" target="_blank">구글 Docs 열기</a>';
-    if (j.warnings && j.warnings.length) t += '<br><small>※ 양식에서 찾지 못한 항목: ' + j.warnings.map(esc).join(', ') + '</small>';
+    if (j.warnings && j.warnings.length) {
+      t += '<br><small>※ 양식에서 찾지 못한 항목: ' + j.warnings.map(esc).join(', ') + '</small>';
+      if (j.tables && j.tables.length) t += '<details><summary><small>양식 구조 보기 (관리자에게 전달)</small></summary><small>' + j.tables.map(esc).join('<br>') + '</small></details>';
+    }
     show(t, true, true);
   } catch (e) {
     let m = e.message;
