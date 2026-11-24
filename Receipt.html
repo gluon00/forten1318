@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>수령확인증</title>
+<style>
+  :root { --bd:#c9ced6; --pri:#1a5fb4; --bg:#f4f6f9; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,"Noto Sans KR","Malgun Gothic",sans-serif; background:var(--bg); color:#111; }
+  .wrap { max-width:640px; margin:0 auto; padding:16px; }
+  h1 { text-align:center; font-size:24px; margin:8px 0 16px; }
+  .card { background:#fff; border:1px solid var(--bd); border-radius:12px; padding:14px; margin-bottom:14px; }
+  .card h2 { font-size:16px; margin:0 0 10px; }
+  label.f { display:block; font-size:13px; color:#444; margin:10px 0 4px; }
+  input[type=text], input[type=tel], input[type=date], select { width:100%; padding:11px; font-size:16px; border:1px solid var(--bd); border-radius:8px; background:#fff; }
+  .row { display:flex; gap:14px; flex-wrap:wrap; }
+  .row label.o { display:flex; align-items:center; gap:6px; font-size:16px; padding:6px 0; }
+  .row input[type=radio] { width:20px; height:20px; }
+  .item { display:grid; grid-template-columns:1fr 70px 1fr 36px; gap:6px; margin-bottom:6px; align-items:center; }
+  .item button { height:40px; border:0; background:#eee; border-radius:8px; font-size:18px; }
+  .hdr { font-size:12px; color:#666; display:grid; grid-template-columns:1fr 70px 1fr 36px; gap:6px; }
+  button.btn { padding:12px 16px; font-size:16px; border:0; border-radius:8px; background:var(--pri); color:#fff; width:100%; }
+  button.sub { background:#e8eef7; color:var(--pri); }
+  .sig { border:1px dashed #888; border-radius:8px; background:#fff; touch-action:none; width:100%; height:160px; display:block; }
+  .sigbar { display:flex; justify-content:space-between; margin-top:6px; font-size:13px; }
+  .sigbar a { color:var(--pri); cursor:pointer; }
+  .box { background:#fafafa; font-size:13px; line-height:1.5; padding:10px; border-radius:8px; border:1px solid var(--bd); }
+  .msg { padding:10px; border-radius:8px; margin:10px 0; font-size:14px; display:none; }
+  .ok { background:#e6f4ea; color:#137333; } .err { background:#fce8e6; color:#c5221f; }
+  .top { display:flex; gap:8px; margin-bottom:10px; }
+  .top button { flex:1; }
+  dialog { border:0; border-radius:12px; padding:16px; width:min(92vw,520px); }
+  dialog ul { list-style:none; padding:0; margin:10px 0; max-height:50vh; overflow:auto; }
+  dialog li { padding:12px 8px; border-bottom:1px solid #eee; cursor:pointer; font-size:15px; }
+  small.cur { color:#137333; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>수령확인증</h1>
+
+  <div class="top">
+    <button class="btn sub" id="btnLoad" type="button">📂 저장된 문서 불러오기</button>
+    <button class="btn sub" id="btnNew" type="button">＋ 새로 작성</button>
+  </div>
+  <div id="cur" style="font-size:13px;margin-bottom:8px"></div>
+
+  <div class="card">
+    <h2>수령인</h2>
+    <div class="row">
+      <label class="o"><input type="radio" name="role" value="본인" checked> 본인</label>
+      <label class="o"><input type="radio" name="role" value="대리인"> 대리인</label>
+    </div>
+    <label class="f">본인과의 관계</label>
+    <div class="row">
+      <label class="o"><input type="radio" name="rel" value="본인" checked> 본인</label>
+      <label class="o"><input type="radio" name="rel" value="동거인"> 동거인</label>
+      <label class="o"><input type="radio" name="rel" value="기타"> 기타</label>
+    </div>
+    <input type="text" id="relEtc" placeholder="기타 관계 직접 입력" style="display:none;margin-top:6px">
+    <label class="f">성명</label><input type="text" id="name" autocomplete="name">
+    <label class="f">연락처</label><input type="tel" id="phone" placeholder="010-0000-0000" autocomplete="tel">
+    <label class="f">생년월일</label><input type="text" id="birth" placeholder="예: 2008-01-31" inputmode="numeric">
+    <label class="f">주소</label><input type="text" id="addr" autocomplete="street-address">
+  </div>
+
+  <div class="card">
+    <h2>수령내용</h2>
+    <div class="hdr"><span>지급품</span><span>수량</span><span>비고</span><span></span></div>
+    <div id="items"></div>
+    <button class="btn sub" id="addItem" type="button">＋ 줄 추가</button>
+    <label class="f">수령장소</label><input type="text" id="place">
+    <label class="f">수령일</label><input type="date" id="date">
+  </div>
+
+  <div class="card">
+    <h2>개인정보 수집·이용 동의 (필수)</h2>
+    <div class="box">
+      의정부시일시청소년쉼터(이동형)에서는 긴급지원을 위하여 수령인의 개인정보를 수집·이용하려고 합니다.<br>
+      · 수집항목: 성명, 생년월일, 연락처, 주소<br>
+      · 수집목적: 수령인(본인 또는 대리인) 확인<br>
+      · 보유기간: 5년 (공공기관의 기록물관리에 관한 법률 시행령 제26조)<br>
+      ※ 동의를 거부할 권리가 있으나, 거부 시 지급품 수령이 불가합니다.
+    </div>
+    <div class="row" style="margin-top:6px">
+      <label class="o"><input type="radio" name="consent" value="Y"> 동의</label>
+      <label class="o"><input type="radio" name="consent" value="N"> 비동의</label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>서명</h2>
+    <label class="f" style="margin-top:0">수령인 서명</label>
+    <canvas class="sig" id="sigR"></canvas>
+    <div class="sigbar"><span></span><a data-clear="sigR">지우기</a></div>
+    <label class="f">확인자 성명</label><input type="text" id="checker">
+    <label class="f">확인자 서명</label>
+    <canvas class="sig" id="sigC"></canvas>
+    <div class="sigbar"><span></span><a data-clear="sigC">지우기</a></div>
+  </div>
+
+  <div class="card">
+    <label class="f" style="margin-top:0">접근 코드</label>
+    <input type="text" id="key" autocomplete="off" placeholder="관리자에게 받은 코드">
+  </div>
+
+  <div class="msg" id="msg"></div>
+  <button class="btn" id="btnSave" type="button">저장 (구글 Docs에 반영)</button>
+  <div style="height:40px"></div>
+</div>
+
+<dialog id="dlg">
+  <b>저장된 수령확인증</b>
+  <ul id="list"><li>불러오는 중…</li></ul>
+  <button class="btn sub" type="button" onclick="dlg.close()">닫기</button>
+</dialog>
+
+<script>
+/* ★ Apps Script 웹앱 배포 URL로 교체 */
+const API = 'https://script.google.com/macros/s/AKfycbzf81jH4Ud8Wi_7ahYWkhxdgf90kekY4o0stjVMknmuvj8k6b4HyZUCts-PfZMzLwPM/exec';
+
+const $ = id => document.getElementById(id);
+let currentId = null;
+const dlg = $('dlg');
+
+/* ---------- 날짜 기본값(오늘, 한국시간) ---------- */
+function today() {
+  return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+}
+$('date').value = today();
+$('key').value = sessionStorage.getItem('rc_key') || '';
+
+/* ---------- 관계 ---------- */
+document.querySelectorAll('input[name=rel]').forEach(r => r.addEventListener('change', () => {
+  $('relEtc').style.display = val('rel') === '기타' ? 'block' : 'none';
+}));
+document.querySelectorAll('input[name=role]').forEach(r => r.addEventListener('change', () => {
+  if (val('role') === '본인') setRadio('rel', '본인');
+  $('relEtc').style.display = val('rel') === '기타' ? 'block' : 'none';
+}));
+function val(n) { const e = document.querySelector('input[name=' + n + ']:checked'); return e ? e.value : ''; }
+function setRadio(n, v) { document.querySelectorAll('input[name=' + n + ']').forEach(e => e.checked = (e.value === v)); }
+
+/* ---------- 지급품 행 ---------- */
+function addRow(v) {
+  v = v || {};
+  const d = document.createElement('div');
+  d.className = 'item';
+  d.innerHTML = '<input type="text" class="i-item" placeholder="지급품"><input type="text" class="i-qty" placeholder="수량" inputmode="numeric"><input type="text" class="i-note" placeholder="비고"><button type="button" title="삭제">✕</button>';
+  d.querySelector('.i-item').value = v.item || '';
+  d.querySelector('.i-qty').value = v.qty || '';
+  d.querySelector('.i-note').value = v.note || '';
+  d.querySelector('button').onclick = () => { if ($('items').children.length > 1) d.remove(); else { d.querySelectorAll('input').forEach(i => i.value = ''); } };
+  $('items').appendChild(d);
+}
+$('addItem').onclick = () => addRow();
+addRow();
+
+/* ---------- 서명 패드 ---------- */
+function pad(id) {
+  const c = $(id), ctx = c.getContext('2d');
+  let drawing = false, dirty = false;
+  function size() {
+    const r = c.getBoundingClientRect(), s = window.devicePixelRatio || 1;
+    const keep = dirty ? c.toDataURL() : null;
+    c.width = r.width * s; c.height = r.height * s;
+    ctx.scale(s, s); ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#000';
+    if (keep) { const i = new Image(); i.onload = () => ctx.drawImage(i, 0, 0, r.width, r.height); i.src = keep; }
+  }
+  function pos(e) { const r = c.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+  c.addEventListener('pointerdown', e => { drawing = true; c.setPointerCapture(e.pointerId); const [x, y] = pos(e); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 0.1, y + 0.1); ctx.stroke(); dirty = true; e.preventDefault(); });
+  c.addEventListener('pointermove', e => { if (!drawing) return; const [x, y] = pos(e); ctx.lineTo(x, y); ctx.stroke(); e.preventDefault(); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => c.addEventListener(t, () => drawing = false));
+  window.addEventListener('resize', size);
+  size();
+  return {
+    clear() { ctx.clearRect(0, 0, c.width, c.height); dirty = false; },
+    isEmpty() { return !dirty; },
+    data() { return dirty ? c.toDataURL('image/png') : ''; },
+    load(url) {
+      this.clear();
+      if (!url) return;
+      const i = new Image(), r = c.getBoundingClientRect();
+      i.onload = () => { ctx.drawImage(i, 0, 0, r.width, r.height); dirty = true; };
+      i.src = url;
+    }
+  };
+}
+const sigR = pad('sigR'), sigC = pad('sigC');
+document.querySelectorAll('[data-clear]').forEach(a => a.onclick = () => (a.dataset.clear === 'sigR' ? sigR : sigC).clear());
+
+/* ---------- 입력값 수집 / 채우기 ---------- */
+function collect() {
+  const items = [...document.querySelectorAll('.item')].map(r => ({
+    item: r.querySelector('.i-item').value.trim(),
+    qty: r.querySelector('.i-qty').value.trim(),
+    note: r.querySelector('.i-note').value.trim()
+  })).filter(i => i.item || i.qty || i.note);
+  return {
+    role: val('role'), relType: val('rel'), relEtc: $('relEtc').value.trim(),
+    name: $('name').value.trim(), phone: $('phone').value.trim(),
+    birth: $('birth').value.trim(), addr: $('addr').value.trim(),
+    items, place: $('place').value.trim(), date: $('date').value,
+    consent: val('consent'), checker: $('checker').value.trim(),
+    sigReceiver: sigR.data(), sigChecker: sigC.data()
+  };
+}
+function fill(d) {
+  setRadio('role', d.role || '본인'); setRadio('rel', d.relType || '본인');
+  $('relEtc').value = d.relEtc || ''; $('relEtc').style.display = d.relType === '기타' ? 'block' : 'none';
+  $('name').value = d.name || ''; $('phone').value = d.phone || '';
+  $('birth').value = d.birth || ''; $('addr').value = d.addr || '';
+  $('items').innerHTML = '';
+  (d.items && d.items.length ? d.items : [{}]).forEach(addRow);
+  $('place').value = d.place || ''; $('date').value = d.date || today();
+  setRadio('consent', d.consent || ''); $('checker').value = d.checker || '';
+  sigR.load(d.sigReceiver); sigC.load(d.sigChecker);
+}
+function reset() { currentId = null; $('cur').innerHTML = ''; fill({}); window.scrollTo(0, 0); }
+$('btnNew').onclick = () => { if (confirm('입력 내용을 지우고 새로 작성할까요?')) reset(); };
+
+/* ---------- 메시지 ---------- */
+function show(t, ok, html) {
+  const m = $('msg'); m.className = 'msg ' + (ok ? 'ok' : 'err'); m[html ? 'innerHTML' : 'textContent'] = t; m.style.display = 'block';
+  m.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/* ---------- 저장 ---------- */
+$('btnSave').onclick = async () => {
+  const d = collect();
+  if (!d.role) return show('수령인(본인/대리인)을 선택하세요.');
+  if (!d.name) return show('성명을 입력하세요.');
+  if (!d.phone) return show('연락처를 입력하세요.');
+  if (!d.consent) return show('개인정보 동의 여부를 선택하세요.');
+  if (d.consent === 'N' && !confirm('비동의 시 지급품 수령이 불가합니다. 그래도 저장할까요?')) return;
+  if (sigR.isEmpty()) return show('수령인 서명을 해주세요.');
+  const key = $('key').value.trim(); sessionStorage.setItem('rc_key', key);
+  const b = $('btnSave'); b.disabled = true; b.textContent = '저장 중… (10~20초 걸릴 수 있어요)';
+  try {
+    const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'save', key, id: currentId, data: d }) });
+    const j = await res.json();
+    if (!j.ok) throw new Error(j.error);
+    currentId = j.id;
+    $('cur').innerHTML = '<small class="cur">편집 중인 문서: ' + esc(d.name) + ' · <a href="' + j.url + '" target="_blank">Docs 열기</a></small>';
+    show('저장되었습니다. <a href="' + j.url + '" target="_blank">구글 Docs 열기</a>', true, true);
+  } catch (e) { show('저장 실패: ' + e.message); }
+  b.disabled = false; b.textContent = '저장 (구글 Docs에 반영)';
+};
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+/* ---------- 불러오기 ---------- */
+$('btnLoad').onclick = async () => {
+  const key = $('key').value.trim();
+  if (!key) { show('아래 접근 코드를 먼저 입력하세요.'); return; }
+  sessionStorage.setItem('rc_key', key);
+  $('list').innerHTML = '<li>불러오는 중…</li>'; dlg.showModal();
+  try {
+    const j = await (await fetch(API + '?action=list&key=' + encodeURIComponent(key))).json();
+    if (!j.ok) throw new Error(j.error);
+    $('list').innerHTML = j.items.length ? '' : '<li>저장된 문서가 없습니다.</li>';
+    j.items.forEach(it => {
+      const li = document.createElement('li');
+      li.textContent = it.name + '  (' + new Date(it.updated).toLocaleString('ko-KR') + ')';
+      li.onclick = () => loadOne(it.id, it.name);
+      $('list').appendChild(li);
+    });
+  } catch (e) { $('list').innerHTML = '<li>' + esc(e.message) + '</li>'; }
+};
+async function loadOne(id, name) {
+  $('list').innerHTML = '<li>불러오는 중…</li>';
+  try {
+    const key = $('key').value.trim();
+    const j = await (await fetch(API + '?action=get&id=' + encodeURIComponent(id) + '&key=' + encodeURIComponent(key))).json();
+    if (!j.ok) throw new Error(j.error);
+    fill(j.data); currentId = id; dlg.close();
+    $('cur').innerHTML = '<small class="cur">편집 중인 문서: ' + esc(name) + ' · <a href="https://docs.google.com/document/d/' + id + '/edit" target="_blank">Docs 열기</a></small>';
+    window.scrollTo(0, 0);
+  } catch (e) { $('list').innerHTML = '<li>' + esc(e.message) + '</li>'; }
+}
+</script>
+</body>
+</html>
