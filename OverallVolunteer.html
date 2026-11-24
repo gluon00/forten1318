@@ -194,9 +194,28 @@ tbody tr:first-child td{border-top:0}
 <script>
 // ▼ 여기만 수정하세요: 활동가별 출석부 웹앱(앱스 스크립트) URL을 모두 나열 ▼
 const ALL_URLS = [
-  "https://script.google.com/macros/s/AKfycbwvXVegJ2qFIrCeJdzbFjdLu28LnJWL6OKAz_8MDfgTX9R9sfl0YMMzHJAT8D9OCJPc/exec",
-  // "https://script.google.com/macros/s/.../exec",  // 활동가 2
-  // "https://script.google.com/macros/s/.../exec",  // 활동가 3
+  "https://script.google.com/macros/s/AKfycbwvXVegJ2qFIrCeJdzbFjdLu28LnJWL6OKAz_8MDfgTX9R9sfl0YMMzHJAT8D9OCJPc/exec",  // 이란영
+  // "https://script.google.com/macros/s/AKfycby75IpGjxWxmg7v6xMgCnv-TSnETCnQJDrERgp65-YyKW_bgyrRJS3bIvqGzftuCfxE/exec",  // 이은정
+  // "https://script.google.com/macros/s/AKfycbxnNOq-zOoHZ-YrDiL_JVKhNW_cbalx2NUiuLvNnBaDE9U3HfB1KyLj7J9a3F9wqAof/exec",  // 손혜경
+  // "https://script.google.com/macros/s/AKfycbyaobK219jYfu5lfeO1GxBC58cxcERNwrBOoEsf9Pue1r_gJtp5AX4-By3KgR1GXGuR/exec",  // 이혜연
+  // "https://script.google.com/macros/s/AKfycbwjqvWPKqwenSJ92teJiyCQWFB7T-vnnpZtukW9TXzntKd386mEp1gDlPzCBr2Wt531/exec",  // 김명선
+  // "https://script.google.com/macros/s/AKfycbyYc0vvUllrU0FzYUySy7EXhaQM5pwkMdTUOAddhjSdBwtQ1TS6GXVM6vM4WSTHOjFv/exec",  // 원채영
+  // "https://script.google.com/macros/s/AKfycbzQle7hTSYkyOkx1tXWuWQ5VvGxCaEDEOawfyuIxVjCb6UdwTGCi0UXnpqfyIfhZQq_Pg/exec",  // 김유진
+  // "https://script.google.com/macros/s/AKfycbzMYDqO6ddCXpHQlcGq3Sj92aWDxk9Pm18uzTuuiGT6FnsU2IWzdgTDJxUEUX-pwZBq/exec",  // 이영은
+  // "https://script.google.com/macros/s/AKfycbzZz0ZNq_Yl62ncTGyQvz1FeP62iamEzSXw9xdsqk76jkw2U3jJRpyF19d-6TISUp-6/exec",  // 이현민
+  // "https://script.google.com/macros/s/AKfycbzulG_iiLRtIQOHxiPVvM9-Om-b698Fnmgi4BUaq6TajL4ys7yS1ifh5vq16IPfMfaQ/exec",  // 이주영
+  // "https://script.google.com/macros/s/AKfycbwQvF_2ocXA5BgRdLIaoUFw7eTDqld_emJd9RtJ1_el7HYQdpSfrQNbPcg968q4BqKQ/exec",  // 손승재
+  // "https://script.google.com/macros/s/AKfycbz35gNpfMPB-Av0vKzjSSUX8aZsiR7oa6JMj3qzPucqWf_aV873fRwBAbPEViYMbIWdDQ/exec",  // 구원희
+  // "https://script.google.com/macros/s/AKfycbwv9nEP_mUkHCuWOdf0OtU2calrRv9wtIcTgFL-a2kr57rGlpAYnXw9x_rAo8-g1roGBQ/exec",  // 김경숙
+  // "https://script.google.com/macros/s/AKfycbw8cAZbFsF8Vb4SO3WbSpsfGaSB0ipXXwTHnD2YJgvZUkddukzBPpxweQDSytOIlF4efA/exec",  // 박정범
+  // "https://script.google.com/macros/s/AKfycbzkgBAeW8lYlRglpc1CloYrfilukp6F0Ocom8d0eHYSOvncYowZjJyxPNw28yAd1cRCwA/exec",  // 장석진
+  // "https://script.google.com/macros/s/AKfycbwar47BVuF0o9tBqeatpXcE8wT1PrkObnz91-FMuZuv_cpYRw2x_jBCWR7q2xlRDBucew/exec",  // 조지영
+  // "https://script.google.com/macros/s/AKfycbzOzM86bUyvjPlj-XxrKnUoJJPwmw5RNjvLFPgwYrBjf2NhUA2P5cafgf5xfx_2KAZZvA/exec",  // 이진
+  // "https://script.google.com/macros/s/AKfycbwyMsrzIUgz4ejL5-YK-_mn2fJFEADClvERgWLM3BkE05Rv2TWwi5QX6hLghGBwq593/exec",  // 송하윤
+  // "https://script.google.com/macros/s/AKfycbxiG6KZI_J0XprtU0kLcL-eh0ajxHUo5oJa5Po6-SezMErRFqXxuCuP2sXlcikZOn-IwA/exec",  // 이수인
+  // "https://script.google.com/macros/s/AKfycbzE5eCpFQ8iKb9IqZsH7SzNySoJIkPS2-_mb6SUEtUnaB-ATgEuO6fFIMzUYKMIRxAjaQ/exec",  // 조원식
+  // "https://script.google.com/macros/s/AKfycbyG8F_zqcd0lhb0D6fWI2y2dBtJqgKr5h4G-GSvAySctojGKH3i9U5vYiyAfau0UjS8/exec",  // 정인
+  
 ];
 // ▲▲▲
 
