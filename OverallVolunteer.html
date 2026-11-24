@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f2f2f7">
+<title>전문자원활동가 출석 통합 현황</title>
+<style>
+:root{
+  --bg:#f2f2f7;--card:#ffffff;--fill:rgba(118,118,128,.12);--sep:rgba(60,60,67,.14);
+  --tx:#000;--mu:#8e8e93;--mu2:#6c6c70;--ac:#007aff;--ok:#34c759;
+  --shadow:0 1px 2px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#000;--card:#1c1c1e;--fill:rgba(118,118,128,.24);--sep:rgba(84,84,88,.5);
+  --tx:#fff;--mu:#8e8e93;--mu2:#aeaeb2;--ac:#0a84ff;--shadow:none;
+}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+  letter-spacing:-.01em;padding:env(safe-area-inset-top) 16px calc(40px + env(safe-area-inset-bottom));
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:680px;margin:0 auto}
+
+/* 헤더 */
+.nav{display:flex;justify-content:space-between;align-items:center;padding:14px 4px 0;min-height:44px}
+.nav .cap{font-size:13px;color:var(--mu);font-weight:500}
+.link{background:none;border:0;color:var(--ac);font-size:17px;font-family:inherit;padding:6px 0 6px 12px;cursor:pointer}
+.link:disabled{opacity:.4}
+h1{font-size:34px;line-height:1.15;font-weight:700;letter-spacing:-.025em;margin:2px 4px 14px}
+#err{font-size:13px;color:#ff3b30;margin:0 4px 10px;min-height:0}
+#err:empty{display:none}
+
+/* 섹션 */
+.sec{font-size:13px;color:var(--mu);text-transform:none;margin:24px 16px 7px;font-weight:400}
+.group{background:var(--card);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+.pad{padding:16px}
+
+/* 통계 */
+.stats{display:flex}
+.stat{flex:1;text-align:center;padding:16px 4px 14px;position:relative}
+.stat+.stat:before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:.5px;background:var(--sep)}
+.stat b{display:block;font-size:30px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--mu);font-weight:500}
+
+/* 검색·필터 */
+.search{display:flex;align-items:center;gap:6px;background:var(--fill);border-radius:10px;padding:0 10px;height:36px;margin:10px 12px 8px}
+.search i{font-style:normal;color:var(--mu);font-size:14px}
+.search input{flex:1;border:0;background:none;outline:none;font-size:17px;color:var(--tx);font-family:inherit;min-width:0}
+.search input::placeholder{color:var(--mu)}
+.row{display:flex;justify-content:space-between;align-items:center;padding:0 16px;min-height:44px;border-top:.5px solid var(--sep);font-size:17px}
+.row select{appearance:none;-webkit-appearance:none;border:0;background:none;color:var(--ac);font-size:17px;font-family:inherit;text-align:right;direction:rtl;padding:8px 0;max-width:60%;outline:none}
+
+/* 세그먼트 */
+.seg{display:flex;background:var(--fill);border-radius:9px;padding:2px;gap:2px;margin:12px 12px 0}
+.seg button{flex:1;border:0;background:none;color:var(--tx);font-family:inherit;font-size:13px;font-weight:500;padding:7px 2px;border-radius:7px;cursor:pointer;white-space:nowrap;transition:background .15s,box-shadow .15s}
+.seg button.on{background:var(--card);font-weight:600;box-shadow:0 3px 8px rgba(0,0,0,.12),0 3px 1px rgba(0,0,0,.04)}
+@media (prefers-color-scheme:dark){.seg button.on{background:#636366}}
+#placeWrap{display:none}
+#placeWrap .row{border-top:0;margin-top:6px}
+
+/* 시상대 */
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:10px;padding:22px 16px 0}
+.pod{flex:1;max-width:150px;text-align:center}
+.pod .av{font-size:34px;line-height:1}
+.pod .nm{font-weight:600;font-size:15px;margin:6px 0 1px;word-break:keep-all}
+.pod .pt{font-size:12px;color:var(--mu2);font-variant-numeric:tabular-nums}
+.pod .bar{margin-top:8px;border-radius:12px 12px 0 0;color:#fff;font-weight:700;font-size:22px;padding-top:8px}
+.pod.p1 .bar{height:92px;background:linear-gradient(180deg,#ffd60a,#ff9f0a)}
+.pod.p2 .bar{height:68px;background:linear-gradient(180deg,#c7c7cc,#8e8e93)}
+.pod.p3 .bar{height:50px;background:linear-gradient(180deg,#e5a572,#b9763d)}
+.podium:empty{display:none}
+
+/* 순위 행 */
+.rk{display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:.5px solid var(--sep)}
+.rk:first-child{border-top:0}
+.rk .no{width:28px;text-align:center;font-size:17px;font-weight:600;color:var(--mu)}
+.rk .mid{flex:1;min-width:0}
+.rk .top{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:600}
+.rk .lv{font-size:11px;font-weight:600;color:var(--ac);background:rgba(0,122,255,.12);border-radius:20px;padding:2px 8px;white-space:nowrap}
+@media (prefers-color-scheme:dark){.rk .lv{background:rgba(10,132,255,.22)}}
+.rk .meter{height:4px;background:var(--fill);border-radius:3px;margin-top:8px;overflow:hidden}
+.rk .meter i{display:block;height:100%;background:var(--ac);border-radius:3px;transition:width .4s}
+.rk .sub2{font-size:12px;color:var(--mu);margin-top:5px}
+.rk .score{font-size:17px;font-weight:700;color:var(--tx);white-space:nowrap;font-variant-numeric:tabular-nums}
+.empty{color:var(--mu);padding:24px;text-align:center;font-size:15px}
+
+/* 안내 */
+details.guide{border-top:.5px solid var(--sep)}
+details.guide summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:0 16px;min-height:46px;font-size:17px;cursor:pointer}
+details.guide summary::-webkit-details-marker{display:none}
+details.guide summary:after{content:"›";color:var(--mu);font-size:22px;transition:transform .2s}
+details.guide[open] summary:after{transform:rotate(90deg)}
+.gbody{padding:0 16px 14px}
+.guide .g{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:.5px solid var(--sep);font-size:15px}
+.guide .ge{font-size:26px;width:34px;text-align:center}
+.guide .gm{flex:1}
+.guide .gm b{display:block;font-weight:600}
+.guide .gm span{font-size:13px;color:var(--mu)}
+.guide .gh{font-size:13px;font-weight:600;white-space:nowrap;text-align:right}
+.guide .gh small{display:block;font-weight:400;color:var(--mu)}
+.guide h4{margin:14px 0 4px;font-size:13px;color:var(--mu);font-weight:400}
+.guide ul{margin:0;padding-left:18px;font-size:13px;color:var(--mu2);line-height:1.75}
+
+/* 표 */
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:15px;font-variant-numeric:tabular-nums}
+th{font-size:12px;color:var(--mu);font-weight:500;padding:10px 8px 8px;text-align:center;border-bottom:.5px solid var(--sep)}
+td{padding:12px 8px;border-top:.5px solid var(--sep);text-align:center}
+tbody tr:first-child td{border-top:0}
+.sum{cursor:pointer;font-weight:600}
+.sum td:first-child{text-align:left;padding-left:16px}
+.sum td:first-child:before{content:"›";display:inline-block;width:16px;color:var(--mu);font-size:18px;transition:transform .2s}
+.sum.open td:first-child:before{transform:rotate(90deg)}
+.det td{font-size:13px;color:var(--mu2);background:var(--fill);border-top:.5px solid var(--sep)}
+.det td:first-child{padding-left:30px;text-align:left}
+
+/* 비밀번호 입장 */
+#gate{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+#gate .box{width:100%;max-width:320px;text-align:center}
+#gate .ico{font-size:44px;margin-bottom:10px}
+#gate h2{font-size:22px;font-weight:700;margin:0 0 6px;letter-spacing:-.02em}
+#gate p{font-size:14px;color:var(--mu);margin:0 0 22px}
+#gate input{width:100%;height:46px;border:0;border-radius:12px;background:var(--card);color:var(--tx);font-size:17px;text-align:center;font-family:inherit;outline:none;box-shadow:var(--shadow);letter-spacing:.1em}
+#gate button{width:100%;height:46px;margin-top:12px;border:0;border-radius:12px;background:var(--ac);color:#fff;font-size:17px;font-weight:600;font-family:inherit;cursor:pointer}
+#gate button:disabled{opacity:.5}
+#gate .m{min-height:20px;margin-top:12px;font-size:13px;color:#ff3b30}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+#gate .shake{animation:shake .35s}
+#app{display:none}
+</style>
+</head>
+<body>
+<div id="gate">
+  <div class="box" id="gbox">
+    <div class="ico">🔒</div>
+    <h2>비밀번호 입력</h2>
+    <p>담당자 전용 페이지입니다.</p>
+    <input type="password" id="pw" placeholder="비밀번호" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <button id="enter">입장</button>
+    <div class="m" id="gm"></div>
+  </div>
+</div>
+
+<div id="app"><div class="wrap">
+  <div class="nav">
+    <span class="cap">전문자원활동가</span>
+    <button class="link" id="rf">새로고침</button>
+  </div>
+  <h1>출석 현황</h1>
+  <div id="err"></div>
+
+  <div class="group"><div class="stats">
+    <div class="stat"><b id="sN">–</b><span>활동가</span></div>
+    <div class="stat"><b id="sC">–</b><span>총 활동(회)</span></div>
+    <div class="stat"><b id="sH">–</b><span>총 시간(h)</span></div>
+  </div></div>
+
+  <div class="sec">필터</div>
+  <div class="group">
+    <label class="search"><i>🔍</i><input id="q" placeholder="성명 검색" autocomplete="off"></label>
+    <div class="row"><span>기간</span><select id="mon"><option value="">전체 기간</option></select></div>
+  </div>
+
+  <div class="sec">종합순위</div>
+  <div class="group" style="padding-bottom:0">
+    <div class="seg" id="tabs">
+      <button data-m="all" class="on">전체</button>
+      <button data-m="place">장소별</button>
+      <button data-m="count">횟수</button>
+      <button data-m="hours">시간</button>
+      <button data-m="level">레벨</button>
+    </div>
+    <div id="placeWrap"><div class="row"><span>활동장소</span><select id="placeSel"></select></div></div>
+    <div class="podium" id="podium"></div>
+    <div id="rank" style="margin-top:8px"></div>
+    <details class="guide" id="guide"><summary>레벨·점수 안내</summary><div class="gbody" id="guideBody"></div></details>
+  </div>
+
+  <div class="sec">활동가별 누적</div>
+  <div class="group"><div class="scroll"><table>
+    <thead><tr><th style="text-align:left;padding-left:16px">성명</th><th>횟수</th><th>누적 시간</th></tr></thead>
+    <tbody id="list"></tbody>
+  </table></div></div>
+
+  <div class="sec">활동장소별</div>
+  <div class="group"><div class="scroll"><table>
+    <thead><tr><th style="text-align:left;padding-left:16px">장소</th><th>횟수</th><th>시간</th></tr></thead>
+    <tbody id="places"></tbody>
+  </table></div></div>
+</div></div>
+
+<script>
+// ▼ 여기만 수정하세요: 활동가별 출석부 웹앱(앱스 스크립트) URL을 모두 나열 ▼
+const ALL_URLS = [
+  "https://script.google.com/macros/s/AKfycbwvXVegJ2qFIrCeJdzbFjdLu28LnJWL6OKAz_8MDfgTX9R9sfl0YMMzHJAT8D9OCJPc/exec",
+  // "https://script.google.com/macros/s/.../exec",  // 활동가 2
+  // "https://script.google.com/macros/s/.../exec",  // 활동가 3
+];
+// ▲▲▲
+
+// 점수: 시간×PT_H + 횟수×PT_C / 레벨: 전체 누적 시간 기준
+const PT_H = 10, PT_C = 5;
+const LEVELS = [
+  { h: 0,   e: "🌱", n: "새싹",   d: "활동을 시작한 단계예요." },
+  { h: 10,  e: "🌿", n: "열정",   d: "꾸준히 현장에 함께하는 단계예요." },
+  { h: 30,  e: "🌳", n: "든든",   d: "현장의 든든한 버팀목이 된 단계예요." },
+  { h: 60,  e: "⭐", n: "스타",   d: "모두가 인정하는 베테랑 활동가예요." },
+  { h: 100, e: "👑", n: "레전드", d: "최고 레벨! 아웃리치의 전설이에요." },
+];
+const lvOf = h => { let i = 0; LEVELS.forEach((l, k) => { if (h >= l.h) i = k; }); return i; };
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const r1 = n => Math.round(n * 10) / 10;
+let DATA = [];                       // [{name, recs}]
+const open = new Set();
+
+function load() {
+  $("rf").disabled = true; $("err").textContent = "";
+  const urls = [...new Set(ALL_URLS)];
+  Promise.allSettled(urls.map(u => fetch(u).then(r => r.json()))).then(rs => {
+    const failed = [];
+    DATA = [];
+    rs.forEach((r, i) => {
+      if (r.status !== "fulfilled" || r.value.error || !r.value.records) { failed.push(i + 1); return; }
+      DATA.push({ name: r.value.name || ("활동가 " + (i + 1)), recs: r.value.records });
+    });
+    if (failed.length) $("err").textContent = "불러오지 못한 출석부: " + failed.join(", ") + "번째 URL 확인 (배포 권한·URL)";
+    const months = [...new Set(DATA.flatMap(p => p.recs.map(x => String(x.date).slice(0, 7))))].sort().reverse();
+    const cur = $("mon").value;
+    $("mon").innerHTML = '<option value="">전체 기간</option>' + months.map(m => `<option>${esc(m)}</option>`).join("");
+    $("mon").value = months.includes(cur) ? cur : "";
+    render();
+    $("rf").disabled = false;
+  });
+}
+
+let sortMode = "all";
+const metric = (p, m) => m === "count" ? p.recs.length + "회" : m === "hours" ? p.hours + "h" :
+  m === "place" ? p.recs.length + "회·" + p.hours + "h" : p.pts + "점";
+function renderRank(list) {
+  const medal = ["🥇", "🥈", "🥉"];
+  let src = list;
+  // 활동장소별: 장소 선택 후 해당 장소 기록만으로 순위
+  const sel = $("placeSel");
+  $("placeWrap").style.display = sortMode === "place" ? "block" : "none";
+  if (sortMode === "place") {
+    const places = [...new Set(list.flatMap(p => p.recs.map(x => x.place || "(미기재)")))];
+    const cur = sel.value;
+    sel.innerHTML = places.map(k => `<option>${esc(k)}</option>`).join("");
+    sel.value = places.includes(cur) ? cur : (places[0] || "");
+    src = list.map(p => {
+      const recs = p.recs.filter(x => (x.place || "(미기재)") === sel.value);
+      const hours = r1(recs.reduce((s, x) => s + Number(x.hours || 0), 0));
+      return { ...p, recs, hours, pts: Math.round(hours * PT_H + recs.length * PT_C) };
+    }).filter(p => p.recs.length);
+  }
+  const people = [...src].sort((a, b) =>
+    sortMode === "count" ? (b.recs.length - a.recs.length || b.hours - a.hours || b.pts - a.pts) :
+    (sortMode === "hours" || sortMode === "place") ? (b.hours - a.hours || b.recs.length - a.recs.length || b.pts - a.pts) :
+    sortMode === "level" ? (lvOf(b.total) - lvOf(a.total) || b.pts - a.pts || b.hours - a.hours) :
+    (b.pts - a.pts || b.hours - a.hours || b.recs.length - a.recs.length));
+  const top = people.slice(0, 3);
+  const order = [1, 0, 2].filter(i => top[i]);          // 2등-1등-3등 배치
+  $("podium").innerHTML = top.length ? order.map(i => {
+    const p = top[i];
+    return `<div class="pod p${i + 1}"><div class="av">${medal[i]}</div><div class="nm">${esc(p.name)}</div><div class="pt">${metric(p, sortMode)}</div><div class="bar">${i + 1}</div></div>`;
+  }).join("") : "";
+  $("rank").innerHTML = people.length ? people.map((p, i) => {
+    const li = lvOf(p.total), L = LEVELS[li], N = LEVELS[li + 1];
+    const pct = N ? Math.min(100, Math.round((p.total - L.h) / (N.h - L.h) * 100)) : 100;
+    const nxt = N ? `다음 레벨까지 ${r1(N.h - p.total)}h` : "최고 레벨 달성";
+    return `<div class="rk"><div class="no">${i < 3 ? medal[i] : i + 1}</div><div class="mid">
+      <div class="top"><span>${esc(p.name)}</span><span class="lv">${L.e} Lv.${li + 1} ${L.n}</span></div>
+      <div class="meter"><i style="width:${pct}%"></i></div>
+      <div class="sub2">${p.recs.length}회 · ${p.hours}h · ${p.pts}점 · ${nxt}</div></div>
+      <div class="score">${metric(p, sortMode)}</div></div>`;
+  }).join("") : '<div class="empty">표시할 기록이 없습니다.</div>';
+  const cnt = LEVELS.map(() => 0);
+  list.forEach(p => cnt[lvOf(p.total)]++);
+  $("guideBody").innerHTML =
+    '<h4>레벨 단계 (전체 누적 활동시간 기준)</h4>' +
+    LEVELS.map((l, i) => {
+      const nx = LEVELS[i + 1];
+      return `<div class="g"><div class="ge">${l.e}</div><div class="gm"><b>Lv.${i + 1} ${l.n}</b><span>${l.d}</span></div>` +
+        `<div class="gh">${l.h}h${nx ? " ~ " + nx.h + "h 미만" : " 이상"}<small>현재 ${cnt[i]}명</small></div></div>`;
+    }).join("") +
+    '<h4>점수 계산</h4><ul>' +
+    `<li>점수 = 활동시간 ×${PT_H} + 활동횟수 ×${PT_C}</li>` +
+    `<li>예) 3시간씩 4회 활동 → 12h×${PT_H} + 4회×${PT_C} = ${12 * PT_H + 4 * PT_C}점</li>` +
+    '<li>전체: 점수가 높은 순 → 같으면 활동시간 순</li>' +
+    '<li>장소별: 장소를 고르면 그 장소의 활동시간 순 → 같으면 횟수 순</li>' +
+    '<li>횟수: 총 활동 횟수가 많은 순 → 같으면 활동시간 순</li>' +
+    '<li>시간: 총 활동시간이 많은 순 → 같으면 활동 횟수 순</li>' +
+    '<li>레벨: 레벨이 높은 순 → 같으면 점수 순</li>' +
+    '<li>월별로 선택하면 해당 월의 횟수·시간·점수로 순위가 매겨집니다.</li>' +
+    '<li>레벨은 월 선택과 관계없이 전체 누적 시간으로 정해집니다.</li></ul>';
+}
+
+function render() {
+  const q = $("q").value.trim(), mon = $("mon").value;
+  const people = DATA.filter(p => !q || p.name.includes(q)).map(p => {
+    const recs = p.recs.filter(x => !mon || String(x.date).startsWith(mon));
+    const total = r1(p.recs.reduce((s, x) => s + Number(x.hours || 0), 0));
+    const hours = r1(recs.reduce((s, x) => s + Number(x.hours || 0), 0));
+    return { name: p.name, recs, hours, total, pts: Math.round(hours * PT_H + recs.length * PT_C) };
+  }).filter(p => p.recs.length || !mon).sort((a, b) => b.pts - a.pts || b.hours - a.hours);
+  renderRank(people);
+
+  $("sN").textContent = people.length;
+  $("sC").textContent = people.reduce((s, p) => s + p.recs.length, 0);
+  $("sH").textContent = r1(people.reduce((s, p) => s + p.hours, 0));
+
+  $("list").innerHTML = people.length ? people.map((p, i) => {
+    const o = open.has(p.name);
+    return `<tr class="sum${o ? " open" : ""}" data-n="${esc(p.name)}"><td>${esc(p.name)}</td><td>${p.recs.length}회</td><td>${p.hours}h</td></tr>` +
+      p.recs.map(r => `<tr class="det" style="display:${o ? "table-row" : "none"}"><td>${esc(r.date)}</td><td>${esc(r.place)}</td><td>${esc(r.hours)}h</td></tr>`).join("");
+  }).join("") : '<tr><td colspan="3" class="empty">표시할 기록이 없습니다.</td></tr>';
+  document.querySelectorAll("#list .sum").forEach(tr => tr.onclick = () => {
+    const n = tr.dataset.n; open.has(n) ? open.delete(n) : open.add(n); render();
+  });
+
+  const pl = {};
+  people.forEach(p => p.recs.forEach(x => {
+    const k = x.place || "(미기재)"; pl[k] = pl[k] || { c: 0, h: 0 };
+    pl[k].c++; pl[k].h += Number(x.hours || 0);
+  }));
+  const rows = Object.entries(pl).sort((a, b) => b[1].c - a[1].c);
+  $("places").innerHTML = rows.length ? rows.map(([k, v]) => `<tr><td style="text-align:left;padding-left:16px">${esc(k)}</td><td>${v.c}회</td><td>${r1(v.h)}h</td></tr>`).join("")
+    : '<tr><td colspan="3" class="empty">기록 없음</td></tr>';
+}
+
+document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => {
+  sortMode = b.dataset.m;
+  document.querySelectorAll("#tabs button").forEach(x => x.classList.toggle("on", x === b));
+  render();
+});
+$("placeSel").onchange = render;
+$("q").oninput = $("mon").onchange = render;
+$("rf").onclick = load;
+// ── 비밀번호 입장 (SHA-256 해시 비교) ──
+const PW_HASH = "d6833131efd466b90c0802f36aaaf1d142314443754c4b99080959882ddb3149";
+async function sha(t) {
+  const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t));
+  return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join("");
+}
+function unlock() {
+  $("gate").style.display = "none";
+  $("app").style.display = "block";
+  load();
+}
+async function tryEnter() {
+  const m = $("gm");
+  if (!window.crypto || !crypto.subtle) { m.textContent = "https 주소(GitHub Pages)에서 열어 주세요."; return; }
+  $("enter").disabled = true;
+  try {
+    if (await sha($("pw").value) === PW_HASH) {
+      try { sessionStorage.setItem("att_ok", "1"); } catch (e) {}
+      unlock(); return;
+    }
+  } catch (e) {}
+  m.textContent = "비밀번호가 올바르지 않습니다.";
+  $("gbox").classList.remove("shake"); void $("gbox").offsetWidth; $("gbox").classList.add("shake");
+  $("pw").value = ""; $("pw").focus();
+  $("enter").disabled = false;
+}
+$("enter").onclick = tryEnter;
+$("pw").onkeydown = e => { if (e.key === "Enter") tryEnter(); };
+let ok = false;
+try { ok = sessionStorage.getItem("att_ok") === "1"; } catch (e) {}
+if (ok) unlock(); else $("pw").focus();
+
+</script>
+</body>
+</html>
