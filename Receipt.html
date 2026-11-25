@@ -277,9 +277,10 @@ $('calClose').onclick = () => cal.close();
 
 /* ---------- 관계 ---------- */
 function updateRel() {
-  const self = val('role') === '본인';
-  if (self) setRadio('rel', '본인');   // 수령인이 본인이면 관계는 본인만 가능
-  document.querySelectorAll('input[name=rel]').forEach(r => r.disabled = self && r.value !== '본인');
+  const self = val('role') === '본인', proxy = val('role') === '대리인';
+  if (self) setRadio('rel', '본인');                    // 본인 → 관계는 본인만 가능
+  if (proxy && val('rel') === '본인') setRadio('rel', ''); // 대리인 → 본인 선택 불가, 다시 고르게 함
+  document.querySelectorAll('input[name=rel]').forEach(r => r.disabled = (self && r.value !== '본인') || (proxy && r.value === '본인'));
   const t = val('rel'), e = $('relEtc');
   e.style.display = (t === '동거인' || t === '기타') ? 'block' : 'none';
   e.placeholder = t === '동거인' ? '세부 관계 (예: 부, 모, 친구, 연인)' : '기타 관계 직접 입력';
@@ -388,6 +389,7 @@ $('btnSave').onclick = async () => {
   if (!d.role) return show('수령인(본인/대리인)을 선택하세요.');
   if (!d.name) return show('성명을 입력하세요.');
   if (!d.phone) return show('연락처를 입력하세요.');
+  if (!d.relType) return show('본인과의 관계를 선택하세요.');
   if (d.role === '대리인' && d.relType === '본인') return show('대리인인 경우 "본인과의 관계"를 동거인 또는 기타로 선택하세요.');
   if (d.relType === '기타' && !d.relEtc) return show('기타 관계를 입력하세요.');
   if (!d.consent) return show('개인정보 동의 여부를 선택하세요.');
