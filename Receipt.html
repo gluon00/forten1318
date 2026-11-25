@@ -343,7 +343,7 @@ function collect() {
     role: val('role'), relType: val('rel'), relEtc: $('relEtc').value.trim(),
     name: $('name').value.trim(), phone: fmtPhone($('phone').value),
     birth: $('birth').value, addr: $('addr').value.trim(),
-    items, place: $('place').value.trim(), date: $('date').value,
+    items, place: $('place').value.trim(), date: birthToText($('date').value),
     consent: val('consent'),
     sigReceiver: sigR.data(), sigChecker: sigC.data()
   };
@@ -355,7 +355,7 @@ function fill(d) {
   setBirth(birthToIso(d.birth)); $('addr').value = d.addr || '';
   $('items').innerHTML = '';
   (d.items && d.items.length ? d.items : [{}]).forEach(addRow);
-  $('place').value = d.place || ''; $('date').value = d.date || today();
+  $('place').value = d.place || ''; $('date').value = birthToIso(d.date) || today();
   setRadio('consent', d.consent || '');
   sigR.load(d.sigReceiver); sigC.load(d.sigChecker);
 }
