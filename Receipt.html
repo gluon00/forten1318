@@ -40,6 +40,8 @@
   .seg { flex:1; position:relative; }
   .seg input { position:absolute; opacity:0; inset:0; margin:0; cursor:pointer; }
   .seg span { display:block; text-align:center; padding:10px 6px; font-size:15px; font-weight:500; border-radius:10px; color:#4b5f5c; transition:all .18s; }
+  .seg input:disabled { cursor:not-allowed; }
+  .seg input:disabled + span { opacity:.35; }
   .seg input:checked + span { background:#fff; color:var(--ink); font-weight:600; box-shadow:0 2px 6px rgba(35,35,63,.14); }
   .seg input:focus-visible + span { outline:3px solid var(--pri); outline-offset:1px; }
   .seg-group.consent .seg input[value=Y]:checked + span { background:var(--pri); color:var(--ink); }
@@ -275,6 +277,9 @@ $('calClose').onclick = () => cal.close();
 
 /* ---------- 관계 ---------- */
 function updateRel() {
+  const self = val('role') === '본인';
+  if (self) setRadio('rel', '본인');   // 수령인이 본인이면 관계는 본인만 가능
+  document.querySelectorAll('input[name=rel]').forEach(r => r.disabled = self && r.value !== '본인');
   const t = val('rel'), e = $('relEtc');
   e.style.display = (t === '동거인' || t === '기타') ? 'block' : 'none';
   e.placeholder = t === '동거인' ? '세부 관계 (예: 부, 모, 친구, 연인)' : '기타 관계 직접 입력';
@@ -287,6 +292,8 @@ document.querySelectorAll('input[name=role]').forEach(r => r.addEventListener('c
 }));
 function val(n) { const e = document.querySelector('input[name=' + n + ']:checked'); return e ? e.value : ''; }
 function setRadio(n, v) { document.querySelectorAll('input[name=' + n + ']').forEach(e => e.checked = (e.value === v)); }
+
+updateRel();   // 처음 화면: 본인 선택 상태 반영
 
 /* ---------- 지급품 행 ---------- */
 function addRow(v) {
