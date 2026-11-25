@@ -274,12 +274,16 @@ $('calClear').onclick = () => { setBirth(''); cal.close(); };
 $('calClose').onclick = () => cal.close();
 
 /* ---------- 관계 ---------- */
-document.querySelectorAll('input[name=rel]').forEach(r => r.addEventListener('change', () => {
-  $('relEtc').style.display = val('rel') === '기타' ? 'block' : 'none';
-}));
+function updateRel() {
+  const t = val('rel'), e = $('relEtc');
+  e.style.display = (t === '동거인' || t === '기타') ? 'block' : 'none';
+  e.placeholder = t === '동거인' ? '세부 관계 (예: 부, 모, 친구, 연인)' : '기타 관계 직접 입력';
+  if (t === '본인') e.value = '';
+}
+document.querySelectorAll('input[name=rel]').forEach(r => r.addEventListener('change', updateRel));
 document.querySelectorAll('input[name=role]').forEach(r => r.addEventListener('change', () => {
   if (val('role') === '본인') setRadio('rel', '본인');
-  $('relEtc').style.display = val('rel') === '기타' ? 'block' : 'none';
+  updateRel();
 }));
 function val(n) { const e = document.querySelector('input[name=' + n + ']:checked'); return e ? e.value : ''; }
 function setRadio(n, v) { document.querySelectorAll('input[name=' + n + ']').forEach(e => e.checked = (e.value === v)); }
@@ -340,7 +344,7 @@ function collect() {
     note: r.querySelector('.i-note').value.trim()
   })).filter(i => i.item || i.qty || i.note);
   return {
-    role: val('role'), relType: val('rel'), relEtc: $('relEtc').value.trim(),
+    role: val('role'), relType: (val('rel') === '동거인' && $('relEtc').value.trim()) ? '동거인 - ' + $('relEtc').value.trim() : val('rel'), relEtc: $('relEtc').value.trim(),
     name: $('name').value.trim(), phone: fmtPhone($('phone').value),
     birth: $('birth').value, addr: $('addr').value.trim(),
     items, place: $('place').value.trim(), date: birthToText($('date').value),
@@ -349,8 +353,11 @@ function collect() {
   };
 }
 function fill(d) {
-  setRadio('role', d.role || '본인'); setRadio('rel', d.relType || '본인');
-  $('relEtc').value = d.relEtc || ''; $('relEtc').style.display = d.relType === '기타' ? 'block' : 'none';
+  setRadio('role', d.role || '본인');
+  const rm = /^동거인\s*-\s*(.*)$/.exec(d.relType || '');
+  setRadio('rel', rm ? '동거인' : (d.relType || '본인'));
+  $('relEtc').value = rm ? rm[1] : (d.relEtc || '');
+  updateRel();
   $('name').value = d.name || ''; $('phone').value = fmtPhone(d.phone || '');
   setBirth(birthToIso(d.birth)); $('addr').value = d.addr || '';
   $('items').innerHTML = '';
