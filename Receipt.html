@@ -81,6 +81,18 @@
   dialog li:active { background:var(--mint); }
   small.cur { color:#2f6f66; font-size:13px; }
   small.cur a { color:#6b6cf0; }
+  dialog#cal { padding:14px; width:min(94vw,380px); }
+  .cal-nav { display:grid; grid-template-columns:36px 36px 1fr 78px 36px 36px; gap:4px; align-items:center; margin-bottom:10px; }
+  .cal-nav button { height:38px; border:0; border-radius:10px; background:var(--mint); font-size:18px; font-weight:600; color:var(--ink); cursor:pointer; }
+  .cal-nav select { height:38px; border:0; border-radius:10px; background:#f6f5f2; font-size:16px; font-weight:600; font-family:inherit; color:var(--ink); padding:0 6px; width:100%; }
+  .cal-week, .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; text-align:center; }
+  .cal-week span { font-size:12px; color:var(--sub); padding:4px 0; }
+  .cal-week span:first-child { color:var(--coral); }
+  .cal-grid button { aspect-ratio:1; border:0; border-radius:50%; background:transparent; font-size:16px; font-family:inherit; color:var(--ink); cursor:pointer; }
+  .cal-grid button:active { background:var(--mint); }
+  .cal-grid button.sel { background:var(--pri); font-weight:700; }
+  .cal-grid button.sun { color:var(--coral); }
+  .cal-grid button:disabled { color:#c9c9d4; cursor:default; }
   @media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
 </style>
 </head>
@@ -109,7 +121,7 @@
     <input type="text" id="relEtc" placeholder="기타 관계 직접 입력" style="display:none;margin-top:8px">
     <label class="f">성명</label><input type="text" id="name" autocomplete="name">
     <label class="f">연락처</label><input type="tel" id="phone" placeholder="숫자만 입력 (예: 01012341234)" inputmode="numeric" autocomplete="tel" maxlength="13">
-    <label class="f">생년월일</label><input type="date" id="birth" min="1900-01-01">
+    <label class="f">생년월일</label><input type="text" id="birth" readonly inputmode="none" placeholder="눌러서 달력에서 선택" style="cursor:pointer">
     <label class="f">주소</label><input type="text" id="addr" autocomplete="street-address">
   </div>
 
@@ -156,6 +168,23 @@
   <button class="btn" id="btnSave" type="button">저장 (구글 Docs에 반영)</button>
 </div>
 
+<dialog id="cal">
+  <div class="cal-nav">
+    <button type="button" id="yPrev" aria-label="이전 해">«</button>
+    <button type="button" id="mPrev" aria-label="이전 달">‹</button>
+    <select id="ySel" aria-label="연도"></select>
+    <select id="mSel" aria-label="월"></select>
+    <button type="button" id="mNext" aria-label="다음 달">›</button>
+    <button type="button" id="yNext" aria-label="다음 해">»</button>
+  </div>
+  <div class="cal-week"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+  <div class="cal-grid" id="calGrid"></div>
+  <div class="top" style="margin:12px 0 0">
+    <button class="btn sub" type="button" id="calClear">지우기</button>
+    <button class="btn sub" type="button" id="calClose">닫기</button>
+  </div>
+</dialog>
+
 <dialog id="dlg">
   <b style="font-size:19px">저장된 수령확인증</b>
   <ul id="list"><li>불러오는 중…</li></ul>
@@ -175,7 +204,6 @@ function today() {
   return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
 }
 $('date').value = today();
-$('birth').max = today();
 $('key').value = sessionStorage.getItem('rc_key') || '';
 
 /* ---------- 연락처 자동 하이픈 ---------- */
@@ -205,6 +233,45 @@ function birthToIso(txt) {
   if (!m) return '';
   return m[1] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[3]).slice(-2);
 }
+
+/* ---------- 생년월일 달력 (연·월 이동 가능) ---------- */
+const cal = $('cal'), MIN_Y = 1930, MAX_Y = +today().slice(0, 4);
+let cy = 2010, cm = 0;
+for (let y = MAX_Y; y >= MIN_Y; y--) $('ySel').add(new Option(y + '년', y));
+for (let m = 0; m < 12; m++) $('mSel').add(new Option((m + 1) + '월', m));
+function setBirth(iso) { $('birth').dataset.iso = iso || ''; $('birth').value = birthToText(iso); }
+function renderCal() {
+  cy = Math.min(MAX_Y, Math.max(MIN_Y, cy));
+  $('ySel').value = cy; $('mSel').value = cm;
+  const g = $('calGrid'); g.innerHTML = '';
+  const first = new Date(cy, cm, 1).getDay(), last = new Date(cy, cm + 1, 0).getDate();
+  const sel = $('birth').dataset.iso || '', tdy = today();
+  for (let i = 0; i < first; i++) g.appendChild(document.createElement('span'));
+  for (let d = 1; d <= last; d++) {
+    const iso = cy + '-' + ('0' + (cm + 1)).slice(-2) + '-' + ('0' + d).slice(-2);
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = d;
+    if (iso === sel) b.className = 'sel';
+    else if ((first + d - 1) % 7 === 0) b.className = 'sun';
+    if (iso > tdy) b.disabled = true;
+    b.onclick = () => { setBirth(iso); cal.close(); };
+    g.appendChild(b);
+  }
+}
+function moveMonth(n) { cm += n; while (cm < 0) { cm += 12; cy--; } while (cm > 11) { cm -= 12; cy++; } renderCal(); }
+$('birth').onclick = () => {
+  const iso = $('birth').dataset.iso;
+  if (iso) { cy = +iso.slice(0, 4); cm = +iso.slice(5, 7) - 1; } else { cy = 2010; cm = 0; }
+  renderCal(); cal.showModal();
+};
+$('yPrev').onclick = () => { cy--; renderCal(); };
+$('yNext').onclick = () => { cy++; renderCal(); };
+$('mPrev').onclick = () => moveMonth(-1);
+$('mNext').onclick = () => moveMonth(1);
+$('ySel').onchange = () => { cy = +$('ySel').value; renderCal(); };
+$('mSel').onchange = () => { cm = +$('mSel').value; renderCal(); };
+$('calClear').onclick = () => { setBirth(''); cal.close(); };
+$('calClose').onclick = () => cal.close();
 
 /* ---------- 관계 ---------- */
 document.querySelectorAll('input[name=rel]').forEach(r => r.addEventListener('change', () => {
@@ -275,7 +342,7 @@ function collect() {
   return {
     role: val('role'), relType: val('rel'), relEtc: $('relEtc').value.trim(),
     name: $('name').value.trim(), phone: fmtPhone($('phone').value),
-    birth: birthToText($('birth').value), addr: $('addr').value.trim(),
+    birth: $('birth').value, addr: $('addr').value.trim(),
     items, place: $('place').value.trim(), date: $('date').value,
     consent: val('consent'),
     sigReceiver: sigR.data(), sigChecker: sigC.data()
@@ -285,7 +352,7 @@ function fill(d) {
   setRadio('role', d.role || '본인'); setRadio('rel', d.relType || '본인');
   $('relEtc').value = d.relEtc || ''; $('relEtc').style.display = d.relType === '기타' ? 'block' : 'none';
   $('name').value = d.name || ''; $('phone').value = fmtPhone(d.phone || '');
-  $('birth').value = birthToIso(d.birth); $('addr').value = d.addr || '';
+  setBirth(birthToIso(d.birth)); $('addr').value = d.addr || '';
   $('items').innerHTML = '';
   (d.items && d.items.length ? d.items : [{}]).forEach(addRow);
   $('place').value = d.place || ''; $('date').value = d.date || today();
