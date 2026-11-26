@@ -80,15 +80,9 @@
 
   <section class="panel">
     <h2>참가자</h2>
-    <p class="help">작성 안내: 참여자 전원을 빠짐없이 작성해 주세요. 참가자별로 인적사항, 제공서비스, 상담주제를 선택하고 상담내용을 작성합니다.</p>
+    <p class="help">작성 안내: 참여자 전원을 빠짐없이 작성해 주세요. 참가자별로 인적사항, 제공서비스, 상담주제를 선택하고 상담내용과 평가 및 제언을 작성합니다.</p>
     <div id="participants"></div>
     <button class="btn secondary" type="button" id="addPartBtn">＋ 참가자 추가</button>
-  </section>
-
-  <section class="panel">
-    <h2>평가 및 제언</h2>
-    <p class="help">작성 안내: 청소년 상태에 대한 강사의 제언, 위기개입의 필요성 및 제언 등을 작성해 주세요.</p>
-    <textarea id="evaluation" placeholder="평가 및 제언을 작성"></textarea>
   </section>
 
   <section class="panel">
@@ -198,6 +192,11 @@ function addParticipant() {
     <div class="sec">
       <label class="field">세부내용</label>
       <textarea class="p-detail" placeholder="청소년별 상황, 욕구, 반응, 주요상담내용, 특이사항 등을 작성"></textarea>
+    </div>
+    <div class="sec">
+      <label class="field">평가 및 제언</label>
+      <div class="muted" style="margin:0 0 8px">청소년 상태에 대한 강사의 제언, 위기개입의 필요성 및 제언 등을 작성해 주세요.</div>
+      <textarea class="p-eval" placeholder="평가 및 제언을 작성"></textarea>
     </div>`;
 
   card.addEventListener('change', e => {
@@ -265,9 +264,9 @@ function collectData() {
         return { type: x.value, note: inp ? inp.value.trim() : '' };
       }),
       topics: collectTopics(card, i + 1),
-      detail: card.querySelector('.p-detail').value.trim()
-    })),
-    evaluation: $('evaluation').value.trim()
+      detail: card.querySelector('.p-detail').value.trim(),
+      evaluation: card.querySelector('.p-eval').value.trim()
+    }))
   };
 }
 
